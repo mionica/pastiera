@@ -67,6 +67,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     
     // Flag per tracciare se siamo in un contesto di input valido
     private var isInputViewActive = false
+    
+    // Flag per tracciare se siamo in un campo numerico
+    private var isNumericField = false
 
     private fun refreshStatusBar() {
         updateStatusBarText()
@@ -299,6 +302,14 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         // Segna che siamo in un contesto di input valido solo se il campo è editabile
         isInputViewActive = isEditable
         
+        // Verifica se il campo è numerico
+        isNumericField = info?.let { editorInfo ->
+            val inputType = editorInfo.inputType
+            val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+            inputClass == android.text.InputType.TYPE_CLASS_NUMBER
+        } ?: false
+        Log.d(TAG, "onStartInput() - isNumericField: $isNumericField")
+        
         // Disabilita i suggerimenti per evitare popup
         if (info != null && isEditable) {
             info.inputType = info.inputType or android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
@@ -375,6 +386,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             
             if (isReallyEditable) {
                 isInputViewActive = true
+                // Verifica se il campo è numerico
+                isNumericField = info?.let { editorInfo ->
+                    val inputType = editorInfo.inputType
+                    val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+                    inputClass == android.text.InputType.TYPE_CLASS_NUMBER
+                } ?: false
+                Log.d(TAG, "onStartInputView() - isNumericField: $isNumericField")
                 // Se siamo in nav mode e entriamo in un campo realmente editabile, disattiva il nav mode
                 if (ctrlLatchFromNavMode && ctrlLatchActive) {
                     val inputConnection = currentInputConnection
@@ -410,6 +428,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         Log.d(TAG, "onFinishInput() chiamato - reset degli stati modificatori")
         // Segna che non siamo più in un contesto di input valido
         isInputViewActive = false
+        isNumericField = false
         // Reset degli stati modificatori quando si esce da un campo
         // Preserva Ctrl latch se attivo nel nav mode
         resetModifierStates(preserveNavMode = true)
@@ -919,6 +938,16 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         
         // Controlla se questo tasto ha una mappatura Alt
         if (altSymManager.hasAltMapping(keyCode)) {
+            // Se siamo in un campo numerico, inserisci direttamente il carattere Alt
+            if (isNumericField) {
+                val altChar = altSymManager.getAltMappings()[keyCode]
+                if (altChar != null) {
+                    Log.d(TAG, "Campo numerico: inserimento diretto carattere Alt '$altChar' per keyCode $keyCode")
+                    inputConnection.commitText(altChar, 1)
+                    return true
+                }
+            }
+            // Altrimenti, usa la gestione normale con long press
             altSymManager.handleKeyWithAltMapping(
                 keyCode,
                 event,
