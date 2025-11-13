@@ -24,6 +24,9 @@
     <!-- Swipe to Delete Section -->
     <string name="swipe_to_delete_title">Enable Swipe to Delete</string>
     
+    <!-- Auto Show Keyboard Section -->
+    <string name="auto_show_keyboard_title">Auto Show Keyboard</string>
+    
     <!-- Info Section -->
     <string name="info_title">Information</string>
     <string name="info_description">Settings are automatically saved and immediately applied to the input method.</string>

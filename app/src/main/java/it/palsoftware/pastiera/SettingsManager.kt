@@ -19,6 +19,7 @@ object SettingsManager {
     private const val KEY_AUTO_CAPITALIZE_FIRST_LETTER = "auto_capitalize_first_letter"
     private const val KEY_DOUBLE_SPACE_TO_PERIOD = "double_space_to_period"
     private const val KEY_SWIPE_TO_DELETE = "swipe_to_delete"
+    private const val KEY_AUTO_SHOW_KEYBOARD = "auto_show_keyboard"
     private const val KEY_SYM_MAPPINGS_CUSTOM = "sym_mappings_custom"
     private const val KEY_AUTO_CORRECT_ENABLED = "auto_correct_enabled"
     private const val KEY_AUTO_CORRECT_ENABLED_LANGUAGES = "auto_correct_enabled_languages"
@@ -30,6 +31,7 @@ object SettingsManager {
     private const val DEFAULT_AUTO_CAPITALIZE_FIRST_LETTER = false
     private const val DEFAULT_DOUBLE_SPACE_TO_PERIOD = false
     private const val DEFAULT_SWIPE_TO_DELETE = true
+    private const val DEFAULT_AUTO_SHOW_KEYBOARD = true
     private const val DEFAULT_AUTO_CORRECT_ENABLED = true
     
     /**
@@ -117,6 +119,22 @@ object SettingsManager {
     fun setSwipeToDelete(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_SWIPE_TO_DELETE, enabled)
+            .apply()
+    }
+    
+    /**
+     * Ottiene lo stato dell'attivazione automatica della tastiera quando un campo riceve il focus.
+     */
+    fun getAutoShowKeyboard(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_AUTO_SHOW_KEYBOARD, DEFAULT_AUTO_SHOW_KEYBOARD)
+    }
+    
+    /**
+     * Imposta lo stato dell'attivazione automatica della tastiera quando un campo riceve il focus.
+     */
+    fun setAutoShowKeyboard(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_AUTO_SHOW_KEYBOARD, enabled)
             .apply()
     }
     

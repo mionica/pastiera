@@ -62,6 +62,11 @@ fun SettingsScreen(
         mutableStateOf(SettingsManager.getSwipeToDelete(context))
     }
     
+    // Carica il valore salvato dell'attivazione automatica della tastiera
+    var autoShowKeyboard by remember {
+        mutableStateOf(SettingsManager.getAutoShowKeyboard(context))
+    }
+    
     // Carica il valore salvato dell'auto-correzione
     var autoCorrectEnabled by remember {
         mutableStateOf(SettingsManager.getAutoCorrectEnabled(context))
@@ -322,6 +327,41 @@ fun SettingsScreen(
                         onCheckedChange = { enabled ->
                             swipeToDelete = enabled
                             SettingsManager.setSwipeToDelete(context, enabled)
+                        }
+                    )
+                }
+            }
+            
+            HorizontalDivider()
+            
+            // Auto Show Keyboard
+            Surface(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.TextFields,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.auto_show_keyboard_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Switch(
+                        checked = autoShowKeyboard,
+                        onCheckedChange = { enabled ->
+                            autoShowKeyboard = enabled
+                            SettingsManager.setAutoShowKeyboard(context, enabled)
                         }
                     )
                 }

@@ -38,8 +38,8 @@ object AutoCorrector {
 
     /**
      * Carica le regole di auto-correzione dai file JSON per lingua.
-     * I file devono essere nella cartella assets con nome: auto_corrections_{locale}.json
-     * Esempio: auto_corrections_it.json, auto_corrections_en.json
+     * I file devono essere nella cartella common/autocorrect con nome: auto_corrections_{locale}.json
+     * Esempio: common/autocorrect/auto_corrections_it.json, common/autocorrect/auto_corrections_en.json
      * Supporta anche il caricamento di file JSON personalizzati.
      */
     fun loadCorrections(assets: AssetManager, context: Context? = null) {
@@ -66,7 +66,7 @@ object AutoCorrector {
                     }
                     
                     // Se non ci sono personalizzazioni, carica il file di default
-                    val fileName = "auto_corrections_$locale.json"
+                    val fileName = "common/autocorrect/auto_corrections_$locale.json"
                     val jsonString = assets.open(fileName).bufferedReader().use { it.readText() }
                     loadCorrectionsFromJson(locale, jsonString)
                 } catch (e: Exception) {

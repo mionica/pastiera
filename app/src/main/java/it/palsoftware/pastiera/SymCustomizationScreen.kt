@@ -37,7 +37,7 @@ fun SymCustomizationScreen(
     val defaultMappings = remember {
         // Carica le mappature di default dal JSON
         try {
-            val inputStream = context.assets.open("sym_key_mappings.json")
+            val inputStream = context.assets.open("common/sym/sym_key_mappings.json")
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val jsonObject = org.json.JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")

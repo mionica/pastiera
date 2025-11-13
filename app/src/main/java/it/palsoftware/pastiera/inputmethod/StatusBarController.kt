@@ -148,8 +148,8 @@ class StatusBarController(
             variationsContainer = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.START or Gravity.CENTER_VERTICAL
-                // Usa lo stesso padding sinistro degli altri container per evitare il tasto di collapse
-                setPadding(leftPadding, variationsVerticalPadding, horizontalPadding, variationsVerticalPadding)
+                // Padding speculare: sinistro e destro uguali (64dp)
+                setPadding(leftPadding, variationsVerticalPadding, leftPadding, variationsVerticalPadding)
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     variationsContainerHeight // Altezza fissa invece di WRAP_CONTENT
@@ -692,54 +692,41 @@ class StatusBarController(
      */
     private fun createVariationButton(
         variation: String,
-        inputConnection: android.view.inputmethod.InputConnection?
+        inputConnection: android.view.inputmethod.InputConnection?,
+        buttonWidth: Int
     ): TextView {
-        // Converti dp in pixel (aumentati del 10%)
-        val dp4_4 = TypedValue.applyDimension(
+        // Converti dp in pixel
+        val dp4 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, 
-            4.4f, // 4f * 1.1 (aumentato del 10%)
+            4f,
             context.resources.displayMetrics
         ).toInt()
-        val dp6_6 = TypedValue.applyDimension(
+        val dp6 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, 
-            6.6f, // 6f * 1.1 (aumentato del 10%)
+            6f,
             context.resources.displayMetrics
         ).toInt()
-        val dp8_8 = TypedValue.applyDimension(
+        val dp3 = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, 
-            8.8f, // 8f * 1.1 (aumentato del 10%)
-            context.resources.displayMetrics
-        ).toInt()
-        val borderWidth = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 
-            1.5f, // Bordo più sottile
-            context.resources.displayMetrics
-        ).toInt()
-        val cornerRadius = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 
-            4.4f, // 4f * 1.1 (aumentato del 10%)
-            context.resources.displayMetrics
-        )
-        
-        // Larghezza fissa per tutti i pulsanti (circa 48dp)
-        val buttonWidth = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 
-            48f, 
+            3f, // Spazio ridotto tra i pulsanti
             context.resources.displayMetrics
         ).toInt()
         
-        // Crea il background del pulsante (rettangolo arrotondato)
+        // Altezza fissa per tutti i pulsanti (quadrati, stessa della larghezza)
+        val buttonHeight = buttonWidth
+        
+        // Crea il background del pulsante (rettangolo senza angoli arrotondati, scuro)
         val drawable = GradientDrawable().apply {
-            setColor(Color.argb(180, 255, 255, 255)) // Bianco semi-trasparente
-            setCornerRadius(cornerRadius)
-            setStroke(borderWidth, Color.WHITE) // Bordo bianco più sottile
+            setColor(Color.rgb(17, 17, 17)) // Grigio quasi nero
+            setCornerRadius(0f) // Nessun angolo arrotondato
+            // Nessun bordo
         }
         
-        // Crea un drawable per lo stato pressed (più scuro)
+        // Crea un drawable per lo stato pressed (più chiaro)
         val pressedDrawable = GradientDrawable().apply {
-            setColor(Color.argb(220, 200, 200, 200)) // Grigio più scuro quando premuto
-            setCornerRadius(cornerRadius)
-            setStroke(borderWidth, Color.WHITE)
+            setColor(Color.rgb(38, 0, 255)) // azzurro quando pressed
+            setCornerRadius(0f) // Nessun angolo arrotondato
+            // Nessun bordo
         }
         
         // Crea uno StateListDrawable per gestire gli stati (normale e pressed)
@@ -751,16 +738,17 @@ class StatusBarController(
         val button = TextView(context).apply {
             text = variation
             textSize = 17.6f // 16f * 1.1 (aumentato del 10%)
-            setTextColor(Color.BLACK)
+            setTextColor(Color.WHITE) // Testo bianco
+            setTypeface(null, android.graphics.Typeface.BOLD) // Testo in grassetto
             gravity = Gravity.CENTER
-            // Padding aumentato del 10%
-            setPadding(dp6_6, dp4_4, dp6_6, dp4_4)
+            // Padding
+            setPadding(dp6, dp4, dp6, dp4)
             background = stateListDrawable
             layoutParams = LinearLayout.LayoutParams(
-                buttonWidth, // Larghezza fissa invece di WRAP_CONTENT
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                buttonWidth, // Larghezza calcolata dinamicamente
+                buttonHeight  // Altezza fissa (quadrato)
             ).apply {
-                marginEnd = dp8_8 // Margine a destra tra i pulsanti (aumentato del 10%)
+                marginEnd = dp3 // Margine ridotto tra i pulsanti
             }
             // Rendi il pulsante clickabile
             isClickable = true
@@ -775,6 +763,112 @@ class StatusBarController(
                 onVariationSelectedListener
             )
         )
+        
+        return button
+    }
+    
+    /**
+     * Crea il pulsante microfono placeholder (8° pulsante, sempre presente).
+     */
+    private fun createMicrophoneButton(buttonWidth: Int): TextView {
+        // Converti dp in pixel
+        val dp4 = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 
+            4f,
+            context.resources.displayMetrics
+        ).toInt()
+        val dp6 = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 
+            6f,
+            context.resources.displayMetrics
+        ).toInt()
+        // Altezza fissa per tutti i pulsanti (quadrati, stessa della larghezza)
+        val buttonHeight = buttonWidth
+        
+        // Crea il background del pulsante (rettangolo senza angoli arrotondati, scuro)
+        val drawable = GradientDrawable().apply {
+            setColor(Color.rgb(17, 17, 17)) // Grigio quasi nero
+            setCornerRadius(0f) // Nessun angolo arrotondato
+            // Nessun bordo
+        }
+        
+        // Crea un drawable per lo stato pressed (più chiaro)
+        val pressedDrawable = GradientDrawable().apply {
+            setColor(Color.rgb(38, 0, 255)) // azzurro quando pressed
+            setCornerRadius(0f) // Nessun angolo arrotondato
+            // Nessun bordo
+        }
+        
+        // Crea uno StateListDrawable per gestire gli stati (normale e pressed)
+        val stateListDrawable = android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), pressedDrawable)
+            addState(intArrayOf(), drawable) // Stato normale
+        }
+        
+        val button = TextView(context).apply {
+            text = "🎤" // Icona microfono placeholder
+            textSize = 20f // Dimensione leggermente più grande per l'emoji
+            setTextColor(Color.WHITE)
+            gravity = Gravity.CENTER
+            // Padding
+            setPadding(dp6, dp4, dp6, dp4)
+            background = stateListDrawable
+            layoutParams = LinearLayout.LayoutParams(
+                buttonWidth, // Larghezza calcolata dinamicamente
+                buttonHeight  // Altezza fissa (quadrato)
+            ).apply {
+                marginEnd = 0 // Nessun margine dopo l'ultimo pulsante
+            }
+            // Rendi il pulsante clickabile
+            isClickable = true
+            isFocusable = true
+        }
+        
+        // Listener placeholder (per ora non fa nulla)
+        button.setOnClickListener {
+            // TODO: Implementare funzionalità microfono
+        }
+        
+        return button
+    }
+    
+    /**
+     * Crea un pulsante placeholder trasparente per riempire gli slot vuoti.
+     */
+    private fun createPlaceholderButton(buttonWidth: Int): View {
+        // Larghezza e altezza fissa per tutti i pulsanti (quadrati, circa 48dp)
+        val buttonSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 
+            48f, 
+            context.resources.displayMetrics
+        ).toInt()
+        val dp3 = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 
+            3f, // Spazio ridotto tra i pulsanti
+            context.resources.displayMetrics
+        ).toInt()
+        
+        // Altezza fissa per tutti i pulsanti (quadrati, stessa della larghezza)
+        val buttonHeight = buttonWidth
+        
+        // Crea un background trasparente
+        val drawable = GradientDrawable().apply {
+            setColor(Color.TRANSPARENT) // Completamente trasparente
+            setCornerRadius(0f) // Nessun angolo arrotondato
+        }
+        
+        val button = View(context).apply {
+            background = drawable
+            layoutParams = LinearLayout.LayoutParams(
+                buttonWidth, // Larghezza calcolata dinamicamente
+                buttonHeight  // Altezza fissa (quadrato)
+            ).apply {
+                marginEnd = dp3 // Margine ridotto tra i pulsanti
+            }
+            // Non clickabile
+            isClickable = false
+            isFocusable = false
+        }
         
         return button
     }
@@ -839,20 +933,53 @@ class StatusBarController(
             variationsContainerView.removeAllViews()
             variationButtons.clear()
             
-            // Mostra le variazioni se disponibili
-            if (snapshot.variations.isNotEmpty() && snapshot.lastInsertedChar != null) {
-                // Crea un pulsante per ogni variazione
-                for (variation in snapshot.variations) {
-                    val button = createVariationButton(variation, inputConnection)
-                    variationButtons.add(button)
-                    variationsContainerView.addView(button)
-                }
-                variationsContainerView.visibility = View.VISIBLE
+            // Calcola la larghezza disponibile per i pulsanti
+            val screenWidth = context.resources.displayMetrics.widthPixels
+            val leftPadding = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 
+                64f, 
+                context.resources.displayMetrics
+            ).toInt()
+            val rightPadding = leftPadding // Padding speculare
+            val availableWidth = screenWidth - leftPadding - rightPadding
+            
+            // Calcola la larghezza di ogni pulsante
+            // 8 pulsanti totali (7 variazioni/placeholder + 1 microfono)
+            // 7 spazi tra i pulsanti (ogni spazio è 3dp)
+            val spacingBetweenButtons = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 
+                3f, 
+                context.resources.displayMetrics
+            ).toInt()
+            val totalSpacing = spacingBetweenButtons * 7 // 7 spazi tra 8 pulsanti
+            val buttonWidth = (availableWidth - totalSpacing) / 8
+            
+            // Limita a 7 variazioni (prendi solo le prime 7)
+            val limitedVariations = if (snapshot.variations.isNotEmpty() && snapshot.lastInsertedChar != null) {
+                snapshot.variations.take(7)
             } else {
-                // Nascondi il container ma mantieni lo spazio (INVISIBLE) per mantenere l'altezza costante
-                // L'altezza è già fissa nel layoutParams, quindi INVISIBLE manterrà lo spazio
-                variationsContainerView.visibility = View.INVISIBLE
+                emptyList()
             }
+            
+            // Crea un pulsante per ogni variazione (massimo 7)
+            for (variation in limitedVariations) {
+                val button = createVariationButton(variation, inputConnection, buttonWidth)
+                variationButtons.add(button)
+                variationsContainerView.addView(button)
+            }
+            
+            // Aggiungi pulsanti placeholder trasparenti per riempire fino a 7
+            val placeholderCount = 7 - limitedVariations.size
+            for (i in 0 until placeholderCount) {
+                val placeholderButton = createPlaceholderButton(buttonWidth)
+                variationsContainerView.addView(placeholderButton)
+            }
+            
+            // Aggiungi sempre il pulsante microfono come 8° pulsante
+            val microphoneButton = createMicrophoneButton(buttonWidth)
+            variationsContainerView.addView(microphoneButton)
+            
+            variationsContainerView.visibility = View.VISIBLE
         }
         emojiView.visibility = View.GONE // Sempre nascosto, usiamo la griglia
     }

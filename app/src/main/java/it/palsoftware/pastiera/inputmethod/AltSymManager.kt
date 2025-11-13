@@ -38,7 +38,7 @@ class AltSymManager(
     private var longPressThreshold: Long = 500L
 
     init {
-        altKeyMap.putAll(KeyMappingLoader.loadAltKeyMappings(assets))
+        altKeyMap.putAll(KeyMappingLoader.loadAltKeyMappings(assets, context))
         symKeyMap.putAll(KeyMappingLoader.loadSymKeyMappings(assets))
         reloadLongPressThreshold()
     }

@@ -359,7 +359,7 @@ private fun loadCorrectionsForLanguage(context: Context, languageCode: String): 
     // Poi carica quelle di default dalle assets (solo se non ci sono personalizzazioni)
     if (corrections.isEmpty()) {
         try {
-            val fileName = "auto_corrections_$languageCode.json"
+            val fileName = "common/autocorrect/auto_corrections_$languageCode.json"
             val jsonString = context.assets.open(fileName).bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(jsonString)
             

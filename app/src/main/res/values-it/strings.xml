@@ -24,6 +24,9 @@
     <!-- Swipe to Delete Section -->
     <string name="swipe_to_delete_title">Abilita Swipe per Cancellare</string>
     
+    <!-- Auto Show Keyboard Section -->
+    <string name="auto_show_keyboard_title">Mostra Automaticamente la Tastiera</string>
+    
     <!-- Info Section -->
     <string name="info_title">Informazioni</string>
     <string name="info_description">Le impostazioni vengono salvate automaticamente e applicate immediatamente all\'input method.</string>

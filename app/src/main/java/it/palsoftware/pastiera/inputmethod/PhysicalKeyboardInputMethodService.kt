@@ -84,6 +84,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     
     // Flag per tracciare se siamo in un campo numerico
     private var isNumericField = false
+    
+    // Flag per evitare loop infiniti quando riattiviamo la tastiera ricorsivamente
+    private var isRehandlingKeyAfterReactivation = false
 
     private fun refreshStatusBar() {
         updateStatusBarText()
@@ -152,8 +155,16 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     override fun onCreateInputView(): View? {
         Log.d(TAG, "onCreateInputView() chiamato")
         val layout = statusBarController.getOrCreateLayout(altSymManager.buildEmojiMapText())
+        
+        // Se la view ha già un parent, rimuovila prima di restituirla
+        // Questo evita il crash "The specified child already has a parent"
+        if (layout.parent != null) {
+            Log.d(TAG, "onCreateInputView() - rimuovo la view dal parent esistente")
+            (layout.parent as? android.view.ViewGroup)?.removeView(layout)
+        }
+        
         refreshStatusBar()
-        Log.d(TAG, "onCreateInputView() completato - view creata: ${layout != null}")
+        Log.d(TAG, "onCreateInputView() completato - view creata: ${layout != null}, parent: ${layout.parent}")
         return layout
     }
 
@@ -477,6 +488,28 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             info.inputType = info.inputType or android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         }
         
+        // Attiva automaticamente la tastiera quando un campo editabile riceve il focus (se abilitato nelle impostazioni)
+        if (isEditable && !restarting) {
+            val autoShowKeyboardEnabled = SettingsManager.getAutoShowKeyboard(this)
+            if (autoShowKeyboardEnabled) {
+                // Verifica se il campo è REALMENTE editabile (non solo sembra editabile)
+                val isReallyEditable = info?.let { editorInfo ->
+                    val inputType = editorInfo.inputType
+                    val inputClass = inputType and android.text.InputType.TYPE_MASK_CLASS
+                    // Verifica che sia un tipo di input realmente editabile
+                    inputClass == android.text.InputType.TYPE_CLASS_TEXT ||
+                    inputClass == android.text.InputType.TYPE_CLASS_NUMBER ||
+                    inputClass == android.text.InputType.TYPE_CLASS_PHONE ||
+                    inputClass == android.text.InputType.TYPE_CLASS_DATETIME
+                } ?: false
+                
+                if (isReallyEditable) {
+                    Log.d(TAG, "onStartInput() - campo editabile rilevato, attivazione automatica tastiera (auto_show_keyboard abilitato)")
+                    ensureInputViewCreated()
+                }
+            }
+        }
+        
         // Reset degli stati modificatori quando si entra in un nuovo campo (solo se non è un restart)
         // IMPORTANTE: Disattiva il nav mode SOLO quando si entra in un campo di testo editabile
         // Non disattivarlo quando si passa a un altro elemento UI (come icone, liste, ecc.)
@@ -664,7 +697,18 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     }
 
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
-        val inputConnection = currentInputConnection ?: return super.onKeyLongPress(keyCode, event)
+        // Gestisci il long press anche quando la tastiera è nascosta ma abbiamo un input connection valido
+        val inputConnection = currentInputConnection
+        if (inputConnection == null) {
+            return super.onKeyLongPress(keyCode, event)
+        }
+        
+        // Se la tastiera è nascosta ma abbiamo un input connection, riattivala
+        if (!isInputViewActive) {
+            Log.d(TAG, "Long press rilevato con tastiera nascosta - riattivazione immediata")
+            ensureInputViewCreated()
+            isInputViewActive = true
+        }
         
         // Intercetta i long press PRIMA che Android li gestisca
         if (altSymManager.hasAltMapping(keyCode)) {
@@ -696,51 +740,121 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         
         // Se non siamo in un contesto di input valido, gestisci Ctrl per il nav mode
         // e anche altri tasti se Ctrl latch è attivo (nav mode attivo)
-        if (!isInputViewActive) {
-            if (isCtrlKey) {
-                // Gestisci il nav mode: doppio tap su Ctrl per attivare/disattivare Ctrl latch
-                val (shouldConsume, result) = NavModeHandler.handleCtrlKeyDown(
-                    keyCode,
-                    ctrlPressed,
-                    ctrlLatchActive,
-                    lastCtrlReleaseTime
-                )
+        // Se siamo nella fase di ri-gestione dopo riattivazione, saltiamo questo check
+        if (!isInputViewActive && !isRehandlingKeyAfterReactivation) {
+            // Verifica se abbiamo un input connection valido (siamo su un campo di testo)
+            // ma la tastiera è nascosta (es. dopo aver premuto Back)
+            val inputConnection = currentInputConnection
+            
+            // Se abbiamo un input connection valido ma la tastiera è nascosta,
+            // e stiamo premendo un tasto normale (non modificatore, non Back),
+            // riattiva automaticamente la tastiera
+            if (inputConnection != null && !isCtrlKey && !isBackKey && !ctrlLatchFromNavMode) {
+                // Verifica che sia un tasto che dovrebbe essere gestito dall'IME
+                // (esclude tasti di sistema come HOME, MENU, ecc.)
+                val isRegularKey = (keyCode >= KeyEvent.KEYCODE_A && keyCode <= KeyEvent.KEYCODE_Z) ||
+                                  (keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9) ||
+                                  keyCode == KeyEvent.KEYCODE_SPACE ||
+                                  keyCode == KeyEvent.KEYCODE_ENTER ||
+                                  keyCode == KeyEvent.KEYCODE_DEL ||
+                                  keyCode == KeyEvent.KEYCODE_COMMA ||
+                                  keyCode == KeyEvent.KEYCODE_PERIOD ||
+                                  keyCode == KeyEvent.KEYCODE_SLASH ||
+                                  keyCode == KeyEvent.KEYCODE_SEMICOLON ||
+                                  keyCode == KeyEvent.KEYCODE_APOSTROPHE ||
+                                  keyCode == KeyEvent.KEYCODE_MINUS ||
+                                  keyCode == KeyEvent.KEYCODE_EQUALS ||
+                                  keyCode == KeyEvent.KEYCODE_LEFT_BRACKET ||
+                                  keyCode == KeyEvent.KEYCODE_RIGHT_BRACKET
                 
-                // IMPORTANTE: Applica PRIMA ctrlLatchActive e ctrlLatchFromNavMode
-                // PRIMA di chiamare ensureInputViewCreated(), così quando viene chiamato
-                // onStartInput() o onStartInputView(), il flag è già impostato
-                result.ctrlLatchActive?.let { 
-                    ctrlLatchActive = it
-                    // Se viene attivato nel nav mode, marca il flag PRIMA
-                    if (it) {
-                        ctrlLatchFromNavMode = true
-                        Log.d(TAG, "Nav mode: Ctrl latch attivato, ctrlLatchFromNavMode = true (impostato PRIMA di ensureInputViewCreated)")
-                        // Mostra la notifica quando il nav mode viene attivato
-                        NotificationHelper.showNavModeActivatedNotification(this)
-                    } else {
-                        ctrlLatchFromNavMode = false
-                        Log.d(TAG, "Nav mode: Ctrl latch disattivato, ctrlLatchFromNavMode = false")
-                        // Cancella la notifica quando il nav mode viene disattivato
-                        NotificationHelper.cancelNavModeNotification(this)
-                    }
-                }
-                result.ctrlPhysicallyPressed?.let { ctrlPhysicallyPressed = it }
-                result.lastCtrlReleaseTime?.let { lastCtrlReleaseTime = it }
-                
-                // Aggiorna la status bar PRIMA di mostrare la tastiera
-                updateStatusBarText()
-                
-                if (result.shouldShowKeyboard) {
-                    // Ora che i flag sono impostati, mostra la tastiera
+                if (isRegularKey) {
+                    Log.d(TAG, "Rilevato tasto normale ($keyCode) con tastiera nascosta ma input connection valido - riattivazione immediata")
+                    // Forza la ricreazione della tastiera IMMEDIATAMENTE
                     ensureInputViewCreated()
-                }
-                if (result.shouldHideKeyboard) {
-                    requestHideSelf(0)
-                }
-                
-                if (shouldConsume) {
-                    ctrlPressed = true
+                    // Imposta isInputViewActive a true per permettere la gestione normale del tasto
+                    isInputViewActive = true
+                    
+                    // Consumiamo l'evento per evitare che Android lo gestisca
+                    // e poi chiamiamo ricorsivamente onKeyDown dopo un breve delay per permettere la riattivazione
+                    val savedEvent = event
+                    val savedKeyCode = keyCode
+                    // Usa post invece di postDelayed per eseguire il prima possibile
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        // Dopo che la tastiera è stata riattivata, chiama ricorsivamente onKeyDown
+                        // Questo permetterà alla logica completa di Pastiera di gestire il tasto
+                        if (savedEvent != null) {
+                            // Piccolo delay per assicurarci che la tastiera sia completamente inizializzata
+                            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                                // Imposta il flag per evitare loop infiniti
+                                isRehandlingKeyAfterReactivation = true
+                                // Chiama ricorsivamente onKeyDown con l'evento salvato
+                                onKeyDown(savedKeyCode, savedEvent)
+                                // Reset del flag dopo la gestione
+                                isRehandlingKeyAfterReactivation = false
+                                Log.d(TAG, "KeyEvent ri-gestito dopo riattivazione tastiera (keyCode: $savedKeyCode)")
+                            }, 50) // Delay ridotto a 50ms per una risposta più rapida
+                        }
+                    }
+                    
+                    // Consumiamo l'evento originale per evitare che Android lo gestisca
                     return true
+                } else {
+                    // Non è un tasto regolare, continua con il normale flusso
+                    // Gestisci Ctrl per il nav mode se necessario
+                    if (isCtrlKey) {
+                        // Gestisci il nav mode: doppio tap su Ctrl per attivare/disattivare Ctrl latch
+                        val (shouldConsume, result) = NavModeHandler.handleCtrlKeyDown(
+                            keyCode,
+                            ctrlPressed,
+                            ctrlLatchActive,
+                            lastCtrlReleaseTime
+                        )
+                        
+                        // IMPORTANTE: Applica PRIMA ctrlLatchActive e ctrlLatchFromNavMode
+                        // PRIMA di chiamare ensureInputViewCreated(), così quando viene chiamato
+                        // onStartInput() o onStartInputView(), il flag è già impostato
+                        result.ctrlLatchActive?.let { 
+                            ctrlLatchActive = it
+                            // Se viene attivato nel nav mode, marca il flag PRIMA
+                            if (it) {
+                                ctrlLatchFromNavMode = true
+                                Log.d(TAG, "Nav mode: Ctrl latch attivato, ctrlLatchFromNavMode = true (impostato PRIMA di ensureInputViewCreated)")
+                                // Mostra la notifica quando il nav mode viene attivato
+                                NotificationHelper.showNavModeActivatedNotification(this)
+                            } else {
+                                ctrlLatchFromNavMode = false
+                                Log.d(TAG, "Nav mode: Ctrl latch disattivato, ctrlLatchFromNavMode = false")
+                                // Cancella la notifica quando il nav mode viene disattivato
+                                NotificationHelper.cancelNavModeNotification(this)
+                            }
+                        }
+                        result.ctrlPhysicallyPressed?.let { ctrlPhysicallyPressed = it }
+                        result.lastCtrlReleaseTime?.let { lastCtrlReleaseTime = it }
+                        
+                        // Aggiorna la status bar PRIMA di mostrare la tastiera
+                        updateStatusBarText()
+                        
+                        if (result.shouldShowKeyboard) {
+                            // Ora che i flag sono impostati, mostra la tastiera
+                            ensureInputViewCreated()
+                        }
+                        if (result.shouldHideKeyboard) {
+                            requestHideSelf(0)
+                        }
+                        
+                        if (shouldConsume) {
+                            ctrlPressed = true
+                            return true
+                        }
+                        // Se non consumiamo, passa ad Android
+                        return super.onKeyDown(keyCode, event)
+                    } else if (ctrlLatchActive) {
+                        // Se Ctrl latch è attivo nel nav mode, gestisci i tasti anche senza campo di testo
+                        // Questo permette di usare le combinazioni Ctrl+tasto nel nav mode
+                        return handleCtrlKeyInNavMode(keyCode, event)
+                    }
+                    Log.d(TAG, "onKeyDown() - non siamo in un contesto di input valido, passo l'evento ad Android")
+                    return super.onKeyDown(keyCode, event)
                 }
             } else if (ctrlLatchActive) {
                 // Se Ctrl latch è attivo nel nav mode, gestisci i tasti anche senza campo di testo

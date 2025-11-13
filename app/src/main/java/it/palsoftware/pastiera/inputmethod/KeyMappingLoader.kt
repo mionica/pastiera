@@ -1,5 +1,6 @@
 package it.palsoftware.pastiera.inputmethod
 
+import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
 import android.view.KeyEvent
@@ -11,6 +12,24 @@ import java.io.InputStream
  */
 object KeyMappingLoader {
     private const val TAG = "KeyMappingLoader"
+    
+    /**
+     * Rileva il dispositivo corrente e restituisce il nome della cartella device-specific.
+     * Per ora supporta solo "titan2", ma può essere esteso in futuro.
+     * 
+     * TODO: In futuro implementare il rilevamento automatico basato su Build.MODEL, Build.MANUFACTURER, ecc.
+     */
+    fun getDeviceName(context: Context? = null): String {
+        // Per ora hardcodiamo "titan2" come dispositivo predefinito
+        // In futuro si può implementare il rilevamento automatico:
+        // val model = Build.MODEL.lowercase()
+        // val manufacturer = Build.MANUFACTURER.lowercase()
+        // return when {
+        //     model.contains("titan") && model.contains("2") -> "titan2"
+        //     else -> "default" // o altro dispositivo
+        // }
+        return "titan2"
+    }
     
     /**
      * Mappa comune dei keycode alle costanti KeyEvent.
@@ -64,12 +83,15 @@ object KeyMappingLoader {
     )
     
     /**
-     * Carica le mappature Alt+tasto dal file JSON.
+     * Carica le mappature Alt+tasto dal file JSON device-specific.
+     * I file sono nella cartella devices/{device_name}/alt_key_mappings.json
      */
-    fun loadAltKeyMappings(assets: AssetManager): Map<Int, String> {
+    fun loadAltKeyMappings(assets: AssetManager, context: Context? = null): Map<Int, String> {
         val altKeyMap = mutableMapOf<Int, String>()
         try {
-            val inputStream: InputStream = assets.open("alt_key_mappings.json")
+            val deviceName = getDeviceName(context)
+            val filePath = "devices/$deviceName/alt_key_mappings.json"
+            val inputStream: InputStream = assets.open(filePath)
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
@@ -84,6 +106,7 @@ object KeyMappingLoader {
                     altKeyMap[keyCode] = character
                 }
             }
+            Log.d(TAG, "Caricate mappature Alt per dispositivo: $deviceName")
         } catch (e: Exception) {
             Log.e(TAG, "Errore nel caricamento delle mappature Alt", e)
             // Fallback a mappature di base
@@ -94,12 +117,14 @@ object KeyMappingLoader {
     }
     
     /**
-     * Carica le mappature SYM+tasto dal file JSON.
+     * Carica le mappature SYM+tasto dal file JSON comune.
+     * I file sono nella cartella common/sym/sym_key_mappings.json
      */
     fun loadSymKeyMappings(assets: AssetManager): Map<Int, String> {
         val symKeyMap = mutableMapOf<Int, String>()
         try {
-            val inputStream: InputStream = assets.open("sym_key_mappings.json")
+            val filePath = "common/sym/sym_key_mappings.json"
+            val inputStream: InputStream = assets.open(filePath)
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
@@ -129,12 +154,14 @@ object KeyMappingLoader {
     data class CtrlMapping(val type: String, val value: String)
     
     /**
-     * Carica le mappature Ctrl+tasto dal file JSON.
+     * Carica le mappature Ctrl+tasto dal file JSON comune.
+     * I file sono nella cartella common/ctrl/ctrl_key_mappings.json
      */
     fun loadCtrlKeyMappings(assets: AssetManager): Map<Int, CtrlMapping> {
         val ctrlKeyMap = mutableMapOf<Int, CtrlMapping>()
         try {
-            val inputStream: InputStream = assets.open("ctrl_key_mappings.json")
+            val filePath = "common/ctrl/ctrl_key_mappings.json"
+            val inputStream: InputStream = assets.open(filePath)
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
@@ -193,12 +220,14 @@ object KeyMappingLoader {
     }
     
     /**
-     * Carica le variazioni dei caratteri dal file JSON.
+     * Carica le variazioni dei caratteri dal file JSON comune.
+     * I file sono nella cartella common/variations/variations.json
      */
     fun loadVariations(assets: AssetManager): Map<Char, List<String>> {
         val variationsMap = mutableMapOf<Char, List<String>>()
         try {
-            val inputStream: InputStream = assets.open("variations.json")
+            val filePath = "common/variations/variations.json"
+            val inputStream: InputStream = assets.open(filePath)
             val jsonString = inputStream.bufferedReader().use { it.readText() }
             val jsonObject = JSONObject(jsonString)
             val variationsObject = jsonObject.getJSONObject("variations")
