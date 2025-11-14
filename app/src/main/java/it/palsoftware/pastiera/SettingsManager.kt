@@ -557,7 +557,7 @@ object SettingsManager {
     
     private const val KEY_LAUNCHER_SHORTCUTS = "launcher_shortcuts"
     private const val KEY_LAUNCHER_SHORTCUTS_ENABLED = "launcher_shortcuts_enabled"
-    private const val DEFAULT_LAUNCHER_SHORTCUTS_ENABLED = true
+    private const val DEFAULT_LAUNCHER_SHORTCUTS_ENABLED = false
     
     /**
      * Imposta una scorciatoia del launcher per un tasto (tipo app).

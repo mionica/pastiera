@@ -134,4 +134,38 @@
     <string name="about_github">GitHub</string>
     <string name="about_build_info">Build</string>
     <string name="about_title">About</string>
+    
+    <!-- Launcher Shortcuts Section -->
+    <string name="launcher_shortcuts_title">Launcher Shortcuts</string>
+    <string name="launcher_shortcuts_experimental">Experimental</string>
+    <string name="launcher_shortcuts_description">Enable keyboard shortcuts in the launcher</string>
+    <string name="launcher_shortcuts_configure">Configure Shortcuts</string>
+    <string name="launcher_shortcuts_configure_description">Assign keys to open apps in the launcher</string>
+    
+    <!-- Launcher Shortcuts Screen -->
+    <string name="launcher_shortcuts_screen_title">Launcher Shortcuts</string>
+    <string name="launcher_shortcuts_screen_assign_title">Assign shortcuts to apps</string>
+    <string name="launcher_shortcuts_screen_assign_description">When you are in the launcher and not in a text field, you can press a key to open an assigned app.</string>
+    <string name="launcher_shortcuts_not_assigned">Not assigned</string>
+    <string name="launcher_shortcuts_remove">Remove</string>
+    <string name="launcher_shortcuts_app_name_unavailable">App (name unavailable)</string>
+    <string name="launcher_shortcuts_shortcut_type">Shortcut: %1$s</string>
+    <string name="launcher_shortcuts_shortcut_unknown">unknown</string>
+    <string name="launcher_shortcuts_action_type">Action: %1$s</string>
+    
+    <!-- Launcher Shortcut Assignment Activity -->
+    <string name="launcher_shortcut_assignment_title">Assign app to key</string>
+    <string name="launcher_shortcut_assignment_key">Key %1$s</string>
+    <string name="launcher_shortcut_assignment_search_placeholder">Search apps...</string>
+    <string name="launcher_shortcut_assignment_search_description">Search</string>
+    <string name="launcher_shortcut_assignment_close">Close</string>
+    <string name="launcher_shortcut_assignment_no_apps">No apps found</string>
+    <string name="launcher_shortcut_assignment_no_results">No results for \"%1$s\"</string>
+    <string name="launcher_shortcut_assignment_key_name">Key %1$d</string>
+    
+    <!-- Notification Helper -->
+    <string name="notification_nav_mode_channel_name">Pastiera Nav Mode</string>
+    <string name="notification_nav_mode_channel_description">Notifications for Pastiera nav mode</string>
+    <string name="notification_nav_mode_activated_title">Nav Mode Activated</string>
+    <string name="notification_nav_mode_activated_text">Nav mode activated</string>
 </resources>

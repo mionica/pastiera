@@ -1,6 +1,9 @@
 package it.palsoftware.pastiera
 
+import android.content.Intent
 import android.view.KeyEvent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,6 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.activity.compose.BackHandler
+import androidx.compose.ui.res.stringResource
+import it.palsoftware.pastiera.inputmethod.LauncherShortcutAssignmentActivity
 
 /**
  * Schermata per gestire le scorciatoie del launcher.
@@ -31,7 +36,23 @@ fun LauncherShortcutsScreen(
         mutableStateOf(SettingsManager.getLauncherShortcuts(context))
     }
     
-    var showAppPicker by remember { mutableStateOf<Int?>(null) }
+    // Activity launcher per avviare LauncherShortcutAssignmentActivity
+    val launcherShortcutAssignmentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == LauncherShortcutAssignmentActivity.RESULT_ASSIGNED) {
+            // Aggiorna le scorciatoie dopo l'assegnazione
+            shortcuts = SettingsManager.getLauncherShortcuts(context)
+        }
+    }
+    
+    // Funzione helper per avviare l'activity di assegnazione
+    fun launchShortcutAssignment(keyCode: Int) {
+        val intent = Intent(context, LauncherShortcutAssignmentActivity::class.java).apply {
+            putExtra(LauncherShortcutAssignmentActivity.EXTRA_KEY_CODE, keyCode)
+        }
+        launcherShortcutAssignmentLauncher.launch(intent)
+    }
     
     BackHandler {
         onBack()
@@ -52,11 +73,11 @@ fun LauncherShortcutsScreen(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Indietro"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
             Text(
-                text = "Scorciatoie Launcher",
+                text = stringResource(R.string.launcher_shortcuts_screen_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 4.dp)
@@ -79,12 +100,12 @@ fun LauncherShortcutsScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Assegna scorciatoie alle app",
+                    text = stringResource(R.string.launcher_shortcuts_screen_assign_title),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Quando sei nel launcher e non in un campo di testo, puoi premere un tasto per aprire un'app assegnata.",
+                    text = stringResource(R.string.launcher_shortcuts_screen_assign_description),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -136,7 +157,7 @@ fun LauncherShortcutsScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                         .clickable {
-                            showAppPicker = keyCode
+                            launchShortcutAssignment(keyCode)
                         }
                 ) {
                     Row(
@@ -164,17 +185,17 @@ fun LauncherShortcutsScreen(
                                     text = if (shortcut != null) {
                                         when (shortcut.type) {
                                             SettingsManager.LauncherShortcut.TYPE_APP -> {
-                                                shortcut.appName ?: "App (nome non disponibile)"
+                                                shortcut.appName ?: stringResource(R.string.launcher_shortcuts_app_name_unavailable)
                                             }
                                             SettingsManager.LauncherShortcut.TYPE_SHORTCUT -> {
-                                                "Scorciatoia: ${shortcut.action ?: "sconosciuta"}"
+                                                stringResource(R.string.launcher_shortcuts_shortcut_type, shortcut.action ?: stringResource(R.string.launcher_shortcuts_shortcut_unknown))
                                             }
                                             else -> {
-                                                "Azione: ${shortcut.type}"
+                                                stringResource(R.string.launcher_shortcuts_action_type, shortcut.type)
                                             }
                                         }
                                     } else {
-                                        "Non assegnato"
+                                        stringResource(R.string.launcher_shortcuts_not_assigned)
                                     },
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = if (shortcut != null) {
@@ -199,26 +220,13 @@ fun LauncherShortcutsScreen(
                                     shortcuts = SettingsManager.getLauncherShortcuts(context)
                                 }
                             ) {
-                                Text("Rimuovi")
+                                Text(stringResource(R.string.launcher_shortcuts_remove))
                             }
                         }
                     }
                 }
             }
         }
-    }
-    
-    // Dialog per selezionare l'app
-    if (showAppPicker != null) {
-        AppPickerDialog(
-            onAppSelected = { app ->
-                val keyCode = showAppPicker!!
-                SettingsManager.setLauncherShortcut(context, keyCode, app.packageName, app.appName)
-                shortcuts = SettingsManager.getLauncherShortcuts(context)
-                showAppPicker = null
-            },
-            onDismiss = { showAppPicker = null }
-        )
     }
 }
 

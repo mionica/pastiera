@@ -80,5 +80,39 @@
     <string name="long_press_modifier_description">Scegli se il long press simula Alt+tasto o Shift+tasto</string>
     <string name="long_press_modifier_alt">Alt</string>
     <string name="long_press_modifier_shift">Shift</string>
+    
+    <!-- Launcher Shortcuts Section -->
+    <string name="launcher_shortcuts_title">Scorciatoie Launcher</string>
+    <string name="launcher_shortcuts_experimental">Experimental</string>
+    <string name="launcher_shortcuts_description">Abilita le scorciatoie da tastiera nel launcher</string>
+    <string name="launcher_shortcuts_configure">Configura scorciatoie</string>
+    <string name="launcher_shortcuts_configure_description">Assegna tasti per aprire app nel launcher</string>
+    
+    <!-- Launcher Shortcuts Screen -->
+    <string name="launcher_shortcuts_screen_title">Scorciatoie Launcher</string>
+    <string name="launcher_shortcuts_screen_assign_title">Assegna scorciatoie alle app</string>
+    <string name="launcher_shortcuts_screen_assign_description">Quando sei nel launcher e non in un campo di testo, puoi premere un tasto per aprire un\'app assegnata.</string>
+    <string name="launcher_shortcuts_not_assigned">Non assegnato</string>
+    <string name="launcher_shortcuts_remove">Rimuovi</string>
+    <string name="launcher_shortcuts_app_name_unavailable">App (nome non disponibile)</string>
+    <string name="launcher_shortcuts_shortcut_type">Scorciatoia: %1$s</string>
+    <string name="launcher_shortcuts_shortcut_unknown">sconosciuta</string>
+    <string name="launcher_shortcuts_action_type">Azione: %1$s</string>
+    
+    <!-- Launcher Shortcut Assignment Activity -->
+    <string name="launcher_shortcut_assignment_title">Assegna app al tasto</string>
+    <string name="launcher_shortcut_assignment_key">Tasto %1$s</string>
+    <string name="launcher_shortcut_assignment_search_placeholder">Cerca app...</string>
+    <string name="launcher_shortcut_assignment_search_description">Cerca</string>
+    <string name="launcher_shortcut_assignment_close">Chiudi</string>
+    <string name="launcher_shortcut_assignment_no_apps">Nessuna app trovata</string>
+    <string name="launcher_shortcut_assignment_no_results">Nessun risultato per \"%1$s\"</string>
+    <string name="launcher_shortcut_assignment_key_name">Tasto %1$d</string>
+    
+    <!-- Notification Helper -->
+    <string name="notification_nav_mode_channel_name">Pastiera Nav Mode</string>
+    <string name="notification_nav_mode_channel_description">Notifiche per il nav mode di Pastiera</string>
+    <string name="notification_nav_mode_activated_title">Nav Mode Attivato</string>
+    <string name="notification_nav_mode_activated_text">Nav mode attivato</string>
 </resources>
 

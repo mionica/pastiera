@@ -14,13 +14,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.IconCompat
+import it.palsoftware.pastiera.R
 
 /**
  * Helper for managing app notifications.
  */
 object NotificationHelper {
     private const val CHANNEL_ID = "pastiera_nav_mode_channel"
-    private const val CHANNEL_NAME = "Pastiera Nav Mode"
     private const val NOTIFICATION_ID = 1
     
     /**
@@ -58,10 +58,10 @@ object NotificationHelper {
             
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(R.string.notification_nav_mode_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT // Normal priority notification
             ).apply {
-                description = "Notifications for Pastiera nav mode"
+                description = context.getString(R.string.notification_nav_mode_channel_description)
                 setShowBadge(false)
                 enableLights(false) // Disable LED light
                 enableVibration(false) // No vibration
@@ -140,8 +140,8 @@ object NotificationHelper {
         val largeIconBitmap = createNavModeIcon(largeIconSize, Color.TRANSPARENT, Color.WHITE)
         
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setContentTitle("Nav Mode Activated")
-            .setContentText("Nav mode activated")
+            .setContentTitle(context.getString(R.string.notification_nav_mode_activated_title))
+            .setContentText(context.getString(R.string.notification_nav_mode_activated_text))
             .setSmallIcon(smallIcon) // Custom "N" icon for status bar
             .setLargeIcon(largeIconBitmap) // Large "N" icon for expanded notification
             .setPriority(NotificationCompat.PRIORITY_DEFAULT) // Normal priority notification

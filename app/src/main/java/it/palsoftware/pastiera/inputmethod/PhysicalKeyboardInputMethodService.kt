@@ -19,6 +19,9 @@ import android.os.Looper
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.view.MotionEvent
+import android.view.InputDevice
+import it.palsoftware.pastiera.inputmethod.MotionEventTracker
 
 /**
  * Input method service specialized for physical keyboards.
@@ -159,7 +162,43 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     }
     
     /**
-     * Gestisce le scorciatoie del launcher quando non siamo in un campo di testo.
+     * Checks if a keycode corresponds to an alphabetic key (A-Z).
+     * Returns true only for alphabetic keys, false for all others (modifiers, volume, etc.).
+     */
+    private fun isAlphabeticKey(keyCode: Int): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_A,
+            KeyEvent.KEYCODE_B,
+            KeyEvent.KEYCODE_C,
+            KeyEvent.KEYCODE_D,
+            KeyEvent.KEYCODE_E,
+            KeyEvent.KEYCODE_F,
+            KeyEvent.KEYCODE_G,
+            KeyEvent.KEYCODE_H,
+            KeyEvent.KEYCODE_I,
+            KeyEvent.KEYCODE_J,
+            KeyEvent.KEYCODE_K,
+            KeyEvent.KEYCODE_L,
+            KeyEvent.KEYCODE_M,
+            KeyEvent.KEYCODE_N,
+            KeyEvent.KEYCODE_O,
+            KeyEvent.KEYCODE_P,
+            KeyEvent.KEYCODE_Q,
+            KeyEvent.KEYCODE_R,
+            KeyEvent.KEYCODE_S,
+            KeyEvent.KEYCODE_T,
+            KeyEvent.KEYCODE_U,
+            KeyEvent.KEYCODE_V,
+            KeyEvent.KEYCODE_W,
+            KeyEvent.KEYCODE_X,
+            KeyEvent.KEYCODE_Y,
+            KeyEvent.KEYCODE_Z -> true
+            else -> false
+        }
+    }
+    
+    /**
+     * Handles launcher shortcuts when not in a text field.
      */
     private fun handleLauncherShortcut(keyCode: Int): Boolean {
         val shortcut = SettingsManager.getLauncherShortcut(this, keyCode)
@@ -939,10 +978,11 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         if (!isInputViewActive && !isRehandlingKeyAfterReactivation) {
             // Gestisci le scorciatoie del launcher quando non siamo in un campo di testo
             // MA: bypassa questa logica se siamo in nav mode (ctrlLatchActive) o se le scorciatoie sono disabilitate
+            // ATTENZIONE: abilita le scorciatoie SOLO per i tasti alfabetici (A-Z), non per modificatori, volume, ecc.
             if (!ctrlLatchActive && SettingsManager.getLauncherShortcutsEnabled(this)) {
                 val packageName = currentInputEditorInfo?.packageName ?: currentPackageName
-                if (isLauncher(packageName)) {
-                    // Siamo nel launcher e non in un campo di testo - controlla se c'è una scorciatoia
+                if (isLauncher(packageName) && isAlphabeticKey(keyCode)) {
+                    // Siamo nel launcher, non in un campo di testo, e il tasto è alfabetico - controlla se c'è una scorciatoia
                     if (handleLauncherShortcut(keyCode)) {
                         return true // Scorciatoia eseguita, consumiamo l'evento
                     }
@@ -1925,6 +1965,72 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
      */
     fun removeAltKeyMapping(keyCode: Int) {
         altSymManager.removeAltKeyMapping(keyCode)
+    }
+    
+    /**
+     * Intercepts trackpad/touch-sensitive keyboard motion events.
+     * The Unihertz Titan 2 keyboard can act as a trackpad, sending MotionEvents
+     * for scrolling, cursor movement, and gestures.
+     */
+    override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
+        if (event == null) {
+            return super.onGenericMotionEvent(event)
+        }
+        
+        // Check if this is a trackpad/touch event from the keyboard
+        val source = event.source
+        val isFromTrackpad = (source and InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE ||
+                            (source and InputDevice.SOURCE_TOUCHPAD) == InputDevice.SOURCE_TOUCHPAD
+        
+        // Also check if it's from a keyboard device (touch-sensitive keyboard)
+        val device = event.device
+        val isFromKeyboard = device != null && 
+                            ((source and InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD ||
+                             device.name?.contains("keyboard", ignoreCase = true) == true ||
+                             device.name?.contains("titan", ignoreCase = true) == true)
+        
+        if (isFromTrackpad || isFromKeyboard) {
+            Log.d(TAG, "Motion event intercepted - Action: ${MotionEventTracker.getActionName(event.action)}, " +
+                    "Source: ${MotionEventTracker.getSourceName(source)}, " +
+                    "Device: ${device?.name}, " +
+                    "X: ${event.x}, Y: ${event.y}, " +
+                    "ScrollX: ${event.getAxisValue(MotionEvent.AXIS_HSCROLL)}, " +
+                    "ScrollY: ${event.getAxisValue(MotionEvent.AXIS_VSCROLL)}")
+            
+            // Notify the tracker for debug display
+            MotionEventTracker.notifyMotionEvent(event)
+            
+            // Handle different motion event types
+            when (event.action) {
+                MotionEvent.ACTION_SCROLL -> {
+                    val scrollX = event.getAxisValue(MotionEvent.AXIS_HSCROLL)
+                    val scrollY = event.getAxisValue(MotionEvent.AXIS_VSCROLL)
+                    Log.d(TAG, "Trackpad scroll detected - X: $scrollX, Y: $scrollY")
+                    
+                    // You can handle scroll events here
+                    // For example, convert to cursor movement or scroll actions
+                    // return true to consume the event, false to pass it to Android
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    Log.d(TAG, "Trackpad move detected - X: ${event.x}, Y: ${event.y}")
+                    // Handle cursor movement
+                }
+                MotionEvent.ACTION_DOWN -> {
+                    Log.d(TAG, "Trackpad touch down detected - X: ${event.x}, Y: ${event.y}")
+                    // Handle touch down (click)
+                }
+                MotionEvent.ACTION_UP -> {
+                    Log.d(TAG, "Trackpad touch up detected")
+                    // Handle touch up (release)
+                }
+            }
+            
+            // Return true to consume the event, false to let Android handle it
+            // For now, we'll let Android handle it but log everything for debugging
+            return false
+        }
+        
+        return super.onGenericMotionEvent(event)
     }
 }
 

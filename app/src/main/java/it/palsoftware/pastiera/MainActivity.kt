@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.size
 import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.inputmethod.KeyboardEventTracker
 import it.palsoftware.pastiera.inputmethod.NotificationHelper
@@ -35,6 +36,9 @@ import it.palsoftware.pastiera.ui.theme.PastieraTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Keyboard
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     
@@ -164,6 +168,30 @@ fun KeyboardSetupScreen(
     // State for navigation to settings
     var showSettings by remember { mutableStateOf(false) }
     var showSymCustomization by remember { mutableStateOf(false) }
+    
+    // State for IME status
+    var isPastieraEnabled by remember { mutableStateOf(false) }
+    var isPastieraSelected by remember { mutableStateOf(false) }
+    
+    // Check IME status
+    LaunchedEffect(Unit) {
+        checkImeStatus(context) { enabled, selected ->
+            isPastieraEnabled = enabled
+            isPastieraSelected = selected
+        }
+    }
+    
+    // Refresh IME status periodically and when activity resumes
+    LaunchedEffect(Unit) {
+        // Check status every 2 seconds when screen is visible
+        while (true) {
+            kotlinx.coroutines.delay(2000)
+            checkImeStatus(context) { enabled, selected ->
+                isPastieraEnabled = enabled
+                isPastieraSelected = selected
+            }
+        }
+    }
     
     // Read the intent to open the SYM screen directly
     LaunchedEffect(Unit) {
@@ -308,7 +336,7 @@ fun KeyboardSetupScreen(
             }
         }
         
-        // Button to open keyboard settings
+        // Enable Pastiera button
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -317,23 +345,124 @@ fun KeyboardSetupScreen(
                     context.startActivity(intent)
                 }
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.open_keyboard_settings),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Icon(
-                    imageVector = Icons.Filled.ArrowForward,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Keyboard,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Abilita Pastiera",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    if (!isPastieraEnabled) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "Pastiera non è abilitata",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+        
+        HorizontalDivider()
+        
+        // Choose input method button
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showInputMethodPicker()
+                }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Keyboard,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Scegli metodo di immissione",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    if (isPastieraEnabled && !isPastieraSelected) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Warning,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "Pastiera non è selezionata",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
         
@@ -442,5 +571,79 @@ fun KeyboardSetupScreen(
                 }
             }
         }
+    }
+}
+
+/**
+ * Checks if Pastiera IME is enabled and selected.
+ * Uses InputMethodManager for Android 14+ compatibility.
+ */
+private fun checkImeStatus(
+    context: Context,
+    callback: (enabled: Boolean, selected: Boolean) -> Unit
+) {
+    try {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val pastieraPackageName = "it.palsoftware.pastiera"
+        val pastieraImeId = "it.palsoftware.pastiera/.inputmethod.PhysicalKeyboardInputMethodService"
+        
+        // Check if Pastiera is enabled using InputMethodManager
+        val enabledInputMethods = imm.enabledInputMethodList
+        val isEnabled = enabledInputMethods.any { inputMethodInfo ->
+            inputMethodInfo.packageName == pastieraPackageName ||
+            inputMethodInfo.id == pastieraImeId
+        }
+        
+        // Check if Pastiera is selected
+        var isSelected = false
+        if (isEnabled) {
+            // Try to read DEFAULT_INPUT_METHOD
+            // On Android 13 (API 33) it might still work even with targetSdk 36
+            // On Android 14+ (API 34+) it will throw SecurityException
+            try {
+                val defaultInputMethod = android.provider.Settings.Secure.getString(
+                    context.contentResolver,
+                    android.provider.Settings.Secure.DEFAULT_INPUT_METHOD
+                ) ?: ""
+                isSelected = defaultInputMethod == pastieraImeId
+            } catch (e: SecurityException) {
+                // On Android 14+ (API 34+) with targetSdk 36, we can't read this setting
+                // Try alternative method: check if we can get current input method info
+                try {
+                    // Alternative: check if our IME is in the list and try to infer selection
+                    // This is not 100% reliable, but it's the best we can do
+                    val currentSubtype = imm.currentInputMethodSubtype
+                    if (currentSubtype != null) {
+                        // If we have a subtype, check if it matches our package
+                        // Note: This is a heuristic and may not be 100% accurate
+                        val allInputMethods = imm.inputMethodList
+                        val pastieraInputMethod = allInputMethods.find { 
+                            it.packageName == pastieraPackageName || it.id == pastieraImeId 
+                        }
+                        // If Pastiera is the only enabled IME, assume it's selected
+                        if (pastieraInputMethod != null && enabledInputMethods.size == 1) {
+                            isSelected = true
+                        } else {
+                            // We can't reliably determine, so assume not selected to show warning
+                            isSelected = false
+                        }
+                    } else {
+                        // Can't determine, assume not selected
+                        isSelected = false
+                    }
+                } catch (e2: Exception) {
+                    // If all methods fail, assume not selected
+                    isSelected = false
+                }
+            } catch (e: Exception) {
+                // Other exceptions, assume not selected
+                isSelected = false
+            }
+        }
+        
+        callback(isEnabled, isSelected)
+    } catch (e: Exception) {
+        android.util.Log.e("MainActivity", "Error checking IME status", e)
+        callback(false, false)
     }
 }

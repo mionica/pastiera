@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.res.stringResource
+import it.palsoftware.pastiera.R
 
 /**
  * Activity per assegnare una scorciatoia del launcher a un tasto.
@@ -108,9 +110,42 @@ private fun LauncherShortcutAssignmentBottomSheet(
     
     var searchQuery by remember { mutableStateOf("") }
     
-    // Filtra le app in base alla query di ricerca
-    val filteredApps = remember(installedApps, searchQuery) {
-        if (searchQuery.isBlank()) {
+    // Funzione helper per ottenere la lettera del tasto
+    fun getKeyLetter(keyCode: Int): Char? {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_Q -> 'Q'
+            KeyEvent.KEYCODE_W -> 'W'
+            KeyEvent.KEYCODE_E -> 'E'
+            KeyEvent.KEYCODE_R -> 'R'
+            KeyEvent.KEYCODE_T -> 'T'
+            KeyEvent.KEYCODE_Y -> 'Y'
+            KeyEvent.KEYCODE_U -> 'U'
+            KeyEvent.KEYCODE_I -> 'I'
+            KeyEvent.KEYCODE_O -> 'O'
+            KeyEvent.KEYCODE_P -> 'P'
+            KeyEvent.KEYCODE_A -> 'A'
+            KeyEvent.KEYCODE_S -> 'S'
+            KeyEvent.KEYCODE_D -> 'D'
+            KeyEvent.KEYCODE_F -> 'F'
+            KeyEvent.KEYCODE_G -> 'G'
+            KeyEvent.KEYCODE_H -> 'H'
+            KeyEvent.KEYCODE_J -> 'J'
+            KeyEvent.KEYCODE_K -> 'K'
+            KeyEvent.KEYCODE_L -> 'L'
+            KeyEvent.KEYCODE_Z -> 'Z'
+            KeyEvent.KEYCODE_X -> 'X'
+            KeyEvent.KEYCODE_C -> 'C'
+            KeyEvent.KEYCODE_V -> 'V'
+            KeyEvent.KEYCODE_B -> 'B'
+            KeyEvent.KEYCODE_N -> 'N'
+            KeyEvent.KEYCODE_M -> 'M'
+            else -> null
+        }
+    }
+    
+    // Filtra e ordina le app in base alla query di ricerca e alla lettera del tasto
+    val filteredApps = remember(installedApps, searchQuery, keyCode) {
+        val apps = if (searchQuery.isBlank()) {
             installedApps
         } else {
             installedApps.filter {
@@ -118,11 +153,29 @@ private fun LauncherShortcutAssignmentBottomSheet(
                 it.packageName.contains(searchQuery, ignoreCase = true)
             }
         }
+        
+        // Ordina: prima le app che iniziano con la lettera del tasto, poi le altre
+        val keyLetter = getKeyLetter(keyCode)?.lowercaseChar()
+        if (keyLetter != null && searchQuery.isBlank()) {
+            val appsStartingWithLetter = apps.filter { 
+                it.appName.isNotEmpty() && it.appName[0].lowercaseChar() == keyLetter 
+            }.sortedBy { it.appName.lowercase() }
+            
+            val otherApps = apps.filter { 
+                it.appName.isEmpty() || it.appName[0].lowercaseChar() != keyLetter 
+            }.sortedBy { it.appName.lowercase() }
+            
+            appsStartingWithLetter + otherApps
+        } else {
+            // Se c'è una ricerca attiva, ordina normalmente
+            apps.sortedBy { it.appName.lowercase() }
+        }
     }
     
     // Funzione helper per ottenere il nome del tasto
+    @Composable
     fun getKeyName(keyCode: Int): String {
-        return when (keyCode) {
+        val keyName = when (keyCode) {
             KeyEvent.KEYCODE_Q -> "Q"
             KeyEvent.KEYCODE_W -> "W"
             KeyEvent.KEYCODE_E -> "E"
@@ -149,8 +202,9 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> "B"
             KeyEvent.KEYCODE_N -> "N"
             KeyEvent.KEYCODE_M -> "M"
-            else -> "Tasto $keyCode"
+            else -> null
         }
+        return keyName ?: stringResource(R.string.launcher_shortcut_assignment_key_name, keyCode)
     }
     
     ModalBottomSheet(
@@ -178,7 +232,7 @@ private fun LauncherShortcutAssignmentBottomSheet(
             ) {
                 Column {
                     Text(
-                        text = "Assegna app al tasto",
+                        text = stringResource(R.string.launcher_shortcut_assignment_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -188,7 +242,7 @@ private fun LauncherShortcutAssignmentBottomSheet(
                         shape = MaterialTheme.shapes.small
                     ) {
                         Text(
-                            text = getKeyName(keyCode),
+                            text = stringResource(R.string.launcher_shortcut_assignment_key, getKeyName(keyCode)),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -199,7 +253,7 @@ private fun LauncherShortcutAssignmentBottomSheet(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Chiudi"
+                        contentDescription = stringResource(R.string.launcher_shortcut_assignment_close)
                     )
                 }
             }
@@ -213,12 +267,12 @@ private fun LauncherShortcutAssignmentBottomSheet(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Cerca app...") },
+                placeholder = { Text(stringResource(R.string.launcher_shortcut_assignment_search_placeholder)) },
                 singleLine = true,
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "Cerca"
+                        contentDescription = stringResource(R.string.launcher_shortcut_assignment_search_description)
                     )
                 }
             )
@@ -242,9 +296,9 @@ private fun LauncherShortcutAssignmentBottomSheet(
                         ) {
                             Text(
                                 text = if (searchQuery.isBlank()) {
-                                    "Nessuna app trovata"
+                                    stringResource(R.string.launcher_shortcut_assignment_no_apps)
                                 } else {
-                                    "Nessun risultato per \"$searchQuery\""
+                                    stringResource(R.string.launcher_shortcut_assignment_no_results, searchQuery)
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -252,7 +306,10 @@ private fun LauncherShortcutAssignmentBottomSheet(
                         }
                     }
                 } else {
-                    items(filteredApps) { app ->
+                    items(
+                        items = filteredApps,
+                        key = { app -> app.packageName }
+                    ) { app ->
                         AppListItem(
                             app = app,
                             onClick = {
@@ -291,26 +348,32 @@ private fun AppListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Icona app usando AndroidView
-            Box(
-                modifier = Modifier.size(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                androidx.compose.ui.viewinterop.AndroidView(
-                    factory = { ctx ->
-                        android.widget.ImageView(ctx).apply {
-                            layoutParams = android.view.ViewGroup.LayoutParams(
-                                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-                                android.view.ViewGroup.LayoutParams.MATCH_PARENT
-                            )
-                            scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
-                            setImageDrawable(app.icon)
-                        }
-                    },
-                    modifier = Modifier.size(48.dp)
-                )
+            // Usa key per forzare il recomposition quando cambia l'app
+            key(app.packageName) {
+                Box(
+                    modifier = Modifier.size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    androidx.compose.ui.viewinterop.AndroidView(
+                        factory = { ctx ->
+                            android.widget.ImageView(ctx).apply {
+                                layoutParams = android.view.ViewGroup.LayoutParams(
+                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                                )
+                                scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+                                setImageDrawable(app.icon)
+                            }
+                        },
+                        update = { imageView ->
+                            imageView.setImageDrawable(app.icon)
+                        },
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
             }
             
-            // Nome app e package
+            // Nome app (package name nascosto)
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -318,11 +381,6 @@ private fun AppListItem(
                     text = app.appName,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = app.packageName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

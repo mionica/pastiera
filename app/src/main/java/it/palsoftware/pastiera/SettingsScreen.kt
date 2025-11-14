@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -89,6 +90,9 @@ fun SettingsScreen(
     // State for navigation to launcher shortcuts settings
     var showLauncherShortcuts by remember { mutableStateOf(false) }
     
+    // State for navigation to trackpad debug screen
+    var showTrackpadDebug by remember { mutableStateOf(false) }
+    
     // Handle system back button
     BackHandler {
         when {
@@ -100,6 +104,9 @@ fun SettingsScreen(
             }
             showLauncherShortcuts -> {
                 showLauncherShortcuts = false
+            }
+            showTrackpadDebug -> {
+                showTrackpadDebug = false
             }
             else -> {
                 onBack()
@@ -132,6 +139,14 @@ fun SettingsScreen(
         LauncherShortcutsScreen(
             modifier = modifier,
             onBack = { showLauncherShortcuts = false }
+        )
+        return
+    }
+    
+    if (showTrackpadDebug) {
+        TrackpadDebugScreen(
+            modifier = modifier,
+            onBack = { showTrackpadDebug = false }
         )
         return
     }
@@ -566,37 +581,59 @@ fun SettingsScreen(
             Surface(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Keyboard,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "Scorciatoie Launcher",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Keyboard,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
                         )
-                        Text(
-                            text = "Abilita le scorciatoie da tastiera nel launcher",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.launcher_shortcuts_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Surface(
+                                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                                    shape = MaterialTheme.shapes.extraSmall
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.launcher_shortcuts_experimental),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
+                            Text(
+                                text = stringResource(R.string.launcher_shortcuts_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = launcherShortcutsEnabled,
+                            onCheckedChange = { enabled ->
+                                launcherShortcutsEnabled = enabled
+                                SettingsManager.setLauncherShortcutsEnabled(context, enabled)
+                            }
                         )
                     }
-                    Switch(
-                        checked = launcherShortcutsEnabled,
-                        onCheckedChange = { enabled ->
-                            launcherShortcutsEnabled = enabled
-                            SettingsManager.setLauncherShortcutsEnabled(context, enabled)
-                        }
-                    )
                 }
             }
             
@@ -623,12 +660,12 @@ fun SettingsScreen(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Configura scorciatoie",
+                                text = stringResource(R.string.launcher_shortcuts_configure),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
-                                text = "Assegna tasti per aprire app nel launcher",
+                                text = stringResource(R.string.launcher_shortcuts_configure_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -643,6 +680,46 @@ fun SettingsScreen(
                 
                 HorizontalDivider()
             }
+            
+            // Trackpad Debug
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showTrackpadDebug = true }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.TouchApp,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Trackpad Debug",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = "Test trackpad/touch-sensitive keyboard events",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            HorizontalDivider()
             
             // About section
             Surface(
