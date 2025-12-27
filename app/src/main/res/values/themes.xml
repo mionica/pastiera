@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Pastiera" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.TypeQ25" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/splash_background_light</item>
         <item name="android:statusBarColor">@color/splash_background_light</item>
         <item name="android:navigationBarColor">@color/splash_background_light</item>
     </style>
 
     <!-- Overlay dialog theme for launcher shortcut assignment -->
-    <style name="Theme.Pastiera.OverlayDialog" parent="android:Theme.Material.Light.Dialog">
+    <style name="Theme.TypeQ25.OverlayDialog" parent="android:Theme.Material.Light.Dialog">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowCloseOnTouchOutside">false</item>
         <item name="android:backgroundDimEnabled">true</item>

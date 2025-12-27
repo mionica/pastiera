@@ -25,4 +25,4 @@
 -keep class org.json.** { *; }
 
 # Keep BuildConfig for runtime checks if needed
--keep class it.palsoftware.pastiera.BuildConfig { *; }
+-keep class it.srik.typeq25.BuildConfig { *; }

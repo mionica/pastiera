@@ -1,4 +1,4 @@
-# Script to upload Pastiera APK release to GitHub using GitHub CLI (gh)
+# Script to upload TypeQ25 APK release to GitHub using GitHub CLI (gh)
 # Usage: .\upload_release_gh.ps1
 param(
     [Parameter(Mandatory=$false)]
@@ -8,10 +8,10 @@ param(
     [string]$Tag = "v0.1-alpha",
     
     [Parameter(Mandatory=$false)]
-    [string]$Title = "Pastiera 0.1-alpha",
+    [string]$Title = "TypeQ25 0.1-alpha",
     
     [Parameter(Mandatory=$false)]
-    [string]$Notes = "Release Alpha 0.1 - First alpha release of Pastiera keyboard`n`n**Installation:**`n1. Download the APK`n2. Enable 'Install from unknown sources' in Android settings`n3. Install the APK`n4. Go to Settings → System → Languages & input → Virtual keyboard → Manage keyboards`n5. Enable 'Pastiera Physical Keyboard'"
+    [string]$Notes = "Release Alpha 0.1 - First alpha release of TypeQ25 keyboard`n`n**Installation:**`n1. Download the APK`n2. Enable 'Install from unknown sources' in Android settings`n3. Install the APK`n4. Go to Settings → System → Languages & input → Virtual keyboard → Manage keyboards`n5. Enable 'TypeQ25 Physical Keyboard'"
 )
 
 $APKPath = "app\build\outputs\apk\release\app-release.apk"

@@ -1,5 +1,5 @@
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/C0C31OHWF2)
-# Pastiera
+# TypeQ25
 
 A physical keyboard input method for Android, made for devices like the Unihertz Titan 2. Built as a hobby project to make typing on physical keyboards more efficient and enjoyable.
 
@@ -78,12 +78,12 @@ Built-in auto-correction only for punctuation and similar (for example im → I'
 
 1. Build the app or install the APK
 2. Open the app and go to Settings → System → Languages & input → Virtual keyboard → Manage keyboards
-3. Enable "Pastiera Physical Keyboard"
-4. When typing, switch to Pastiera from your keyboard selector
+3. Enable "TypeQ25 Physical Keyboard"
+4. When typing, switch to TypeQ25 from your keyboard selector
 
 ## Configuration
 
-Open the Pastiera app to access settings:
+Open the TypeQ25 app to access settings:
 
 - **Long Press Duration**: Adjust how long you need to hold a key for long-press to activate
 - **Auto-Capitalize First Letter**: Toggle automatic capitalization

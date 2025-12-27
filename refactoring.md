@@ -1,6 +1,6 @@
-# Pastiera IME Refactoring Log
+# TypeQ25 IME Refactoring Log
 
-Questo documento traccia le fasi del refactoring modulare dell’IME fisica di Pastiera, con l’obiettivo di ridurre il “god class” `PhysicalKeyboardInputMethodService`, migliorare il riuso e facilitare futuri test automatizzati. Ogni fase è stata pensata per essere behaviour-preserving e accompagnata da build/test lato utente.
+Questo documento traccia le fasi del refactoring modulare dell’IME fisica di TypeQ25, con l’obiettivo di ridurre il “god class” `PhysicalKeyboardInputMethodService`, migliorare il riuso e facilitare futuri test automatizzati. Ogni fase è stata pensata per essere behaviour-preserving e accompagnata da build/test lato utente.
 
 # Incremental refactor plan (behavior-preserving)
 
@@ -38,7 +38,7 @@ Move autocorrect undo, double-space period, auto-capitalization triggers, and ba
 
 # Thin the IME service.
 
-Rename to PastieraImeService (or keep name) and limit it to lifecycle wiring, dependency setup, and delegating events to controllers; ensure settings listener and broadcasts are reattached without logic change.
+Rename to TypeQ25ImeService (or keep name) and limit it to lifecycle wiring, dependency setup, and delegating events to controllers; ensure settings listener and broadcasts are reattached without logic change.
 
 # Cleanup and verification.
 
@@ -54,7 +54,7 @@ Run regression checks (same unit/UI tests) after each step to confirm behavior p
 - ⚠️ **Variazioni/SYM**: `variationsMap`, `lastInsertedChar`, `availableVariations` e le istanze di `StatusBarController` vivono ancora in `PhysicalKeyboardInputMethodService`.
 - ⚠️ **Gestione viste IME**: `onCreateInputView`, `onCreateCandidatesView`, `onEvaluateInputViewShown` e `ensureInputViewCreated` sono logica ad-hoc del servizio; manca un `KeyboardVisibilityController`.
 - ⚠️ **Instradamento eventi**: `onKeyDown/Up/LongPress` è una god function >700 righe; non c’è ancora un `InputEventRouter`.
-- ⏳ **Snellimento servizio**: la classe principale resta >1.700 righe; rename/estrazione a `PastieraImeService` non ancora eseguiti.
+- ⏳ **Snellimento servizio**: la classe principale resta >1.700 righe; rename/estrazione a `TypeQ25ImeService` non ancora eseguiti.
 
 ## Fase 1 – Data/Repository Layer _(Completato)_
 **Obiettivo:** isolare accesso a JSON/layout/variations dal servizio IME.
@@ -182,7 +182,7 @@ Run regression checks (same unit/UI tests) after each step to confirm behavior p
 7B. **Input Event Router**
    - Implementare `InputEventRouter` (nuovo pacchetto `inputmethod/events/`) per smistare `onKeyDown/Up/LongPress/Motion` tra nav-mode, shortcut launcher, text pipeline, SYM/Alt e fallback al sistema.
 7C. **Service slim down & cleanup**
-   - Rinominare o confermare `PastieraImeService`, lasciandolo limitato al lifecycle wiring e ai listener.
+   - Rinominare o confermare `TypeQ25ImeService`, lasciandolo limitato al lifecycle wiring e ai listener.
    - Rimuovere artefatti morti (`CandidatesViewManager`, duplicazioni) e assicurare che i nuovi controller espongano hook per test/regressioni.
 
 Ogni fase continuerà a essere accompagnata da `assembleDebug` e test manuali suggeriti per garantire parità funzionale.

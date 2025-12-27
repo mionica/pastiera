@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Pastiera</string>
-    <string name="input_method_name">Pastiera Physical Keyboard</string>
+    <string name="app_name">TypeQ25</string>
+    <string name="input_method_name">TypeQ25 Physical Keyboard</string>
     <string name="input_method_name_en">English</string>
     <string name="input_method_name_it">Italiano</string>
     <string name="input_method_name_fr">Français</string>
@@ -42,22 +42,22 @@
     <string name="info_description">Einstellungen werden automatisch gespeichert und sofort auf die Eingabemethode angewendet.</string>
     
     <!-- Main Activity -->
-    <string name="keyboard_title">Pastiera Tastatur</string>
+    <string name="keyboard_title">TypeQ25 Tastatur</string>
     <string name="keyboard_subtitle">Physikalische Tastatur mit Unterstützung für langen Druck</string>
     <string name="settings_content_description">Einstellungen</string>
     
     <!-- Installation Section -->
     <string name="installation_title">Installation</string>
     <string name="installation_step1">1. Klicken Sie auf die Schaltfläche unten, um die Einstellungen zu öffnen</string>
-    <string name="installation_step2">2. Aktivieren Sie \'Pastiera Physical Keyboard\'</string>
+    <string name="installation_step2">2. Aktivieren Sie \'TypeQ25 Physical Keyboard\'</string>
     <string name="installation_step3">3. Kommen Sie hierher zurück und testen Sie die Tastatur</string>
     <string name="open_keyboard_settings">Tastatureinstellungen öffnen</string>
     
     <!-- Main Activity - Enable/Select IME -->
-    <string name="enable_pastiera">Pastiera aktivieren</string>
-    <string name="pastiera_not_enabled">Pastiera ist nicht aktiviert</string>
+    <string name="enable_TypeQ25">TypeQ25 aktivieren</string>
+    <string name="TypeQ25_not_enabled">TypeQ25 ist nicht aktiviert</string>
     <string name="choose_input_method">Eingabemethode wählen</string>
-    <string name="pastiera_not_selected">Pastiera ist nicht ausgewählt</string>
+    <string name="TypeQ25_not_selected">TypeQ25 ist nicht ausgewählt</string>
     
     <!-- Test Section -->
     <string name="test_keyboard_title">Tastaturtest</string>
@@ -95,7 +95,7 @@
     <string name="auto_correct_settings_title">Autokorrektur-Sprachen</string>
     <string name="auto_correct_settings_description">Wählen Sie aus, welche Sprachen für die Autokorrektur verwendet werden sollen. Die Systemsprache wird oben angezeigt.</string>
     <string name="auto_correct_system_language">Systemsprache</string>
-    <string name="auto_correct_ricette_pastiera_description">Anpassungen gültig für alle Sprachen</string>
+    <string name="auto_correct_TypeQ25_description">Anpassungen gültig für alle Sprachen</string>
     <string name="auto_correct_other_languages">Andere Sprachen</string>
     <string name="auto_correct_custom_languages">Benutzerdefinierte Sprachen</string>
     <string name="auto_correct_at_least_one_language_required">Mindestens eine Sprache ist für die Funktionalität erforderlich</string>
@@ -189,8 +189,8 @@
     <string name="launcher_shortcut_assignment_key_name">Taste %1$d</string>
     
     <!-- Notification Helper -->
-    <string name="notification_nav_mode_channel_name">Pastiera Nav Mode</string>
-    <string name="notification_nav_mode_channel_description">Benachrichtigungen für Pastiera Nav-Modus</string>
+    <string name="notification_nav_mode_channel_name">TypeQ25 Nav Mode</string>
+    <string name="notification_nav_mode_channel_description">Benachrichtigungen für TypeQ25 Nav-Modus</string>
     <string name="notification_nav_mode_activated_title">Nav-Modus aktiviert</string>
     <string name="notification_nav_mode_activated_text">Nav-Modus aktiviert</string>
     
@@ -270,7 +270,7 @@
     <string name="settings_trackpad_debug_description">Trackpad/berührungsempfindliche Tastatur-Ereignisse testen</string>
     
     <!-- Auto Correct Settings -->
-    <string name="auto_correct_ricette_pastiera_name">Ricette Pastiera</string>
+    <string name="auto_correct_TypeQ25_name">TypeQ25</string>
     
     <!-- Settings Categories -->
     <string name="settings_category_keyboard_timing">Tastatur &amp; Timing</string>

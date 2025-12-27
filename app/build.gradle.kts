@@ -38,11 +38,11 @@ tasks.register("incrementBuildNumber") {
 }
 
 android {
-    namespace = "it.palsoftware.pastiera"
+    namespace = "it.srik.typeq25"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "it.palsoftware.pastiera"
+        applicationId = "it.srik.typeq25"
         minSdk = 29
         targetSdk = 36
         versionCode = 5
@@ -74,10 +74,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("../pastiera-release-key.jks")
-            storePassword = "pastiera123"
-            keyAlias = "pastiera"
-            keyPassword = "pastiera123"
+            storeFile = file("../TypeQ25-release-key.jks")
+            storePassword = "typeq25pass"
+            keyAlias = "typeq25-key"
+            keyPassword = "typeq25pass"
         }
     }
 

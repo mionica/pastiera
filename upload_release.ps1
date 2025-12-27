@@ -1,4 +1,4 @@
-# Script to upload Pastiera APK release to GitHub
+# Script to upload TypeQ25 APK release to GitHub
 # Usage: .\upload_release.ps1 -GitHubToken "your_token_here"
 param(
     [Parameter(Mandatory=$false)]
@@ -68,8 +68,8 @@ $headers = @{
 # Create release body
 $releaseBody = @{
     tag_name = $Tag
-    name = "Pastiera $Version"
-    body = "Release Alpha 0.1 - First alpha release of Pastiera keyboard`n`n**Installation:**`n1. Download the APK`n2. Enable 'Install from unknown sources' in Android settings`n3. Install the APK`n4. Go to Settings → System → Languages & input → Virtual keyboard → Manage keyboards`n5. Enable 'Pastiera Physical Keyboard'"
+    name = "TypeQ25 $Version"
+    body = "Release Alpha 0.1 - First alpha release of TypeQ25 keyboard`n`n**Installation:**`n1. Download the APK`n2. Enable 'Install from unknown sources' in Android settings`n3. Install the APK`n4. Go to Settings → System → Languages & input → Virtual keyboard → Manage keyboards`n5. Enable 'TypeQ25 Physical Keyboard'"
     draft = $false
     prerelease = $true
 } | ConvertTo-Json

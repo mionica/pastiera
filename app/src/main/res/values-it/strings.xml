@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Pastiera</string>
-    <string name="input_method_name">Pastiera</string>
+    <string name="app_name">TypeQ25</string>
+    <string name="input_method_name">TypeQ25</string>
     <string name="input_method_name_en">English</string>
     <string name="input_method_name_it">Italiano</string>
     <string name="input_method_name_fr">Français</string>
@@ -42,22 +42,22 @@
     <string name="info_description">Le impostazioni vengono salvate automaticamente e applicate immediatamente all\'input method.</string>
     
     <!-- Main Activity -->
-    <string name="keyboard_title">Pastiera Keyboard</string>
+    <string name="keyboard_title">TypeQ25 Keyboard</string>
     <string name="keyboard_subtitle">Tastiera fisica con supporto long press</string>
     <string name="settings_content_description">Impostazioni</string>
     
     <!-- Installation Section -->
     <string name="installation_title">Installazione</string>
     <string name="installation_step1">1. Clicca il pulsante qui sotto per aprire le impostazioni</string>
-    <string name="installation_step2">2. Attiva \'Tastiera Fisica Pastiera\'</string>
+    <string name="installation_step2">2. Attiva \'Tastiera Fisica TypeQ25\'</string>
     <string name="installation_step3">3. Torna qui e testa la tastiera</string>
     <string name="open_keyboard_settings">Apri Impostazioni Tastiera</string>
     
     <!-- Main Activity - Enable/Select IME -->
-    <string name="enable_pastiera">Abilita Pastiera</string>
-    <string name="pastiera_not_enabled">Pastiera non è abilitata</string>
+    <string name="enable_TypeQ25">Abilita TypeQ25</string>
+    <string name="TypeQ25_not_enabled">TypeQ25 non è abilitata</string>
     <string name="choose_input_method">Scegli metodo di immissione</string>
-    <string name="pastiera_not_selected">Pastiera non è selezionata</string>
+    <string name="TypeQ25_not_selected">TypeQ25 non è selezionata</string>
     
     <!-- Test Section -->
     <string name="test_keyboard_title">Test Tastiera</string>
@@ -95,7 +95,7 @@
     <string name="auto_correct_settings_title">Lingue Auto-Correzione</string>
     <string name="auto_correct_settings_description">Seleziona quali lingue usare per l\'auto-correzione. La lingua di sistema è mostrata in alto.</string>
     <string name="auto_correct_system_language">Lingua di sistema</string>
-    <string name="auto_correct_ricette_pastiera_description">Personalizzazioni valide per tutte le lingue</string>
+    <string name="auto_correct_TypeQ25_description">Personalizzazioni valide per tutte le lingue</string>
     <string name="auto_correct_other_languages">Altre Lingue</string>
     <string name="auto_correct_custom_languages">Lingue Personalizzate</string>
     <string name="auto_correct_at_least_one_language_required">Almeno una lingua necessaria per il funzionamento</string>
@@ -202,8 +202,8 @@
     <string name="launcher_shortcut_assignment_key_name">Tasto %1$d</string>
     
     <!-- Notification Helper -->
-    <string name="notification_nav_mode_channel_name">Pastiera Nav Mode</string>
-    <string name="notification_nav_mode_channel_description">Notifiche per il nav mode di Pastiera</string>
+    <string name="notification_nav_mode_channel_name">TypeQ25 Nav Mode</string>
+    <string name="notification_nav_mode_channel_description">Notifiche per il nav mode di TypeQ25</string>
     <string name="notification_nav_mode_activated_title">Nav Mode Attivato</string>
     <string name="notification_nav_mode_activated_text">Nav mode attivato</string>
     
@@ -283,7 +283,7 @@
     <string name="settings_trackpad_debug_description">Testa eventi trackpad/tastiera touch-sensitive</string>
     
     <!-- Auto Correct Settings -->
-    <string name="auto_correct_ricette_pastiera_name">Ricette Pastiera</string>
+    <string name="auto_correct_TypeQ25_name">TypeQ25</string>
     
     <!-- Settings Categories -->
     <string name="settings_category_keyboard_timing">Tastiera &amp; Temporizzazione</string>

@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Pastiera</string>
-    <string name="input_method_name">Pastiera Physical Keyboard</string>
+    <string name="app_name">TypeQ25</string>
+    <string name="input_method_name">TypeQ25 Physical Keyboard</string>
     <string name="input_method_name_en">English</string>
     <string name="input_method_name_it">Italiano</string>
     <string name="input_method_name_fr">Français</string>
@@ -50,22 +50,22 @@
     <string name="info_description">Settings are automatically saved and immediately applied to the input method.</string>
     
     <!-- Main Activity -->
-    <string name="keyboard_title">Pastiera Keyboard</string>
+    <string name="keyboard_title">TypeQ25 Keyboard</string>
     <string name="keyboard_subtitle">Physical keyboard with long press support</string>
     <string name="settings_content_description">Settings</string>
     
     <!-- Installation Section -->
     <string name="installation_title">Installation</string>
     <string name="installation_step1">1. Click the button below to open settings</string>
-    <string name="installation_step2">2. Enable \'Pastiera Physical Keyboard\'</string>
+    <string name="installation_step2">2. Enable \'TypeQ25 Physical Keyboard\'</string>
     <string name="installation_step3">3. Come back here and test the keyboard</string>
     <string name="open_keyboard_settings">Open Keyboard Settings</string>
     
     <!-- Main Activity - Enable/Select IME -->
-    <string name="enable_pastiera">Enable Pastiera</string>
-    <string name="pastiera_not_enabled">Pastiera is not enabled</string>
+    <string name="enable_TypeQ25">Enable TypeQ25</string>
+    <string name="TypeQ25_not_enabled">TypeQ25 is not enabled</string>
     <string name="choose_input_method">Choose input method</string>
-    <string name="pastiera_not_selected">Pastiera is not selected</string>
+    <string name="TypeQ25_not_selected">TypeQ25 is not selected</string>
     
     <!-- Test Section -->
     <string name="test_keyboard_title">Keyboard Test</string>
@@ -103,7 +103,7 @@
     <string name="auto_correct_settings_title">Auto-Correction Languages</string>
     <string name="auto_correct_settings_description">Select which languages to use for auto-correction. The system language is shown at the top.</string>
     <string name="auto_correct_system_language">System language</string>
-    <string name="auto_correct_ricette_pastiera_description">Customizations valid for all languages</string>
+    <string name="auto_correct_TypeQ25_description">Customizations valid for all languages</string>
     <string name="auto_correct_other_languages">Other Languages</string>
     <string name="auto_correct_custom_languages">Custom Languages</string>
     <string name="auto_correct_at_least_one_language_required">At least one language required for operation</string>
@@ -217,8 +217,8 @@
     <string name="launcher_shortcut_assignment_key_name">Key %1$d</string>
     
     <!-- Notification Helper -->
-    <string name="notification_nav_mode_channel_name">Pastiera Nav Mode</string>
-    <string name="notification_nav_mode_channel_description">Notifications for Pastiera nav mode</string>
+    <string name="notification_nav_mode_channel_name">TypeQ25 Nav Mode</string>
+    <string name="notification_nav_mode_channel_description">Notifications for TypeQ25 nav mode</string>
     <string name="notification_nav_mode_activated_title">Nav Mode Activated</string>
     <string name="notification_nav_mode_activated_text">Nav mode activated</string>
     
@@ -304,7 +304,7 @@
     <string name="settings_update_check_failed">Unable to reach GitHub.</string>
     
     <!-- Auto Correct Settings -->
-    <string name="auto_correct_ricette_pastiera_name">Ricette Pastiera</string>
+    <string name="auto_correct_TypeQ25_name">TypeQ25</string>
     
     <!-- Settings Categories -->
     <string name="settings_category_keyboard_timing">Keyboard &amp; Timing</string>

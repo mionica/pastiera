@@ -1,6 +1,6 @@
 # Changelog
 
-## New Features Pastiera 0.2
+## New Features TypeQ25 0.2
 
 ### Keyboard Enhancements
 - **Swipe Pad Navigation**: The keyboard status bar now doubles as a swipe pad, allowing you to move the cursor by swiping
@@ -16,7 +16,7 @@
 - **Enhanced Dictionary Management**: 
   - Added search functionality in the dictionary corrections interface
   - Custom dictionary entries now appear at the top of the list for easier access
-  - Ricette Pastiera: autocorrections that are valid in all the languages. (such as ppp-> %)
+  - Ricette TypeQ25: autocorrections that are valid in all the languages. (such as ppp-> %)
   - Added a lot of new unicode chara for sym layer page 2
 
 ### User Interface

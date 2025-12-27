@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Pastiera</string>
-    <string name="input_method_name">Pastiera Physical Keyboard</string>
+    <string name="app_name">TypeQ25</string>
+    <string name="input_method_name">TypeQ25 Physical Keyboard</string>
     <string name="input_method_name_en">English</string>
     <string name="input_method_name_it">Italiano</string>
     <string name="input_method_name_fr">Français</string>
@@ -42,22 +42,22 @@
     <string name="info_description">Les paramètres sont automatiquement enregistrés et appliqués immédiatement à la méthode de saisie.</string>
     
     <!-- Main Activity -->
-    <string name="keyboard_title">Clavier Pastiera</string>
+    <string name="keyboard_title">Clavier TypeQ25</string>
     <string name="keyboard_subtitle">Clavier physique avec support d\'appui long</string>
     <string name="settings_content_description">Paramètres</string>
     
     <!-- Installation Section -->
     <string name="installation_title">Installation</string>
     <string name="installation_step1">1. Cliquez sur le bouton ci-dessous pour ouvrir les paramètres</string>
-    <string name="installation_step2">2. Activez \'Clavier Physique Pastiera\'</string>
+    <string name="installation_step2">2. Activez \'Clavier Physique TypeQ25\'</string>
     <string name="installation_step3">3. Revenez ici et testez le clavier</string>
     <string name="open_keyboard_settings">Ouvrir les Paramètres du Clavier</string>
     
     <!-- Main Activity - Enable/Select IME -->
-    <string name="enable_pastiera">Activer Pastiera</string>
-    <string name="pastiera_not_enabled">Pastiera n\'est pas activé</string>
+    <string name="enable_TypeQ25">Activer TypeQ25</string>
+    <string name="TypeQ25_not_enabled">TypeQ25 n\'est pas activé</string>
     <string name="choose_input_method">Choisir la méthode de saisie</string>
-    <string name="pastiera_not_selected">Pastiera n\'est pas sélectionné</string>
+    <string name="TypeQ25_not_selected">TypeQ25 n\'est pas sélectionné</string>
     
     <!-- Test Section -->
     <string name="test_keyboard_title">Test du Clavier</string>
@@ -95,7 +95,7 @@
     <string name="auto_correct_settings_title">Langues d\'Auto-Correction</string>
     <string name="auto_correct_settings_description">Sélectionnez les langues à utiliser pour l\'auto-correction. La langue du système est affichée en haut.</string>
     <string name="auto_correct_system_language">Langue du système</string>
-    <string name="auto_correct_ricette_pastiera_description">Personnalisations valides pour toutes les langues</string>
+    <string name="auto_correct_TypeQ25_description">Personnalisations valides pour toutes les langues</string>
     <string name="auto_correct_other_languages">Autres Langues</string>
     <string name="auto_correct_custom_languages">Langues Personnalisées</string>
     <string name="auto_correct_at_least_one_language_required">Au moins une langue est nécessaire pour le fonctionnement</string>
@@ -189,8 +189,8 @@
     <string name="launcher_shortcut_assignment_key_name">Touche %1$d</string>
     
     <!-- Notification Helper -->
-    <string name="notification_nav_mode_channel_name">Pastiera Nav Mode</string>
-    <string name="notification_nav_mode_channel_description">Notifications pour le mode nav de Pastiera</string>
+    <string name="notification_nav_mode_channel_name">TypeQ25 Nav Mode</string>
+    <string name="notification_nav_mode_channel_description">Notifications pour le mode nav de TypeQ25</string>
     <string name="notification_nav_mode_activated_title">Mode Nav Activé</string>
     <string name="notification_nav_mode_activated_text">Mode nav activé</string>
     
@@ -270,7 +270,7 @@
     <string name="settings_trackpad_debug_description">Tester les événements trackpad/clavier tactile</string>
     
     <!-- Auto Correct Settings -->
-    <string name="auto_correct_ricette_pastiera_name">Ricette Pastiera</string>
+    <string name="auto_correct_TypeQ25_name">TypeQ25</string>
     
     <!-- Settings Categories -->
     <string name="settings_category_keyboard_timing">Clavier &amp; Temporisation</string>
