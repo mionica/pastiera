@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.util.Log
+import it.srik.TypeQ25.R
 import it.srik.TypeQ25.SettingsManager
 
 /**
@@ -16,18 +17,29 @@ class LauncherShortcutController(
 ) {
     companion object {
         private const val TAG = "TypeQ25InputMethod"
+        private const val POWER_SHORTCUT_TIMEOUT_MS = 5000L // 5 seconds timeout
     }
 
     // Cache for launcher packages
     private var cachedLauncherPackages: Set<String>? = null
+    
+    // State for Power Shortcuts: SYM pressed to activate shortcuts
+    private var powerShortcutSymPressed: Boolean = false
+    private var powerShortcutTimeoutHandler: android.os.Handler? = null
+    private var powerShortcutTimeoutRunnable: Runnable? = null
+    
+    // State for managing nav mode during power shortcuts
+    private var navModeWasActive: Boolean = false
+    private var exitNavModeCallback: (() -> Unit)? = null
+    private var enterNavModeCallback: (() -> Unit)? = null
 
     /**
-     * Verifica se il package corrente è un launcher.
+     * Check if the current package is a launcher.
      */
     fun isLauncher(packageName: String?): Boolean {
         if (packageName == null) return false
         
-        // Cache la lista dei launcher per evitare query ripetute
+        // Cache the list of launchers to avoid repeated queries
         if (cachedLauncherPackages == null) {
             try {
                 val pm = context.packageManager
@@ -37,9 +49,9 @@ class LauncherShortcutController(
                 
                 val resolveInfos: List<ResolveInfo> = pm.queryIntentActivities(intent, 0)
                 cachedLauncherPackages = resolveInfos.map { it.activityInfo.packageName }.toSet()
-                Log.d(TAG, "Launcher packages trovati: $cachedLauncherPackages")
+                Log.d(TAG, "Launcher packages found: $cachedLauncherPackages")
             } catch (e: Exception) {
-                Log.e(TAG, "Errore nel rilevamento dei launcher", e)
+                Log.e(TAG, "Error detecting launchers", e)
                 cachedLauncherPackages = emptySet()
             }
         }
@@ -50,7 +62,7 @@ class LauncherShortcutController(
     }
     
     /**
-     * Apre un'app tramite package name.
+     * Open an app by package name.
      */
     private fun launchApp(packageName: String): Boolean {
         try {
@@ -59,14 +71,14 @@ class LauncherShortcutController(
             if (intent != null) {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
-                Log.d(TAG, "App aperta: $packageName")
+                Log.d(TAG, "App opened: $packageName")
                 return true
             } else {
-                Log.w(TAG, "Nessun launch intent trovato per: $packageName")
+                Log.w(TAG, "No launch intent found for: $packageName")
                 return false
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Errore nell'apertura dell'app $packageName", e)
+            Log.e(TAG, "Error opening app $packageName", e)
             return false
         }
     }
@@ -83,29 +95,29 @@ class LauncherShortcutController(
                     if (shortcut.packageName != null) {
                         val success = launchApp(shortcut.packageName)
                         if (success) {
-                            Log.d(TAG, "Scorciatoia launcher eseguita: tasto $keyCode -> ${shortcut.packageName}")
-                            return true // Consumiamo l'evento
+                            Log.d(TAG, "Launcher shortcut executed: key $keyCode -> ${shortcut.packageName}")
+                            return true // Consume the event
                         }
                     }
                 }
                 SettingsManager.LauncherShortcut.TYPE_SHORTCUT -> {
-                    // TODO: Gestire scorciatoie in futuro
-                    Log.d(TAG, "Tipo scorciatoia non ancora implementato: ${shortcut.type}")
+                    // TODO: Handle shortcuts in the future
+                    Log.d(TAG, "Shortcut type not yet implemented: ${shortcut.type}")
                 }
                 else -> {
-                    Log.d(TAG, "Tipo azione sconosciuto: ${shortcut.type}")
+                    Log.d(TAG, "Unknown action type: ${shortcut.type}")
                 }
             }
         } else {
-            // Tasto non assegnato: mostra dialog per assegnare un'app
+            // Key not assigned: show dialog to assign an app
             showLauncherShortcutAssignmentDialog(keyCode)
-            return true // Consumiamo l'evento per evitare che venga gestito altrove
+            return true // Consume the event to prevent it from being handled elsewhere
         }
-        return false // Non consumiamo l'evento
+        return false // Don't consume the event
     }
     
     /**
-     * Mostra il dialog per assegnare un'app a un tasto.
+     * Show the dialog to assign an app to a key.
      */
     private fun showLauncherShortcutAssignmentDialog(keyCode: Int) {
         try {
@@ -117,10 +129,121 @@ class LauncherShortcutController(
                 putExtra(LauncherShortcutAssignmentActivity.EXTRA_KEY_CODE, keyCode)
             }
             context.startActivity(intent)
-            Log.d(TAG, "Dialog assegnazione mostrato per tasto $keyCode")
+            Log.d(TAG, "Assignment dialog shown for key $keyCode")
         } catch (e: Exception) {
-            Log.e(TAG, "Errore nel mostrare il dialog di assegnazione", e)
+            Log.e(TAG, "Error showing assignment dialog", e)
         }
+    }
+    
+    /**
+     * Set callbacks to manage nav mode during power shortcuts.
+     */
+    fun setNavModeCallbacks(
+        exitNavMode: () -> Unit,
+        enterNavMode: () -> Unit
+    ) {
+        exitNavModeCallback = exitNavMode
+        enterNavModeCallback = enterNavMode
+    }
+    
+    /**
+     * Toggle Power Shortcut mode (SYM pressed).
+     * If already active, deactivates it (edge case).
+     * Returns true if mode was activated, false if deactivated.
+     * @param isNavModeActive indicates if nav mode is active when SYM is pressed
+     */
+    fun togglePowerShortcutMode(
+        showToast: (String) -> Unit,
+        isNavModeActive: Boolean = false
+    ): Boolean {
+        if (powerShortcutSymPressed) {
+            // Edge case: if already active, deactivate
+            resetPowerShortcutMode()
+            Log.d(TAG, "Power Shortcut mode deactivated by SYM")
+            return false
+        }
+        
+        // Save if nav mode was active and disable it if necessary
+        navModeWasActive = isNavModeActive
+        if (isNavModeActive) {
+            exitNavModeCallback?.invoke()
+            Log.d(TAG, "Nav mode disabled to activate Power Shortcut")
+        }
+        
+        // Activate mode
+        powerShortcutSymPressed = true
+        Log.d(TAG, "Power Shortcut mode activated")
+        
+        // Show toast
+        val message = context.getString(R.string.power_shortcuts_press_key)
+        showToast(message)
+        
+        // Cancel previous timeout if exists
+        cancelPowerShortcutTimeout()
+        
+        // Set timeout to reset automatically
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        powerShortcutTimeoutRunnable = Runnable {
+            resetPowerShortcutMode()
+        }
+        powerShortcutTimeoutHandler = handler
+        handler.postDelayed(powerShortcutTimeoutRunnable!!, POWER_SHORTCUT_TIMEOUT_MS)
+        
+        return true
+    }
+    
+    /**
+     * Reset Power Shortcut mode.
+     * If nav mode was active before, re-enable it.
+     */
+    fun resetPowerShortcutMode() {
+        if (powerShortcutSymPressed) {
+            powerShortcutSymPressed = false
+            cancelPowerShortcutTimeout()
+            Log.d(TAG, "Power Shortcut mode reset")
+            
+            // If nav mode was active before, re-enable it
+            if (navModeWasActive) {
+                enterNavModeCallback?.invoke()
+                navModeWasActive = false
+                Log.d(TAG, "Nav mode re-enabled after Power Shortcut")
+            }
+        }
+    }
+    
+    /**
+     * Check if Power Shortcut mode is active.
+     */
+    fun isPowerShortcutModeActive(): Boolean {
+        return powerShortcutSymPressed
+    }
+    
+    /**
+     * Cancel Power Shortcut mode timeout.
+     */
+    private fun cancelPowerShortcutTimeout() {
+        powerShortcutTimeoutRunnable?.let { runnable ->
+            powerShortcutTimeoutHandler?.removeCallbacks(runnable)
+        }
+        powerShortcutTimeoutRunnable = null
+        powerShortcutTimeoutHandler = null
+    }
+
+    /**
+     * Handle power shortcuts when SYM was pressed first.
+     * Reuses existing handleLauncherShortcut logic.
+     * Returns true if shortcut was handled, false otherwise.
+     */
+    fun handlePowerShortcut(keyCode: Int): Boolean {
+        if (!isPowerShortcutModeActive()) {
+            return false
+        }
+        
+        // Reset mode after use
+        resetPowerShortcutMode()
+        
+        // Reuse existing logic - same function, same assignments
+        return handleLauncherShortcut(keyCode)
     }
 }
 

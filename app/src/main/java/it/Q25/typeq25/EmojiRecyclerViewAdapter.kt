@@ -50,4 +50,3 @@ class EmojiRecyclerViewAdapter(
 
     override fun getItemCount(): Int = emojis.size
 }
-

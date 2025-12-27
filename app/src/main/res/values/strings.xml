@@ -27,6 +27,10 @@
     <string name="auto_capitalize_after_period_title">Auto-Capitalize After Period</string>
     <string name="auto_capitalize_after_period_description">Automatically capitalizes the next letter after typing a period followed by a space (end of sentence).</string>
 
+    <!-- Spell Checker Section -->
+    <string name="spell_check_title">Spell Checker</string>
+    <string name="spell_check_description">Use Android system spell checker to suggest corrections for misspelled words.</string>
+
     <!-- Double Space to Period Section -->
     <string name="double_space_to_period_title">Double Space to Period</string>
     <string name="double_space_to_period_description">Double tap space to insert a period followed by a space and capitalize the next letter.</string>
@@ -40,6 +44,11 @@
     
     <!-- Auto Show Keyboard Section -->
     <string name="auto_show_keyboard_title">Auto Show Keyboard</string>
+    
+    <!-- Auto Focus Input Fields Section -->
+    <string name="auto_focus_input_fields_title">Auto-Focus Input Fields</string>
+    <string name="auto_focus_input_fields_description">Automatically focus on input fields when opening apps (requires Accessibility permission). Works with browsers, messaging apps, and more.</string>
+    <string name="accessibility_service_description">Automatically focuses on input fields when you open apps like browsers and messaging apps, so you can start typing immediately.</string>
     
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl Speech Recognition</string>
@@ -143,19 +152,7 @@
     <string name="sym_reset_confirm_message">Are you sure you want to reset all SYM mappings to default? This action cannot be undone.</string>
     <string name="sym_reset_confirm_button">Reset</string>
     <string name="cancel">Cancel</string>
-    
-    <!-- Emoji Picker Dialog -->
-    <string name="emoji_picker_title">Select Emoji</string>
-    <string name="emoji_picker_title_for_letter">Select emoji for letter %1$s</string>
-    <string name="emoji_picker_close">Close</string>
-    <string name="emoji_category_smileys">Smileys &amp; People</string>
-    <string name="emoji_category_animals">Animals &amp; Nature</string>
-    <string name="emoji_category_food">Food &amp; Drink</string>
-    <string name="emoji_category_travel">Travel &amp; Places</string>
-    <string name="emoji_category_activities">Activities</string>
-    <string name="emoji_category_objects">Objects</string>
-    <string name="emoji_category_symbols">Symbols</string>
-    <string name="emoji_category_flags">Flags</string>
+    <string name="save">Save</string>
     
     <!-- Modifiers -->
     <string name="modifier_shift">SHIFT</string>
@@ -175,18 +172,44 @@
     <string name="keyboard_layout_conversions_title">Layout Conversions</string>
     <string name="keyboard_layout_conversions_description">Convert letter keys to match the selected layout</string>
     <string name="keyboard_layout_viewer_title">Keyboard map</string>
+    <string name="keyboard_layout_editor_title">Edit Keyboard Layout</string>
     <string name="keyboard_layout_viewer_subtitle">Layout: %1$s</string>
     <string name="keyboard_layout_viewer_unavailable">Unable to load this layout mapping.</string>
     <string name="keyboard_layout_viewer_empty">No key mappings found for this layout.</string>
     <string name="keyboard_layout_viewer_multitap_on">multitap</string>
     <string name="keyboard_layout_viewer_multitap_off">single</string>
     <string name="keyboard_layout_viewer_open">View mapping</string>
+    <string name="keyboard_layout_edit">Edit layout</string>
+    <string name="keyboard_layout_edit_key_title">Edit Key: %1$s</string>
+    <string name="keyboard_layout_lowercase">Lowercase character</string>
+    <string name="keyboard_layout_uppercase">Uppercase character</string>
+    <string name="keyboard_layout_edit_hint">Enter the character(s) this key should produce</string>
+    <string name="keyboard_layout_save">Save changes</string>
+    <string name="keyboard_layout_saved">Layout saved successfully</string>
+    <string name="keyboard_layout_save_failed">Failed to save layout</string>
     <string name="keyboard_layout_settings_button">Keyboard Layout Settings</string>
+    
+    <!-- Layout Editor -->
+    <string name="edit_layout">Edit layout</string>
+    <string name="save_layout">Save layout</string>
+    <string name="delete_layout">Delete custom layout</string>
+    <string name="delete_layout_title">Delete Custom Layout?</string>
+    <string name="delete_layout_message">This will delete the custom layout \"%1$s\". This action cannot be undone.</string>
+    <string name="edit_key_title">Edit Key: %1$s</string>
+    <string name="base_characters">Base Characters</string>
+    <string name="lowercase">Lowercase</string>
+    <string name="uppercase">Uppercase</string>
+    <string name="multi_tap_variations">Multi-tap Variations</string>
+    <string name="multi_tap_hint">Add character variations that will cycle when the key is pressed multiple times</string>
+    <string name="add_tap_variation">Add variation</string>
+    <string name="tap_number">Tap %1$d</string>
     
     <!-- About Section -->
     <string name="about_github">GitHub</string>
     <string name="about_build_info">Build</string>
     <string name="about_title">About</string>
+    <string name="about_app_description">App information and version</string>
+    <string name="about_github_description">View source code and contribute</string>
     
     <!-- Launcher Shortcuts Section -->
     <string name="launcher_shortcuts_title">Launcher Shortcuts</string>
@@ -224,6 +247,13 @@
     
     <!-- Speech Recognition -->
     <string name="speech_recognition_prompt">Speak now...</string>
+    <string name="speech_app_chooser_title">Choose Speech Recognition App</string>
+    <string name="speech_app_chooser_no_apps">No speech recognition apps found on your device</string>
+    <string name="speech_app_chooser_info_title">Select Your Preferred App</string>
+    <string name="speech_app_chooser_info_description">Choose which app to use for speech-to-text. You can change this later in Text Input settings.</string>
+    <string name="speech_app_selection_title">Speech Recognition App</string>
+    <string name="speech_app_selection_current">Current: %1$s</string>
+    <string name="speech_app_selection_not_set">Not set (will prompt on first use)</string>
     
     <!-- Auto Correct Edit Screen -->
     <string name="auto_correct_search_placeholder">Search corrections...</string>
@@ -292,7 +322,6 @@
     <string name="app_picker_search_placeholder">Search apps...</string>
     
     <!-- Settings Screen -->
-    <string name="settings_support_ko_fi">Support on Ko-fi</string>
     <string name="settings_nav_mode_configure">Configure navigation mode key mappings</string>
     <string name="settings_trackpad_debug_title">Trackpad Debug</string>
     <string name="settings_trackpad_debug_description">Test trackpad/touch-sensitive keyboard events</string>
@@ -349,5 +378,40 @@
     <string name="nav_mode_keycode_page_down">PgDn</string>
     <string name="nav_mode_keycode_escape">Esc</string>
     <string name="nav_mode_keycode_tab">Tab</string>
+    <string name="nav_mode_keycode_forward_delete">Del</string>
     <string name="nav_mode_key_unknown">?</string>
+    
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Speaker ON</string>
+    <string name="speaker_toggle_off">Speaker OFF</string>
+    <string name="speaker_toggle_not_in_call">Not in a call</string>
+    
+    <!-- Power Shortcuts -->
+    <string name="power_shortcuts_title">Power Shortcuts</string>
+    <string name="power_shortcuts_description">Enable quick access shortcuts for system functions</string>
+    <string name="power_shortcuts_press_key">Press a key to open the app</string>
+    
+    <!-- Emoji Picker -->
+    <string name="emoji_picker_title">Select Emoji</string>
+    <string name="emoji_picker_title_for_letter">Select Emoji for %s</string>
+    <string name="emoji_picker_close">Close</string>
+    <string name="emoji_category_smileys">Smileys</string>
+    <string name="emoji_category_animals">Animals</string>
+    <string name="emoji_category_food">Food</string>
+    <string name="emoji_category_travel">Travel</string>
+    <string name="emoji_category_activities">Activities</string>
+    <string name="emoji_category_objects">Objects</string>
+    <string name="emoji_category_symbols">Symbols</string>
+    <string name="emoji_category_flags">Flags</string>
+    
+    <!-- Launcher Shortcut Assignment -->
+    <string name="launcher_shortcut_assignment_current">Current: %s</string>
+    <string name="launcher_shortcut_assignment_or_choose_new">or choose a new app</string>
+    
+    <!-- Tutorial -->
+    <string name="settings_tutorial_title">Tutorial</string>
+    <string name="settings_tutorial_description">Learn how to use TypeQ25 features</string>
+    <string name="settings_currency_key_title">Currency Key Settings</string>
+    <string name="settings_currency_key_description">Configure currency key behavior</string>
 </resources>
+

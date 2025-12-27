@@ -6,5 +6,5 @@ package it.srik.TypeQ25
 data class SymPagesConfig(
     val emojiEnabled: Boolean = true,
     val symbolsEnabled: Boolean = true,
-    val emojiFirst: Boolean = true
+    val emojiFirst: Boolean = false
 )

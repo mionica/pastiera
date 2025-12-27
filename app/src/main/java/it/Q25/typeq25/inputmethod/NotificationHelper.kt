@@ -63,7 +63,6 @@ object NotificationHelper {
             ).apply {
                 description = context.getString(R.string.notification_nav_mode_channel_description)
                 setShowBadge(false)
-                enableLights(false) // Disable LED light
                 enableVibration(true) // Enable vibration
                 // Set vibration pattern: short vibration (50ms)
                 vibrationPattern = longArrayOf(0, 50)

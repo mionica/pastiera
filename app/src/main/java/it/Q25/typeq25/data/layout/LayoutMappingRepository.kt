@@ -11,6 +11,18 @@ import android.view.KeyEvent
  */
 object LayoutMappingRepository {
     private const val TAG = "LayoutMappingRepo"
+    
+    // Map Arabic-Indic numerals (٠-٩) back to Western numerals (0-9) for password fields
+    private val arabicToWesternNumerals = mapOf(
+        '٠' to '0', '١' to '1', '٢' to '2', '٣' to '3', '٤' to '4',
+        '٥' to '5', '٦' to '6', '٧' to '7', '٨' to '8', '٩' to '9'
+    )
+    
+    // Map Arabic punctuation back to Western for password fields
+    private val arabicToWesternPunctuation = mapOf(
+        '؟' to '?',  // Arabic question mark → Western
+        '،' to ','   // Arabic comma → Western
+    )
 
     private val defaultLayout = mapOf(
         KeyEvent.KEYCODE_Q to LayoutMapping("q", "Q"),
@@ -122,6 +134,17 @@ object LayoutMappingRepository {
             else -> false
         }
         return resolveText(mapping, needsUppercase, tapIndex) ?: ""
+    }
+    
+    /**
+     * Converts Arabic-Indic numerals (٠-٩) to Western numerals (0-9) and
+     * Arabic punctuation (،؟) to Western (,?) for password fields.
+     * This ensures password fields always use Western characters for compatibility.
+     */
+    fun convertArabicNumeralsToWestern(text: String): String {
+        return text.map { char -> 
+            arabicToWesternNumerals[char] ?: arabicToWesternPunctuation[char] ?: char 
+        }.joinToString("")
     }
 
     fun isMapped(keyCode: Int): Boolean = currentLayout.containsKey(keyCode)

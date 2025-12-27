@@ -132,19 +132,6 @@
     <string name="sym_instructions_text">Toque cualquier tecla a continuación para cambiar su emoji. Los cambios se guardan automáticamente.</string>
     <string name="sym_reset_to_default">Restablecer Predeterminado</string>
     
-    <!-- Emoji Picker Dialog -->
-    <string name="emoji_picker_title">Seleccionar Emoji</string>
-    <string name="emoji_picker_title_for_letter">Seleccionar emoji para la letra %1$s</string>
-    <string name="emoji_picker_close">Cerrar</string>
-    <string name="emoji_category_smileys">Sonrisas &amp; Personas</string>
-    <string name="emoji_category_animals">Animales &amp; Naturaleza</string>
-    <string name="emoji_category_food">Comida &amp; Bebidas</string>
-    <string name="emoji_category_travel">Viajes &amp; Lugares</string>
-    <string name="emoji_category_activities">Actividades</string>
-    <string name="emoji_category_objects">Objetos</string>
-    <string name="emoji_category_symbols">Símbolos</string>
-    <string name="emoji_category_flags">Banderas</string>
-    
     <!-- Modifiers -->
     <string name="modifier_shift">SHIFT</string>
     <string name="modifier_ctrl">CTRL</string>
@@ -166,6 +153,9 @@
     <string name="launcher_shortcuts_description">Activar atajos de teclado en el lanzador</string>
     <string name="launcher_shortcuts_configure">Configurar Accesos Rápidos</string>
     <string name="launcher_shortcuts_configure_description">Asignar teclas para abrir aplicaciones en el lanzador</string>
+    
+    <!-- Power Shortcuts -->
+    <string name="power_shortcuts_press_key">Presione una tecla para abrir la aplicación</string>
     
     <!-- Launcher Shortcuts Screen -->
     <string name="launcher_shortcuts_screen_title">Accesos Rápidos del Lanzador</string>
@@ -264,7 +254,6 @@
     <string name="app_picker_search_placeholder">Buscar aplicaciones…</string>
     
     <!-- Settings Screen -->
-    <string name="settings_support_ko_fi">Apoyar en Ko-fi</string>
     <string name="settings_nav_mode_configure">Configurar asignaciones de teclas del modo de navegación</string>
     <string name="settings_trackpad_debug_title">Depuración de Trackpad</string>
     <string name="settings_trackpad_debug_description">Probar eventos de trackpad/teclado táctil</string>
@@ -311,11 +300,17 @@
     <string name="nav_mode_keycode_left">←</string>
     <string name="nav_mode_keycode_right">→</string>
     <string name="nav_mode_keycode_center">○</string>
-    <string name="nav_mode_keycode_page_up">RePág</string>
-    <string name="nav_mode_keycode_page_down">AvPág</string>
+    <string name="nav_mode_keycode_page_up">PgUp</string>
+    <string name="nav_mode_keycode_page_down">PgDn</string>
     <string name="nav_mode_keycode_escape">Esc</string>
     <string name="nav_mode_keycode_tab">Tab</string>
+    <string name="nav_mode_keycode_forward_delete">Supr</string>
     <string name="nav_mode_key_unknown">?</string>
+    
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altavoz ENCENDIDO</string>
+    <string name="speaker_toggle_off">Altavoz APAGADO</string>
+    <string name="speaker_toggle_not_in_call">No en llamada</string>
 </resources>
 
 

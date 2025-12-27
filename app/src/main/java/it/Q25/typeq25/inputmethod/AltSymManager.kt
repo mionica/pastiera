@@ -51,6 +51,16 @@ class AltSymManager(
     fun reloadLongPressThreshold() {
         longPressThreshold = prefs.getLong("long_press_threshold", 500L).coerceIn(50L, 1000L)
     }
+    
+    /**
+     * Reloads Alt key mappings from assets.
+     * Useful when settings change (e.g., Arabic numerals toggle).
+     */
+    fun reloadAltMappings() {
+        altKeyMap.clear()
+        altKeyMap.putAll(KeyMappingLoader.loadAltKeyMappings(assets, context))
+        Log.d(TAG, "Alt mappings reloaded")
+    }
 
     fun getAltMappings(): Map<Int, String> = altKeyMap
 
@@ -180,7 +190,7 @@ class AltSymManager(
 
         // For unmapped keys, apply case conversion if needed (fallback only)
         if (normalChar.isNotEmpty() && !LayoutMappingRepository.isMapped(keyCode)) {
-            // Gestisci shiftOneShot: se è attivo e il carattere è una lettera, rendilo maiuscolo
+            // Handle shiftOneShot: if active and the character is a letter, make it uppercase
             if (shiftOneShot && normalChar.isNotEmpty() && normalChar[0].isLetter()) {
                 normalChar = normalChar.uppercase()
             } else if (capsLockEnabled && event?.isShiftPressed != true) {
@@ -203,8 +213,12 @@ class AltSymManager(
         // Only schedule long press if:
         // - Using Alt and key has Alt mapping, OR
         // - Using Shift and key is mapped in layout (works for any character, not just letters)
+        //   BUT not if Shift is already physically pressed (to avoid conflicting with manual shift)
         val shouldScheduleLongPress = if (useShift) {
-            LayoutMappingRepository.isMapped(keyCode) && normalChar.isNotEmpty()
+            // Don't schedule long press if Shift is already physically pressed
+            // This prevents the long press from interfering when user is manually holding Shift
+            val isShiftPhysicallyPressed = event?.isShiftPressed == true
+            LayoutMappingRepository.isMapped(keyCode) && normalChar.isNotEmpty() && !isShiftPhysicallyPressed
         } else {
             altKeyMap.containsKey(keyCode)
         }
@@ -220,10 +234,15 @@ class AltSymManager(
         keyCode: Int,
         inputConnection: InputConnection,
         event: KeyEvent?,
-        defaultHandler: (Int, KeyEvent?) -> Boolean
+        defaultHandler: (Int, KeyEvent?) -> Boolean,
+        isPasswordField: Boolean = false
     ): Boolean {
-        val altChar = altKeyMap[keyCode]
+        var altChar = altKeyMap[keyCode]
         return if (altChar != null) {
+            // Convert Arabic-Indic numerals to Western numerals in password fields
+            if (isPasswordField) {
+                altChar = it.srik.TypeQ25.data.layout.LayoutMappingRepository.convertArabicNumeralsToWestern(altChar)
+            }
             inputConnection.commitText(altChar, 1)
             true
         } else {
@@ -236,8 +255,8 @@ class AltSymManager(
         longPressActivated.remove(keyCode)
         insertedNormalChars.remove(keyCode)
         
-        // Non cancellare il long press se shift è ancora premuto
-        // Questo permette al long press di completarsi anche se il tasto viene rilasciato mentre shift è premuto
+        // Don't cancel long press if shift is still pressed
+        // This allows the long press to complete even if the key is released while shift is pressed
         if (!shiftPressed) {
             longPressRunnables.remove(keyCode)?.let { handler.removeCallbacks(it) }
         }

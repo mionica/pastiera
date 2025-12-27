@@ -25,4 +25,4 @@
 -keep class org.json.** { *; }
 
 # Keep BuildConfig for runtime checks if needed
--keep class it.srik.typeq25.BuildConfig { *; }
+-keep class it.srik.TypeQ25.BuildConfig { *; }

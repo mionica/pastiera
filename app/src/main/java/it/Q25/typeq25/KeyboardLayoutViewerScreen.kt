@@ -1,6 +1,7 @@
 package it.srik.TypeQ25
 
 import android.view.KeyEvent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,18 +21,25 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,8 +48,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import it.srik.TypeQ25.data.layout.JsonLayoutLoader
+import it.srik.TypeQ25.data.layout.LayoutFileStore
 import it.srik.TypeQ25.data.layout.LayoutMapping
 import it.srik.TypeQ25.data.layout.TapMapping
+import kotlinx.coroutines.launch
 
 private data class KeyMappingRowModel(
     val keyCode: Int,
@@ -59,13 +69,21 @@ private data class KeyMappingRowModel(
 fun KeyboardLayoutViewerScreen(
     layoutName: String,
     modifier: Modifier = Modifier,
+    isEditMode: Boolean = false,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var isLoading by remember(layoutName) { mutableStateOf(true) }
-    val layoutState by produceState<Map<Int, LayoutMapping>?>(initialValue = null, layoutName) {
-        value = JsonLayoutLoader.loadLayout(context.assets, layoutName, context)
+    var layoutState by remember(layoutName) { mutableStateOf<Map<Int, LayoutMapping>?>(null) }
+    var editingKey by remember { mutableStateOf<Int?>(null) }
+    
+    // Load initial layout
+    remember(layoutName) {
+        isLoading = true
+        layoutState = JsonLayoutLoader.loadLayout(context.assets, layoutName, context)
         isLoading = false
     }
 
@@ -85,6 +103,7 @@ fun KeyboardLayoutViewerScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Surface(
                 modifier = Modifier
@@ -104,9 +123,9 @@ fun KeyboardLayoutViewerScreen(
                             contentDescription = stringResource(R.string.settings_back_content_description)
                         )
                     }
-                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                    Column(modifier = Modifier.padding(start = 8.dp).weight(1f)) {
                         Text(
-                            text = stringResource(R.string.keyboard_layout_viewer_title),
+                            text = stringResource(if (isEditMode) R.string.keyboard_layout_editor_title else R.string.keyboard_layout_viewer_title),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -115,6 +134,39 @@ fun KeyboardLayoutViewerScreen(
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+                    if (isEditMode) {
+                        IconButton(
+                            onClick = {
+                                val currentLayout = layoutState
+                                if (currentLayout != null) {
+                                    val metadata = LayoutFileStore.getLayoutMetadataFromAssets(
+                                        context.assets,
+                                        layoutName
+                                    )
+                                    val success = LayoutFileStore.saveLayout(
+                                        context = context,
+                                        layoutName = layoutName,
+                                        layout = currentLayout,
+                                        name = metadata?.name ?: layoutName,
+                                        description = metadata?.description ?: ""
+                                    )
+                                    coroutineScope.launch {
+                                        if (success) {
+                                            snackbarHostState.showSnackbar(context.getString(R.string.keyboard_layout_saved))
+                                            onBack()
+                                        } else {
+                                            snackbarHostState.showSnackbar(context.getString(R.string.keyboard_layout_save_failed))
+                                        }
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Save,
+                                contentDescription = stringResource(R.string.keyboard_layout_save)
+                            )
+                        }
                     }
                 }
             }
@@ -163,9 +215,32 @@ fun KeyboardLayoutViewerScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(items, key = { it.keyCode }) { item ->
-                            KeyMappingRow(item)
+                            KeyMappingRow(
+                                model = item,
+                                isEditMode = isEditMode,
+                                onClick = if (isEditMode) {{ editingKey = item.keyCode }} else null
+                            )
                         }
                         item { Spacer(modifier = Modifier.height(8.dp)) }
+                    }
+                    
+                    // Edit dialog
+                    if (isEditMode && editingKey != null) {
+                        val currentMapping = layoutState?.get(editingKey!!)
+                        if (currentMapping != null) {
+                            KeyEditDialog(
+                                keyCode = editingKey!!,
+                                keyLabel = KeyEvent.keyCodeToString(editingKey!!),
+                                currentMapping = currentMapping,
+                                onDismiss = { editingKey = null },
+                                onSave = { newMapping ->
+                                    layoutState = layoutState?.toMutableMap()?.apply {
+                                        put(editingKey!!, newMapping)
+                                    }
+                                    editingKey = null
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -175,14 +250,18 @@ fun KeyboardLayoutViewerScreen(
 
 @Composable
 private fun KeyMappingRow(
-    model: KeyMappingRowModel
+    model: KeyMappingRowModel,
+    isEditMode: Boolean = false,
+    onClick: (() -> Unit)? = null
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier),
         tonalElevation = 0.dp,
         shadowElevation = 0.dp,
         shape = MaterialTheme.shapes.extraSmall,
-        color = MaterialTheme.colorScheme.surface
+        color = if (isEditMode) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
     ) {
         Row(
             modifier = Modifier
@@ -281,4 +360,69 @@ private fun TapChip(
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
         )
     }
+}
+
+@Composable
+private fun KeyEditDialog(
+    keyCode: Int,
+    keyLabel: String,
+    currentMapping: LayoutMapping,
+    onDismiss: () -> Unit,
+    onSave: (LayoutMapping) -> Unit
+) {
+    var lowercase by remember { mutableStateOf(currentMapping.lowercase) }
+    var uppercase by remember { mutableStateOf(currentMapping.uppercase) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.keyboard_layout_edit_key_title, keyLabel),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = lowercase,
+                    onValueChange = { lowercase = it },
+                    label = { Text(stringResource(R.string.keyboard_layout_lowercase)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = uppercase,
+                    onValueChange = { uppercase = it },
+                    label = { Text(stringResource(R.string.keyboard_layout_uppercase)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = stringResource(R.string.keyboard_layout_edit_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val newMapping = currentMapping.copy(
+                        lowercase = lowercase,
+                        uppercase = uppercase
+                    )
+                    onSave(newMapping)
+                }
+            ) {
+                Text(stringResource(R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }

@@ -136,19 +136,6 @@
     <string name="sym_reset_confirm_button">Ripristina</string>
     <string name="cancel">Annulla</string>
     
-    <!-- Emoji Picker Dialog -->
-    <string name="emoji_picker_title">Seleziona Emoji</string>
-    <string name="emoji_picker_title_for_letter">Seleziona emoji per la lettera %1$s</string>
-    <string name="emoji_picker_close">Chiudi</string>
-    <string name="emoji_category_smileys">Faccine &amp; Persone</string>
-    <string name="emoji_category_animals">Animali &amp; Natura</string>
-    <string name="emoji_category_food">Cibo &amp; Bevande</string>
-    <string name="emoji_category_travel">Viaggi &amp; Luoghi</string>
-    <string name="emoji_category_activities">Attività</string>
-    <string name="emoji_category_objects">Oggetti</string>
-    <string name="emoji_category_symbols">Simboli</string>
-    <string name="emoji_category_flags">Bandiere</string>
-    
     <!-- Modifiers -->
     <string name="modifier_shift">SHIFT</string>
     <string name="modifier_ctrl">CTRL</string>
@@ -179,6 +166,9 @@
     <string name="launcher_shortcuts_description">Abilita le scorciatoie da tastiera nel launcher</string>
     <string name="launcher_shortcuts_configure">Configura scorciatoie</string>
     <string name="launcher_shortcuts_configure_description">Assegna tasti per aprire app nel launcher</string>
+    
+    <!-- Power Shortcuts -->
+    <string name="power_shortcuts_press_key">Premi un tasto per aprire l\'app</string>
     
     <!-- Launcher Shortcuts Screen -->
     <string name="launcher_shortcuts_screen_title">Scorciatoie Launcher</string>
@@ -277,7 +267,6 @@
     <string name="app_picker_search_placeholder">Cerca app...</string>
     
     <!-- Settings Screen -->
-    <string name="settings_support_ko_fi">Supporta su Ko-fi</string>
     <string name="settings_nav_mode_configure">Configura le mappature dei tasti della modalità navigazione</string>
     <string name="settings_trackpad_debug_title">Trackpad Debug</string>
     <string name="settings_trackpad_debug_description">Testa eventi trackpad/tastiera touch-sensitive</string>
@@ -324,10 +313,16 @@
     <string name="nav_mode_keycode_left">←</string>
     <string name="nav_mode_keycode_right">→</string>
     <string name="nav_mode_keycode_center">○</string>
-    <string name="nav_mode_keycode_page_up">PagSu</string>
-    <string name="nav_mode_keycode_page_down">PagGiu</string>
+    <string name="nav_mode_keycode_page_up">PgUp</string>
+    <string name="nav_mode_keycode_page_down">PgDn</string>
     <string name="nav_mode_keycode_escape">Esc</string>
     <string name="nav_mode_keycode_tab">Tab</string>
+    <string name="nav_mode_keycode_forward_delete">Canc</string>
     <string name="nav_mode_key_unknown">?</string>
+    
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altoparlante ATTIVO</string>
+    <string name="speaker_toggle_off">Altoparlante DISATTIVO</string>
+    <string name="speaker_toggle_not_in_call">Non in chiamata</string>
 </resources>
 

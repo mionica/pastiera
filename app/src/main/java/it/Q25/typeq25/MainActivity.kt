@@ -141,6 +141,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        // Check if tutorial should be shown on first launch
+        if (!SettingsManager.isTutorialCompleted(this)) {
+            val intent = Intent(this, TutorialActivity::class.java)
+            startActivity(intent)
+        }
+        
         setContent {
             TypeQ25Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -156,12 +163,81 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DeviceSelectionDialog(onDeviceSelected: (String) -> Unit, onDismiss: () -> Unit) {
+    val devices = listOf("Q25", "titan2")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedDevice by remember { mutableStateOf(devices[0]) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select Your Device") },
+        text = {
+            Column {
+                Text("Please select your device to apply the correct key mappings.")
+                Spacer(modifier = Modifier.height(16.dp))
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    TextField(
+                        modifier = Modifier.menuAnchor(),
+                        readOnly = true,
+                        value = selectedDevice,
+                        onValueChange = {},
+                        label = { Text("Device") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        devices.forEach { device ->
+                            DropdownMenuItem(
+                                text = { Text(device) },
+                                onClick = {
+                                    selectedDevice = device
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onDeviceSelected(selectedDevice) }) {
+                Text("Save")
+            }
+        }
+    )
+}
+
 @Composable
 fun KeyboardSetupScreen(
     modifier: Modifier = Modifier,
     activity: MainActivity
 ) {
     val context = LocalContext.current
+    var showDeviceSelectionDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (!DeviceManager.isDeviceSelected(context)) {
+            showDeviceSelectionDialog = true
+        }
+    }
+
+    if (showDeviceSelectionDialog) {
+        DeviceSelectionDialog(
+            onDeviceSelected = {
+                DeviceManager.setDevice(context, it)
+                showDeviceSelectionDialog = false
+            },
+            onDismiss = { showDeviceSelectionDialog = false }
+        )
+    }
     
     var testText by remember { mutableStateOf("") }
     val lastKeyEventState = remember { mutableStateOf<KeyboardEventTracker.KeyEventInfo?>(null) }

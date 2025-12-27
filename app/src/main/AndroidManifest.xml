@@ -1,25 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-	package="it.srik.TypeQ25">
+    package="it.srik.TypeQ25">
 
-    <!-- Permesso per le notifiche (richiesto da Android 13+) -->
+    <!-- Permission for notifications (required by Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     
-    <!-- Permesso per il riconoscimento vocale -->
+    <!-- Permission for voice recognition -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     
-    <!-- Permesso per l'accesso a Internet (richiesto per il controllo aggiornamenti) -->
+    <!-- Permission to answer and end calls -->
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    
+    <!-- Permission to read phone state (required for isInCall) -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    
+    <!-- Permission to modify call state -->
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    
+    <!-- Permission to modify audio settings (mute calls) -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    
+    <!-- Permission to modify audio settings (toggle speakerphone) -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    
+    <!-- Permission for Internet access (required for update checking) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Permission to receive boot notifications (Direct Boot support) -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Query per vedere tutte le app installate che possono essere avviate -->
+    <!-- Query to see all installed apps that can be launched -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
         
-        <!-- Query per vedere i launcher -->
+        <!-- Query to see launchers -->
         <intent>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.HOME" />
@@ -47,25 +66,42 @@
             </intent-filter>
         </activity>
         
-        <!-- Activity per la personalizzazione SYM -->
+        <!-- Activity for SYM customization -->
         <activity
             android:name=".SymCustomizationActivity"
             android:exported="false"
             android:label="@string/sym_customize_title"
             android:theme="@style/Theme.TypeQ25" />
         
-        <!-- Activity per le impostazioni -->
+        <!-- Activity for settings -->
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
             android:label="@string/settings_title"
             android:theme="@style/Theme.TypeQ25" />
         
-        <!-- Servizio di immissione per tastiera fisica -->
+        <!-- Activity for tutorial -->
+        <activity
+            android:name=".TutorialActivity"
+            android:exported="false"
+            android:label="Tutorial"
+            android:theme="@style/Theme.TypeQ25" />
+        
+        <!-- Activity for emoji picker -->
+        <activity
+            android:name=".inputmethod.EmojiPickerActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.google.android.inputmethod.latin" />
+        
+        <!-- Input service for physical keyboard -->
         <service
             android:name=".inputmethod.PhysicalKeyboardInputMethodService"
             android:label="@string/input_method_name"
             android:permission="android.permission.BIND_INPUT_METHOD"
+            android:directBootAware="true"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.view.InputMethod" />
@@ -75,7 +111,18 @@
                 android:resource="@xml/method" />
         </service>
         
-        <!-- Attività helper per il riconoscimento vocale -->
+        <!-- BroadcastReceiver for Direct Boot support -->
+        <receiver
+            android:name=".inputmethod.DirectBootReceiver"
+            android:directBootAware="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- Helper activity for speech recognition -->
         <activity
             android:name=".inputmethod.SpeechRecognitionActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
@@ -84,7 +131,16 @@
             android:launchMode="singleTask"
             android:taskAffinity="com.google.android.inputmethod.latin" />
         
-        <!-- Attività per assegnare scorciatoie del launcher -->
+        <!-- Activity to choose speech recognition app -->
+        <activity
+            android:name=".inputmethod.SpeechAppChooserActivity"
+            android:theme="@style/Theme.TypeQ25"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:taskAffinity="com.google.android.inputmethod.latin" />
+        
+        <!-- Activity to assign launcher shortcuts -->
         <activity
             android:name=".inputmethod.LauncherShortcutAssignmentActivity"
             android:theme="@style/Theme.TypeQ25.OverlayDialog"
@@ -94,6 +150,21 @@
             android:taskAffinity=""
             android:noHistory="true"
             android:finishOnTaskLaunch="true" />
+        
+        <!-- Accessibility service for auto-focusing input fields -->
+        <service
+            android:name=".accessibility.AutoFocusAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+
     </application>
 
 </manifest>

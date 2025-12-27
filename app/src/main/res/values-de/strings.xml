@@ -132,19 +132,6 @@
     <string name="sym_instructions_text">Tippen Sie auf eine Taste unten, um ihr Emoji zu ändern. Änderungen werden automatisch gespeichert.</string>
     <string name="sym_reset_to_default">Auf Standard zurücksetzen</string>
     
-    <!-- Emoji Picker Dialog -->
-    <string name="emoji_picker_title">Emoji auswählen</string>
-    <string name="emoji_picker_title_for_letter">Emoji für Buchstabe %1$s auswählen</string>
-    <string name="emoji_picker_close">Schließen</string>
-    <string name="emoji_category_smileys">Smileys &amp; Personen</string>
-    <string name="emoji_category_animals">Tiere &amp; Natur</string>
-    <string name="emoji_category_food">Essen &amp; Trinken</string>
-    <string name="emoji_category_travel">Reisen &amp; Orte</string>
-    <string name="emoji_category_activities">Aktivitäten</string>
-    <string name="emoji_category_objects">Objekte</string>
-    <string name="emoji_category_symbols">Symbole</string>
-    <string name="emoji_category_flags">Flaggen</string>
-    
     <!-- Modifiers -->
     <string name="modifier_shift">SHIFT</string>
     <string name="modifier_ctrl">CTRL</string>
@@ -166,6 +153,9 @@
     <string name="launcher_shortcuts_description">Tastenkürzel im Launcher aktivieren</string>
     <string name="launcher_shortcuts_configure">Verknüpfungen konfigurieren</string>
     <string name="launcher_shortcuts_configure_description">Tasten zuweisen, um Apps im Launcher zu öffnen</string>
+    
+    <!-- Power Shortcuts -->
+    <string name="power_shortcuts_press_key">Drücken Sie eine Taste, um die App zu öffnen</string>
     
     <!-- Launcher Shortcuts Screen -->
     <string name="launcher_shortcuts_screen_title">Launcher-Verknüpfungen</string>
@@ -264,7 +254,6 @@
     <string name="app_picker_search_placeholder">Apps suchen…</string>
     
     <!-- Settings Screen -->
-    <string name="settings_support_ko_fi">Auf Ko-fi unterstützen</string>
     <string name="settings_nav_mode_configure">Tastenzuordnungen für Navigationsmodus konfigurieren</string>
     <string name="settings_trackpad_debug_title">Trackpad-Debug</string>
     <string name="settings_trackpad_debug_description">Trackpad/berührungsempfindliche Tastatur-Ereignisse testen</string>
@@ -311,11 +300,17 @@
     <string name="nav_mode_keycode_left">←</string>
     <string name="nav_mode_keycode_right">→</string>
     <string name="nav_mode_keycode_center">○</string>
-    <string name="nav_mode_keycode_page_up">Bild↑</string>
-    <string name="nav_mode_keycode_page_down">Bild↓</string>
+    <string name="nav_mode_keycode_page_up">PgUp</string>
+    <string name="nav_mode_keycode_page_down">PgDn</string>
     <string name="nav_mode_keycode_escape">Esc</string>
     <string name="nav_mode_keycode_tab">Tab</string>
+    <string name="nav_mode_keycode_forward_delete">Entf</string>
     <string name="nav_mode_key_unknown">?</string>
+    
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Lautsprecher EIN</string>
+    <string name="speaker_toggle_off">Lautsprecher AUS</string>
+    <string name="speaker_toggle_not_in_call">Nicht im Anruf</string>
 </resources>
 
 

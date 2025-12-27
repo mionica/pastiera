@@ -91,9 +91,7 @@ class LauncherShortcutAssignmentActivity : ComponentActivity() {
                                 app.appName
                             )
                             
-                            // Launch the app immediately
-                            launchApp(app.packageName)
-                            
+                            // Don't launch the app - just stay in settings
                             setResult(RESULT_ASSIGNED)
                             finish()
                         },
@@ -149,6 +147,9 @@ private fun LauncherShortcutAssignmentBottomSheet(
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    
+    // Check if there's already a shortcut assigned (using state to trigger recomposition)
+    var currentShortcut by remember { mutableStateOf(SettingsManager.getLauncherShortcut(context, keyCode)) }
     
     // Carica le app installate
     val installedApps by remember {
@@ -214,7 +215,7 @@ private fun LauncherShortcutAssignmentBottomSheet(
             
             appsStartingWithLetter + otherApps
         } else {
-            // Se c'è una ricerca attiva, ordina normalmente
+            // If there's an active search, sort normally
             apps.sortedBy { it.appName.lowercase() }
         }
     }
@@ -312,6 +313,69 @@ private fun LauncherShortcutAssignmentBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(16.dp))
+            
+            // Current shortcut card with delete button
+            currentShortcut?.let { shortcut ->
+                if (shortcut.type == SettingsManager.LauncherShortcut.TYPE_APP) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.launcher_shortcut_assignment_current),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = shortcut.appName ?: stringResource(R.string.launcher_shortcuts_app_name_unavailable),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                                shortcut.packageName?.let { packageName ->
+                                    Text(
+                                        text = packageName,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
+                                    )
+                                }
+                            }
+                            FilledTonalButton(
+                                onClick = {
+                                    SettingsManager.removeLauncherShortcut(context, keyCode)
+                                    currentShortcut = null // Update state to trigger recomposition
+                                },
+                                colors = ButtonDefaults.filledTonalButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            ) {
+                                Text(stringResource(R.string.launcher_shortcuts_remove))
+                            }
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        text = stringResource(R.string.launcher_shortcut_assignment_or_choose_new),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            }
             
             // Campo di ricerca
             OutlinedTextField(

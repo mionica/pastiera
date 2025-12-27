@@ -23,10 +23,12 @@ class KeyboardVisibilityController(
 ) {
 
     private var forceCandidatesUi: Boolean = false
+    private var currentInputView: View? = null
 
     fun onCreateInputView(): View {
         val layout = candidatesBarController.getInputView(symLayoutController.emojiMapTextForLayout())
         detachFromParent(layout)
+        currentInputView = layout
         refreshStatusBar()
         return layout
     }
@@ -54,6 +56,7 @@ class KeyboardVisibilityController(
         }
 
         val layout = candidatesBarController.getInputView(symLayoutController.emojiMapTextForLayout())
+        currentInputView = layout
         refreshStatusBar()
 
         if (layout.parent == null) {
@@ -72,6 +75,31 @@ class KeyboardVisibilityController(
     private fun detachFromParent(view: View) {
         (view.parent as? ViewGroup)?.removeView(view)
     }
+    
+    /**
+     * Recreates the input view to apply mode changes (e.g., minimal UI toggle)
+     */
+    fun recreateInputView() {
+        if (!isInputViewActive()) {
+            return
+        }
+        
+        // Detach the current view if it exists
+        currentInputView?.let { oldView ->
+            detachFromParent(oldView)
+        }
+        
+        // Get the current layout based on current settings (not cached, but already created)
+        val layout = candidatesBarController.getCurrentLayout(symLayoutController.emojiMapTextForLayout())
+        detachFromParent(layout)
+        
+        // Attach the new layout
+        currentInputView = layout
+        attachInputView(layout)
+        refreshStatusBar()
+    }
 }
+
+
 
 

@@ -24,6 +24,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import it.srik.TypeQ25.data.layout.LayoutFileStore
 import it.srik.TypeQ25.data.layout.LayoutMappingRepository
+import it.srik.TypeQ25.inputmethod.PhysicalKeyboardInputMethodService
 import it.srik.TypeQ25.R
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -70,6 +71,7 @@ fun KeyboardLayoutSettingsScreen(
     val coroutineScope = rememberCoroutineScope()
     var pendingLayoutSave by remember { mutableStateOf<PendingLayoutSave?>(null) }
     var previewLayout by remember { mutableStateOf<String?>(null) }
+    var editLayout by remember { mutableStateOf<String?>(null) }
     
     // File picker launcher for importing layouts
     val filePickerLauncher = rememberLauncherForActivityResult(
@@ -143,6 +145,19 @@ fun KeyboardLayoutSettingsScreen(
         }
     }
 
+    if (editLayout != null) {
+        KeyboardLayoutViewerScreen(
+            layoutName = editLayout!!,
+            modifier = modifier,
+            isEditMode = true,
+            onBack = { 
+                editLayout = null
+                refreshTrigger++
+            }
+        )
+        return
+    }
+    
     if (previewLayout != null) {
         KeyboardLayoutViewerScreen(
             layoutName = previewLayout!!,
@@ -255,6 +270,100 @@ fun KeyboardLayoutSettingsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 )
                 
+                // Arabic Numerals Toggle (show only when Arabic layout is selected)
+                if (selectedLayout.startsWith("arabic", ignoreCase = true)) {
+                    var useArabicNumerals by remember { mutableStateOf(SettingsManager.getUseArabicNumerals(context)) }
+                    
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable {
+                                    useArabicNumerals = !useArabicNumerals
+                                    SettingsManager.setUseArabicNumerals(context, useArabicNumerals)
+                                    // Reload keyboard layout to apply the change
+                                    PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Arabic-Indic Numerals",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Use ٠-٩ instead of 0-9 (Western numerals are always used in password fields)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = useArabicNumerals,
+                                onCheckedChange = { enabled ->
+                                    useArabicNumerals = enabled
+                                    SettingsManager.setUseArabicNumerals(context, enabled)
+                                    // Reload keyboard layout to apply the change
+                                    PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
+                                }
+                            )
+                        }
+                    }
+                    
+                    // Arabic Punctuation Toggle
+                    var useArabicPunctuation by remember { mutableStateOf(SettingsManager.getUseArabicPunctuation(context)) }
+                    
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .clickable {
+                                    useArabicPunctuation = !useArabicPunctuation
+                                    SettingsManager.setUseArabicPunctuation(context, useArabicPunctuation)
+                                    // Reload keyboard layout to apply the change
+                                    PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Arabic Punctuation",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Use ؟، instead of ?, (Western punctuation is always used in password fields)",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Switch(
+                                checked = useArabicPunctuation,
+                                onCheckedChange = { enabled ->
+                                    useArabicPunctuation = enabled
+                                    SettingsManager.setUseArabicPunctuation(context, enabled)
+                                    // Reload keyboard layout to apply the change
+                                    PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
+                                }
+                            )
+                        }
+                    }
+                }
+                
                 // No Conversion (QWERTY - default, passes keycodes as-is)
                 Surface(
                     modifier = Modifier
@@ -263,6 +372,10 @@ fun KeyboardLayoutSettingsScreen(
                         .clickable {
                             selectedLayout = "qwerty"
                             SettingsManager.setKeyboardLayout(context, "qwerty")
+                            // Disable Arabic-specific toggles when switching to non-Arabic layout
+                            SettingsManager.setUseArabicNumerals(context, false)
+                            SettingsManager.setUseArabicPunctuation(context, false)
+                            PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
                             if (!enabledLayouts.contains("qwerty")) {
                                 enabledLayouts = (enabledLayouts + "qwerty").toMutableSet()
                                 SettingsManager.setKeyboardLayoutList(context, enabledLayouts.toList())
@@ -325,6 +438,10 @@ fun KeyboardLayoutSettingsScreen(
                             onClick = {
                                 selectedLayout = "qwerty"
                                 SettingsManager.setKeyboardLayout(context, "qwerty")
+                                // Disable Arabic-specific toggles when switching to non-Arabic layout
+                                SettingsManager.setUseArabicNumerals(context, false)
+                                SettingsManager.setUseArabicPunctuation(context, false)
+                                PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
                                 if (!enabledLayouts.contains("qwerty")) {
                                     enabledLayouts = (enabledLayouts + "qwerty").toMutableSet()
                                     SettingsManager.setKeyboardLayoutList(context, enabledLayouts.toList())
@@ -351,6 +468,12 @@ fun KeyboardLayoutSettingsScreen(
                             .clickable {
                                 selectedLayout = layout
                                 SettingsManager.setKeyboardLayout(context, layout)
+                                // Disable Arabic-specific toggles when switching to non-Arabic layout
+                                if (!layout.startsWith("arabic", ignoreCase = true)) {
+                                    SettingsManager.setUseArabicNumerals(context, false)
+                                    SettingsManager.setUseArabicPunctuation(context, false)
+                                    PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
+                                }
                             }
                     ) {
                         Row(
@@ -404,6 +527,15 @@ fun KeyboardLayoutSettingsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 IconButton(
+                                    onClick = { editLayout = layout }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = stringResource(R.string.keyboard_layout_edit),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                IconButton(
                                     onClick = { previewLayout = layout }
                                 ) {
                                     Icon(
@@ -428,6 +560,12 @@ fun KeyboardLayoutSettingsScreen(
                                     onClick = {
                                         selectedLayout = layout
                                         SettingsManager.setKeyboardLayout(context, layout)
+                                        // Disable Arabic-specific toggles when switching to non-Arabic layout
+                                        if (!layout.startsWith("arabic", ignoreCase = true)) {
+                                            SettingsManager.setUseArabicNumerals(context, false)
+                                            SettingsManager.setUseArabicPunctuation(context, false)
+                                            PhysicalKeyboardInputMethodService.getInstance()?.reloadKeyboardLayout()
+                                        }
                                         if (!enabledLayouts.contains(layout)) {
                                             enabledLayouts = (enabledLayouts + layout).toMutableSet()
                                             SettingsManager.setKeyboardLayoutList(context, enabledLayouts.toList())

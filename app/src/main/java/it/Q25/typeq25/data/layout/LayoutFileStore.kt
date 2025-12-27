@@ -43,7 +43,12 @@ object LayoutFileStore {
         "KEYCODE_V" to KeyEvent.KEYCODE_V,
         "KEYCODE_B" to KeyEvent.KEYCODE_B,
         "KEYCODE_N" to KeyEvent.KEYCODE_N,
-        "KEYCODE_M" to KeyEvent.KEYCODE_M
+        "KEYCODE_M" to KeyEvent.KEYCODE_M,
+        "KEYCODE_68" to 68,
+        "KEYCODE_SPACE" to KeyEvent.KEYCODE_SPACE,
+        "KEYCODE_COMMA" to KeyEvent.KEYCODE_COMMA,
+        "KEYCODE_PERIOD" to KeyEvent.KEYCODE_PERIOD,
+        "KEYCODE_SLASH" to KeyEvent.KEYCODE_SLASH
     )
     private val keyboardLayoutKeyCodeToName = keyboardLayoutNameToKeyCode.entries.associate { (name, code) ->
         code to name
@@ -62,12 +67,20 @@ object LayoutFileStore {
 
     fun loadLayoutFromFile(file: File): Map<Int, LayoutMapping>? {
         return try {
+            Log.d(TAG, "Attempting to load layout from: ${file.absolutePath}")
             if (!file.exists() || !file.canRead()) {
                 Log.w(TAG, "File does not exist or cannot be read: ${file.absolutePath}")
                 return null
             }
             val jsonString = file.readText()
-            parseLayoutJson(jsonString)
+            Log.d(TAG, "Read ${jsonString.length} bytes from ${file.name}")
+            val result = parseLayoutJson(jsonString)
+            if (result != null) {
+                Log.d(TAG, "Successfully parsed ${file.name} with ${result.size} mappings")
+            } else {
+                Log.e(TAG, "Failed to parse ${file.name}")
+            }
+            result
         } catch (e: Exception) {
             Log.e(TAG, "Error loading layout from file: ${file.absolutePath}", e)
             null
@@ -86,11 +99,13 @@ object LayoutFileStore {
 
     private fun parseLayoutJson(jsonString: String): Map<Int, LayoutMapping>? {
         return try {
+            Log.d(TAG, "Parsing layout JSON...")
             val jsonObject = JSONObject(jsonString)
             val mappingsObject = jsonObject.getJSONObject("mappings")
 
             val layout = mutableMapOf<Int, LayoutMapping>()
             val keys = mappingsObject.keys()
+            var skippedKeys = 0
             while (keys.hasNext()) {
                 val keyName = keys.next()
                 val keyCode = keyboardLayoutNameToKeyCode[keyName]
@@ -121,9 +136,12 @@ object LayoutFileStore {
                             taps = normalizedTaps
                         )
                     }
+                } else {
+                    skippedKeys++
+                    Log.w(TAG, "Skipping unknown keycode: $keyName")
                 }
             }
-            Log.d(TAG, "Parsed layout with ${layout.size} mappings")
+            Log.d(TAG, "Parsed layout with ${layout.size} mappings, skipped $skippedKeys keys")
             layout
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing layout JSON", e)
@@ -140,11 +158,19 @@ object LayoutFileStore {
     ): Boolean {
         return try {
             val layoutFile = getLayoutFile(context, layoutName)
+            Log.d(TAG, "Saving layout $layoutName with ${layout.size} mappings to ${layoutFile.absolutePath}")
             val jsonString = buildLayoutJsonString(layoutName, layout, name, description)
+            Log.d(TAG, "Generated JSON string: ${jsonString.length} bytes")
             FileOutputStream(layoutFile).use { outputStream ->
                 outputStream.write(jsonString.toByteArray())
             }
-            Log.d(TAG, "Saved layout: $layoutName to ${layoutFile.absolutePath}")
+            Log.d(TAG, "Successfully saved layout: $layoutName")
+            // Verify file was written
+            if (layoutFile.exists()) {
+                Log.d(TAG, "Verified: file exists with size ${layoutFile.length()} bytes")
+            } else {
+                Log.e(TAG, "ERROR: File does not exist after save!")
+            }
             true
         } catch (e: Exception) {
             Log.e(TAG, "Error saving layout: $layoutName", e)
@@ -216,10 +242,17 @@ object LayoutFileStore {
     fun getCustomLayoutNames(context: Context): List<String> {
         return try {
             val layoutsDir = getLayoutsDirectory(context)
+            Log.d(TAG, "Getting custom layouts from: ${layoutsDir.absolutePath}")
+            if (!layoutsDir.exists()) {
+                Log.d(TAG, "Layouts directory does not exist")
+                return emptyList()
+            }
             val layoutFiles = layoutsDir.listFiles { file ->
                 file.isFile && file.name.endsWith(".json")
             }
-            layoutFiles?.map { it.name.removeSuffix(".json") }?.sorted() ?: emptyList()
+            val names = layoutFiles?.map { it.name.removeSuffix(".json") }?.sorted() ?: emptyList()
+            Log.d(TAG, "Found ${names.size} custom layouts: $names")
+            names
         } catch (e: Exception) {
             Log.e(TAG, "Error getting custom layout names", e)
             emptyList()

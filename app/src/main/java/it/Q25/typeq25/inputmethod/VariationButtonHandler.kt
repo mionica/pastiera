@@ -28,30 +28,33 @@ object VariationButtonHandler {
     fun createVariationClickListener(
         variation: String,
         inputConnection: InputConnection?,
-        listener: OnVariationSelectedListener? = null
+        listener: OnVariationSelectedListener? = null,
+        shouldDeleteBeforeInsert: Boolean = true
     ): View.OnClickListener {
         return View.OnClickListener {
-            Log.d(TAG, "Click on variation button: $variation")
+            Log.d(TAG, "Click on variation button: $variation (shouldDeleteBeforeInsert=$shouldDeleteBeforeInsert, hasInputConnection=${inputConnection != null})")
             
             if (inputConnection == null) {
-                Log.w(TAG, "No inputConnection available to insert variation")
+                Log.e(TAG, "No inputConnection available to insert variation '$variation'")
                 return@OnClickListener
             }
             
-            // Delete character before cursor (backspace)
-            val deleted = inputConnection.deleteSurroundingText(1, 0)
-            if (deleted) {
-                Log.d(TAG, "Character before cursor deleted")
-            } else {
-                Log.w(TAG, "Unable to delete character before cursor")
+            try {
+                // Delete character before cursor (backspace) only for character variations
+                if (shouldDeleteBeforeInsert) {
+                    val deleted = inputConnection.deleteSurroundingText(1, 0)
+                    Log.d(TAG, "Delete before insert: $deleted")
+                }
+                
+                // Insert variation
+                val committed = inputConnection.commitText(variation, 1)
+                Log.d(TAG, "Variation '$variation' committed: $committed")
+                
+                // Notify listener if present
+                listener?.onVariationSelected(variation)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error inserting variation '$variation'", e)
             }
-            
-            // Insert variation
-            inputConnection.commitText(variation, 1)
-            Log.d(TAG, "Variation '$variation' inserted")
-            
-            // Notify listener if present
-            listener?.onVariationSelected(variation)
         }
     }
 }

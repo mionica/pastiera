@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -27,6 +28,9 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Help
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -36,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.background
 import it.srik.TypeQ25.R
 import android.widget.Toast
 import it.srik.TypeQ25.BuildConfig
@@ -53,7 +58,8 @@ fun SettingsScreen(
     
     var checkingForUpdates by remember { mutableStateOf(false) }
     
-    // Automatic update check on screen open (only once, respecting dismissed releases)
+    // Automatic update check disabled
+    /*
     LaunchedEffect(Unit) {
         checkForUpdate(
             context = context,
@@ -65,6 +71,7 @@ fun SettingsScreen(
             }
         }
     }
+    */
     
     // State for navigation to category screens
     var showKeyboardTimingSettings by remember { mutableStateOf(false) }
@@ -72,7 +79,12 @@ fun SettingsScreen(
     var showAutoCorrectionCategory by remember { mutableStateOf(false) }
     var showCustomizationSettings by remember { mutableStateOf(false) }
     var showAdvancedSettings by remember { mutableStateOf(false) }
-    
+    var showDeviceSettings by remember { mutableStateOf(false) }
+    var showCurrencyKeySettings by remember { mutableStateOf(false) }
+    var showAbout by remember { mutableStateOf(false) }
+
+    val device = DeviceManager.getDevice(context)
+
     // Handle system back button
     BackHandler {
         when {
@@ -90,6 +102,15 @@ fun SettingsScreen(
             }
             showAdvancedSettings -> {
                 showAdvancedSettings = false
+            }
+            showDeviceSettings -> {
+                showDeviceSettings = false
+            }
+            showCurrencyKeySettings -> {
+                showCurrencyKeySettings = false
+            }
+            showAbout -> {
+                showAbout = false
             }
             else -> {
                 // Get activity from context to finish it
@@ -136,6 +157,30 @@ fun SettingsScreen(
         AdvancedSettingsScreen(
             modifier = modifier,
             onBack = { showAdvancedSettings = false }
+        )
+        return
+    }
+
+    if (showDeviceSettings) {
+        DeviceSettingsScreen(
+            modifier = modifier,
+            onBack = { showDeviceSettings = false }
+        )
+        return
+    }
+
+    if (showCurrencyKeySettings) {
+        CurrencyKeySettingsScreen(
+            modifier = modifier,
+            onBack = { showCurrencyKeySettings = false }
+        )
+        return
+    }
+
+    if (showAbout) {
+        AboutScreen(
+            modifier = modifier,
+            onBack = { showAbout = false }
         )
         return
     }
@@ -366,8 +411,176 @@ fun SettingsScreen(
                         )
                     }
                 }
+
+                // Device
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clickable { showDeviceSettings = true }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.PhoneAndroid,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Device",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                if (device == "Q25") {
+                    // Currency Key
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp)
+                            .clickable { showCurrencyKeySettings = true }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.AttachMoney,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = stringResource(R.string.settings_currency_key_title),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1
+                                )
+                                Text(
+                                    text = stringResource(R.string.settings_currency_key_description),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
             
-                // About section
+                // Tutorial
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clickable {
+                            val intent = Intent(context, TutorialActivity::class.java)
+                            context.startActivity(intent)
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Help,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.settings_tutorial_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = stringResource(R.string.settings_tutorial_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            
+                // About
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clickable { showAbout = true }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.about_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = stringResource(R.string.about_app_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            
+                // About section - HIDDEN
+                /*
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -397,7 +610,8 @@ fun SettingsScreen(
                     }
                 }
                 
-                // GitHub Link
+                // GitHub Link (Hidden)
+                /*
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -441,6 +655,7 @@ fun SettingsScreen(
                         )
                     }
                 }
+                */
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -471,6 +686,13 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
+                                // Update check disabled
+                                Toast.makeText(
+                                    context,
+                                    "Update checking is currently disabled",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                /*
                                 checkingForUpdates = true
                                 checkForUpdate(
                                     context = context,
@@ -496,6 +718,7 @@ fun SettingsScreen(
                                         }
                                     }
                                 }
+                                */
                             },
                             enabled = !checkingForUpdates,
                             modifier = Modifier.fillMaxWidth()
@@ -555,27 +778,180 @@ fun SettingsScreen(
                         }
                     }
                 }
-
-                // Ko-fi Support Link
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                        .clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://ko-fi.com/palsoftware"))
-                            context.startActivity(intent)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.kofi5),
-                        contentDescription = stringResource(R.string.settings_support_ko_fi),
-                        modifier = Modifier
-                            .fillMaxWidth(0.35f)
-                            .aspectRatio(1f)
-                    )
-                }
+                */
             }
         }
     }
 }
+
+@Composable
+fun AboutScreen(
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    
+    BackHandler(onBack = onBack)
+    
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Top Bar
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shadowElevation = 4.dp,
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.about_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+        
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 8.dp)
+        ) {
+            // App Info
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = stringResource(R.string.about_app_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+            
+            // Build Info
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Code,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.about_build_info),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = BuildInfo.getBuildInfoString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+            
+            // GitHub Link (Hidden)
+            /*
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clickable {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/srik/TypeQ25/"))
+                        context.startActivity(intent)
+                    }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Code,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.about_github),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = stringResource(R.string.about_github_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            */
+        }
+    }
+}
+

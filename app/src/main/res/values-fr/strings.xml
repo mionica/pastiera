@@ -132,19 +132,6 @@
     <string name="sym_instructions_text">Appuyez sur une touche ci-dessous pour changer son emoji. Les modifications sont enregistrées automatiquement.</string>
     <string name="sym_reset_to_default">Réinitialiser par Défaut</string>
     
-    <!-- Emoji Picker Dialog -->
-    <string name="emoji_picker_title">Sélectionner un Emoji</string>
-    <string name="emoji_picker_title_for_letter">Sélectionner un emoji pour la lettre %1$s</string>
-    <string name="emoji_picker_close">Fermer</string>
-    <string name="emoji_category_smileys">Sourires &amp; Personnes</string>
-    <string name="emoji_category_animals">Animaux &amp; Nature</string>
-    <string name="emoji_category_food">Nourriture &amp; Boissons</string>
-    <string name="emoji_category_travel">Voyages &amp; Lieux</string>
-    <string name="emoji_category_activities">Activités</string>
-    <string name="emoji_category_objects">Objets</string>
-    <string name="emoji_category_symbols">Symboles</string>
-    <string name="emoji_category_flags">Drapeaux</string>
-    
     <!-- Modifiers -->
     <string name="modifier_shift">SHIFT</string>
     <string name="modifier_ctrl">CTRL</string>
@@ -166,6 +153,9 @@
     <string name="launcher_shortcuts_description">Activer les raccourcis clavier dans le lanceur</string>
     <string name="launcher_shortcuts_configure">Configurer les Raccourcis</string>
     <string name="launcher_shortcuts_configure_description">Assigner des touches pour ouvrir des applications dans le lanceur</string>
+    
+    <!-- Power Shortcuts -->
+    <string name="power_shortcuts_press_key">Appuyez sur une touche pour ouvrir l\'application</string>
     
     <!-- Launcher Shortcuts Screen -->
     <string name="launcher_shortcuts_screen_title">Raccourcis Lanceur</string>
@@ -264,7 +254,6 @@
     <string name="app_picker_search_placeholder">Rechercher des applications…</string>
     
     <!-- Settings Screen -->
-    <string name="settings_support_ko_fi">Soutenir sur Ko-fi</string>
     <string name="settings_nav_mode_configure">Configurer les mappages des touches du mode navigation</string>
     <string name="settings_trackpad_debug_title">Débogage Trackpad</string>
     <string name="settings_trackpad_debug_description">Tester les événements trackpad/clavier tactile</string>
@@ -311,11 +300,17 @@
     <string name="nav_mode_keycode_left">←</string>
     <string name="nav_mode_keycode_right">→</string>
     <string name="nav_mode_keycode_center">○</string>
-    <string name="nav_mode_keycode_page_up">PgPréc</string>
-    <string name="nav_mode_keycode_page_down">PgSuiv</string>
-    <string name="nav_mode_keycode_escape">Échap</string>
+    <string name="nav_mode_keycode_page_up">PgUp</string>
+    <string name="nav_mode_keycode_page_down">PgDn</string>
+    <string name="nav_mode_keycode_escape">Esc</string>
     <string name="nav_mode_keycode_tab">Tab</string>
+    <string name="nav_mode_keycode_forward_delete">Suppr</string>
     <string name="nav_mode_key_unknown">?</string>
+    
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Haut-parleur ACTIF</string>
+    <string name="speaker_toggle_off">Haut-parleur INACTIF</string>
+    <string name="speaker_toggle_not_in_call">Pas en appel</string>
 </resources>
 
 

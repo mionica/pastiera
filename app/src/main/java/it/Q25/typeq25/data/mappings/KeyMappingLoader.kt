@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
 import android.view.KeyEvent
+import it.srik.TypeQ25.DeviceManager
 import it.srik.TypeQ25.SettingsManager
 import org.json.JSONObject
 import java.io.InputStream
@@ -15,7 +16,7 @@ object KeyMappingLoader {
     private const val TAG = "KeyMappingLoader"
 
     fun getDeviceName(context: Context? = null): String {
-        return "titan2"
+        return context?.let { DeviceManager.getDevice(it) } ?: "titan2"
     }
 
     private val keyCodeMap = mapOf(
@@ -80,8 +81,21 @@ object KeyMappingLoader {
             while (keys.hasNext()) {
                 val keyName = keys.next()
                 val keyCode = keyCodeMap[keyName]
-                val character = mappingsObject.getString(keyName)
-                if (keyCode != null) {
+                var character = mappingsObject.getString(keyName)
+                
+                // Convert to Arabic characters if enabled for Arabic layout
+                if (keyCode != null && context != null) {
+                    val currentLayout = it.srik.TypeQ25.SettingsManager.getKeyboardLayout(context)
+                    if (currentLayout.startsWith("arabic", ignoreCase = true)) {
+                        if (it.srik.TypeQ25.SettingsManager.getUseArabicNumerals(context)) {
+                            character = convertToArabicNumerals(character)
+                        }
+                        if (it.srik.TypeQ25.SettingsManager.getUseArabicPunctuation(context)) {
+                            character = convertToArabicPunctuation(character)
+                        }
+                    }
+                    altKeyMap[keyCode] = character
+                } else if (keyCode != null) {
                     altKeyMap[keyCode] = character
                 }
             }
@@ -92,6 +106,30 @@ object KeyMappingLoader {
             altKeyMap[KeyEvent.KEYCODE_Y] = ")"
         }
         return altKeyMap
+    }
+    
+    /**
+     * Converts Western numerals (0-9) to Arabic-Indic numerals (٠-٩).
+     */
+    private fun convertToArabicNumerals(text: String): String {
+        val arabicNumerals = mapOf(
+            '0' to '٠', '1' to '١', '2' to '٢', '3' to '٣', '4' to '٤',
+            '5' to '٥', '6' to '٦', '7' to '٧', '8' to '٨', '9' to '٩'
+        )
+        return text.map { char -> arabicNumerals[char] ?: char }.joinToString("")
+    }
+    
+    /**
+     * Converts Western punctuation to Arabic punctuation.
+     * ? → ؟ (Arabic question mark)
+     * , → ، (Arabic comma)
+     */
+    private fun convertToArabicPunctuation(text: String): String {
+        val arabicPunctuation = mapOf(
+            '?' to '؟',  // Arabic question mark
+            ',' to '،'   // Arabic comma
+        )
+        return text.map { char -> arabicPunctuation[char] ?: char }.joinToString("")
     }
 
     fun loadSymKeyMappings(assets: AssetManager): Map<Int, String> {
@@ -224,4 +262,3 @@ object KeyMappingLoader {
         return ctrlKeyMap
     }
 }
-

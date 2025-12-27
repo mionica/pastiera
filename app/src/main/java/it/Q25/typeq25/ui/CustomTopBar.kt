@@ -21,18 +21,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.statusBarsPadding
 import it.srik.TypeQ25.R
 
-// TypeQ25 colors inspired by the dessert
-private val TypeQ25Beige = Color(0xFF6B5435) // Much darker beige/brown
-private val TypeQ25BeigeDark = Color(0xFF8B6F47) // Even darker for depth
-private val TypeQ25Orange = Color(0xFFFFA366)
-private val TypeQ25OrangeLight = Color(0xFFFFB84D)
-private val TypeQ25Yellow = Color(0xFFFFD700)
+// BlackBerry colors
+private val BlackBerryBlack = Color(0xFF1A1A1A)
+private val BlackBerryDarkGray = Color(0xFF2D2D2D)
+private val BlackBerryGray = Color(0xFF3F3F3F)
+private val BlackBerrySilver = Color(0xFFBDBDBD)
+private val BlackBerryBlue = Color(0xFF00A0DC)
 
 /**
- * Custom top bar with TypeQ25 lattice pattern.
- * Features diagonal beige stripes over an orange/yellow gradient.
+ * Custom top bar with BlackBerry theme.
+ * Features gradient background with subtle grid pattern.
  */
 @Composable
 fun CustomTopBar(
@@ -42,19 +43,29 @@ fun CustomTopBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .shadow(
                 elevation = 4.dp,
-                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)
             ),
-        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
+        shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
         color = Color.Transparent
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = TypeQ25Orange)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            BlackBerryBlack,
+                            BlackBerryDarkGray,
+                            BlackBerryBlack
+                        )
+                    )
+                )
         ) {
-            TypeQ25Pattern(
+            // Subtle grid pattern overlay
+            GridPattern(
                 modifier = Modifier
                     .fillMaxWidth()
                     .matchParentSize()
@@ -74,12 +85,12 @@ fun CustomTopBar(
                         text = "TypeQ25",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = BlackBerrySilver
                     )
                     Text(
-                        text = "La Tastiera per la tua Tastiera",
+                        text = "Physical Keyboard IME",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = BlackBerryBlue,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -90,9 +101,9 @@ fun CustomTopBar(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .size(48.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(8.dp))
                         .background(
-                            color = TypeQ25Beige.copy(alpha = 0.9f)
+                            color = BlackBerryBlue
                         )
                 ) {
                     Icon(
@@ -108,132 +119,36 @@ fun CustomTopBar(
 }
 
 @Composable
-private fun TypeQ25Pattern(
-    modifier: Modifier = Modifier,
-    stripeWidth: Dp = 50.dp,
-    stripeSpacing: Dp = 90.dp
+private fun GridPattern(
+    modifier: Modifier = Modifier
 ) {
-    val density = LocalDensity.current
-    val widthPx = with(density) { stripeWidth.toPx() }
-    val spacingPx = with(density) { stripeSpacing.toPx() }
-
     Canvas(modifier = modifier) {
-        drawTypeQ25Pattern(stripeWidth = widthPx, stripeSpacing = spacingPx)
-    }
-}
-
-private fun DrawScope.drawTypeQ25Pattern(stripeWidth: Float, stripeSpacing: Float) {
-    val halfWidth = stripeWidth / 2f
-    val sqrt2 = kotlin.math.sqrt(2.0).toFloat()
-    
-    // Perpendicular offset for 45-degree lines
-    val perpOffset = halfWidth / sqrt2
-    
-    // Draw first set: diagonal stripes from top-left to bottom-right (y = x + b)
-    val maxIntercept = size.width + size.height
-    var intercept = -maxIntercept
-    while (intercept < maxIntercept) {
-        val path = Path().apply {
-            // Find where line y = x + intercept intersects screen edges
-            var p1x = 0f
-            var p1y = intercept
-            var p2x = size.width
-            var p2y = size.width + intercept
-            
-            // Adjust if line starts outside top edge
-            if (p1y < 0f) {
-                p1y = 0f
-                p1x = -intercept
-            }
-            // Adjust if line starts outside bottom edge
-            if (p1y > size.height) {
-                p1y = size.height
-                p1x = size.height - intercept
-            }
-            
-            // Adjust if line ends outside top edge
-            if (p2y < 0f) {
-                p2y = 0f
-                p2x = -intercept
-            }
-            // Adjust if line ends outside bottom edge
-            if (p2y > size.height) {
-                p2y = size.height
-                p2x = size.height - intercept
-            }
-            
-            // Ensure points are within bounds
-            p1x = p1x.coerceIn(0f, size.width)
-            p1y = p1y.coerceIn(0f, size.height)
-            p2x = p2x.coerceIn(0f, size.width)
-            p2y = p2y.coerceIn(0f, size.height)
-            
-            // Create parallelogram perpendicular to the diagonal line
-            val perpX = -perpOffset
-            val perpY = perpOffset
-            
-            moveTo(p1x + perpX, p1y + perpY)
-            lineTo(p2x + perpX, p2y + perpY)
-            lineTo(p2x - perpX, p2y - perpY)
-            lineTo(p1x - perpX, p1y - perpY)
-            close()
+        val lineColor = BlackBerryGray.copy(alpha = 0.3f)
+        val spacing = 60f
+        
+        // Draw vertical lines
+        var x = 0f
+        while (x <= size.width) {
+            drawLine(
+                color = lineColor,
+                start = androidx.compose.ui.geometry.Offset(x, 0f),
+                end = androidx.compose.ui.geometry.Offset(x, size.height),
+                strokeWidth = 1f
+            )
+            x += spacing
         }
         
-        drawPath(path, color = TypeQ25Beige)
-        intercept += stripeSpacing * sqrt2
-    }
-    
-    // Draw second set: diagonal stripes from top-right to bottom-left (y = -x + b)
-    intercept = -size.width
-    while (intercept < size.width + size.height) {
-        val path = Path().apply {
-            // Find where line y = -x + intercept intersects screen edges
-            var p1x = 0f
-            var p1y = intercept
-            var p2x = size.width
-            var p2y = -size.width + intercept
-            
-            // Adjust if line starts outside top edge
-            if (p1y < 0f) {
-                p1y = 0f
-                p1x = intercept
-            }
-            // Adjust if line starts outside bottom edge
-            if (p1y > size.height) {
-                p1y = size.height
-                p1x = intercept - size.height
-            }
-            
-            // Adjust if line ends outside top edge
-            if (p2y < 0f) {
-                p2y = 0f
-                p2x = intercept
-            }
-            // Adjust if line ends outside bottom edge
-            if (p2y > size.height) {
-                p2y = size.height
-                p2x = intercept - size.height
-            }
-            
-            // Ensure points are within bounds
-            p1x = p1x.coerceIn(0f, size.width)
-            p1y = p1y.coerceIn(0f, size.height)
-            p2x = p2x.coerceIn(0f, size.width)
-            p2y = p2y.coerceIn(0f, size.height)
-            
-            // Create parallelogram perpendicular to the diagonal line
-            val perpX = perpOffset
-            val perpY = perpOffset
-            
-            moveTo(p1x + perpX, p1y + perpY)
-            lineTo(p2x + perpX, p2y + perpY)
-            lineTo(p2x - perpX, p2y - perpY)
-            lineTo(p1x - perpX, p1y - perpY)
-            close()
+        // Draw horizontal lines
+        var y = 0f
+        while (y <= size.height) {
+            drawLine(
+                color = lineColor,
+                start = androidx.compose.ui.geometry.Offset(0f, y),
+                end = androidx.compose.ui.geometry.Offset(size.width, y),
+                strokeWidth = 1f
+            )
+            y += spacing
         }
-        
-        drawPath(path, color = TypeQ25Beige)
-        intercept += stripeSpacing * sqrt2
     }
 }
 

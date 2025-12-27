@@ -14,6 +14,8 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        // Update check button disabled
+        /*
         findViewById<Button>(R.id.check_updates_button).setOnClickListener {
             checkForUpdate(
                 context = this,
@@ -27,6 +29,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
         }
+        */
     }
 }
 

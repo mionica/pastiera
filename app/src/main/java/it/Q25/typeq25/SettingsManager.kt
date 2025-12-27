@@ -2,6 +2,7 @@ package it.srik.TypeQ25
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import android.util.Log
 import android.view.KeyEvent
 import org.json.JSONObject
@@ -23,8 +24,10 @@ object SettingsManager {
     private const val KEY_DOUBLE_SPACE_TO_PERIOD = "double_space_to_period"
     private const val KEY_SWIPE_TO_DELETE = "swipe_to_delete"
     private const val KEY_AUTO_SHOW_KEYBOARD = "auto_show_keyboard"
+    private const val KEY_AUTO_FOCUS_INPUT_FIELDS = "auto_focus_input_fields"
     private const val KEY_CLEAR_ALT_ON_SPACE = "clear_alt_on_space"
     private const val KEY_ALT_CTRL_SPEECH_SHORTCUT = "alt_ctrl_speech_shortcut"
+    private const val KEY_PREFERRED_SPEECH_APP = "preferred_speech_app"
     private const val KEY_SYM_MAPPINGS_CUSTOM = "sym_mappings_custom"
     private const val KEY_SYM_MAPPINGS_PAGE2_CUSTOM = "sym_mappings_page2_custom"
     private const val KEY_AUTO_CORRECT_ENABLED = "auto_correct_enabled"
@@ -38,6 +41,12 @@ object SettingsManager {
     private const val KEY_SYM_PAGES_CONFIG = "sym_pages_config" // Order/enabled pages for SYM
     private const val KEY_SYM_AUTO_CLOSE = "sym_auto_close" // Auto-close SYM layout after key press
     private const val KEY_DISMISSED_RELEASES = "dismissed_releases" // Set of release tag_names that were dismissed
+    private const val KEY_SPELL_CHECK_ENABLED = "spell_check_enabled" // Enable offline spell checker
+    private const val KEY_EMOJI_SHORTCODE_ENABLED = "emoji_shortcode_enabled" // Enable emoji shortcodes (:smile: -> 😊)
+    private const val KEY_SYMBOL_SHORTCODE_ENABLED = "symbol_shortcode_enabled" // Enable symbol shortcodes (:tm: -> ™)
+    private const val KEY_KEYCODE_7_BEHAVIOR = "keycode_7_behavior" // Behavior for KEYCODE_7 (Q25 ONLY): "zero" or "alt_zero"
+    private const val KEY_USE_ARABIC_NUMERALS = "use_arabic_numerals" // Use Arabic-Indic numerals (٠-٩) instead of Western (0-9) when Arabic layout is active
+    private const val KEY_USE_ARABIC_PUNCTUATION = "use_arabic_punctuation" // Use Arabic punctuation (،؟) instead of Western (,?) when Arabic layout is active
     
     // Default values
     private const val DEFAULT_LONG_PRESS_THRESHOLD = 300L
@@ -47,6 +56,7 @@ object SettingsManager {
     private const val DEFAULT_DOUBLE_SPACE_TO_PERIOD = true
     private const val DEFAULT_SWIPE_TO_DELETE = false
     private const val DEFAULT_AUTO_SHOW_KEYBOARD = true
+    private const val DEFAULT_AUTO_FOCUS_INPUT_FIELDS = false
     private const val DEFAULT_CLEAR_ALT_ON_SPACE = false
     private const val DEFAULT_ALT_CTRL_SPEECH_SHORTCUT = true
     private const val DEFAULT_AUTO_CORRECT_ENABLED = true
@@ -54,13 +64,30 @@ object SettingsManager {
     private const val DEFAULT_LONG_PRESS_MODIFIER = "alt"
     private const val DEFAULT_KEYBOARD_LAYOUT = "qwerty"
     private const val DEFAULT_SYM_AUTO_CLOSE = true
+    private const val DEFAULT_SPELL_CHECK_ENABLED = true
+    private const val DEFAULT_EMOJI_SHORTCODE_ENABLED = true
+    private const val DEFAULT_SYMBOL_SHORTCODE_ENABLED = true
+    private const val DEFAULT_KEYCODE_7_BEHAVIOR = "alt_zero" // Default: keycode 7 triggers speech-to-text, Alt+7 inserts 0
+    private const val DEFAULT_USE_ARABIC_NUMERALS = false
+    private const val DEFAULT_USE_ARABIC_PUNCTUATION = false
     private val DEFAULT_SYM_PAGES_CONFIG = SymPagesConfig()
     
     /**
      * Returns the SharedPreferences instance for TypeQ25.
+     * Uses device-protected storage for Direct Boot support.
      */
     fun getPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                val deviceContext = context.createDeviceProtectedStorageContext()
+                deviceContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to create device protected storage, using default", e)
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            }
+        } else {
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        }
     }
     
     /**
@@ -175,6 +202,22 @@ object SettingsManager {
             .putBoolean(KEY_AUTO_SHOW_KEYBOARD, enabled)
             .apply()
     }
+    
+    /**
+     * Returns whether auto-focus input fields is enabled.
+     */
+    fun getAutoFocusInputFields(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_AUTO_FOCUS_INPUT_FIELDS, DEFAULT_AUTO_FOCUS_INPUT_FIELDS)
+    }
+    
+    /**
+     * Sets whether auto-focus input fields is enabled.
+     */
+    fun setAutoFocusInputFields(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_AUTO_FOCUS_INPUT_FIELDS, enabled)
+            .apply()
+    }
 
     /**
      * Returns whether Alt+Ctrl shortcut for speech recognition is enabled.
@@ -189,6 +232,56 @@ object SettingsManager {
     fun setAltCtrlSpeechShortcutEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_ALT_CTRL_SPEECH_SHORTCUT, enabled)
+            .apply()
+    }
+
+    /**
+     * Returns the preferred speech recognition app package name.
+     * Returns null if no preference is set (first time use).
+     */
+    fun getPreferredSpeechApp(context: Context): String? {
+        return getPreferences(context).getString(KEY_PREFERRED_SPEECH_APP, null)
+    }
+
+    /**
+     * Sets the preferred speech recognition app package name.
+     */
+    fun setPreferredSpeechApp(context: Context, packageName: String?) {
+        getPreferences(context).edit()
+            .putString(KEY_PREFERRED_SPEECH_APP, packageName)
+            .apply()
+    }
+
+    /**
+     * Returns the behavior mode for KEYCODE_7.
+     * This setting is only applicable to Q25 devices.
+     * @return "zero" (inserts 0, Alt+7 for speech) or "alt_zero" (triggers speech, Alt+7 for 0)
+     *         Returns default "alt_zero" for non-Q25 devices.
+     */
+    fun getKeycode7Behavior(context: Context): String {
+        // Only apply this setting on Q25/Jelly2 devices
+        val isQ25Device = Build.MODEL.contains("Jelly2", ignoreCase = true) || 
+                         Build.MODEL.contains("Q25", ignoreCase = true)
+        if (!isQ25Device) {
+            return DEFAULT_KEYCODE_7_BEHAVIOR
+        }
+        return getPreferences(context).getString(KEY_KEYCODE_7_BEHAVIOR, DEFAULT_KEYCODE_7_BEHAVIOR) ?: DEFAULT_KEYCODE_7_BEHAVIOR
+    }
+
+    /**
+     * Sets the behavior mode for KEYCODE_7.
+     * This setting is only applicable to Q25 devices.
+     * @param mode "zero" (inserts 0, Alt+7 for speech) or "alt_zero" (triggers speech, Alt+7 for 0)
+     */
+    fun setKeycode7Behavior(context: Context, mode: String) {
+        // Only allow setting on Q25/Jelly2 devices
+        val isQ25Device = Build.MODEL.contains("Jelly2", ignoreCase = true) || 
+                         Build.MODEL.contains("Q25", ignoreCase = true)
+        if (!isQ25Device) {
+            return
+        }
+        getPreferences(context).edit()
+            .putString(KEY_KEYCODE_7_BEHAVIOR, mode)
             .apply()
     }
 
@@ -478,6 +571,22 @@ object SettingsManager {
     }
     
     /**
+     * Returns whether offline spell checker is enabled.
+     */
+    fun getSpellCheckEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_SPELL_CHECK_ENABLED, DEFAULT_SPELL_CHECK_ENABLED)
+    }
+    
+    /**
+     * Sets whether offline spell checker is enabled.
+     */
+    fun setSpellCheckEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SPELL_CHECK_ENABLED, enabled)
+            .apply()
+    }
+    
+    /**
      * Special JSON field for the language name.
      */
     private const val LANGUAGE_NAME_KEY = "__name"
@@ -642,6 +751,18 @@ object SettingsManager {
     private const val KEY_LAUNCHER_SHORTCUTS_ENABLED = "launcher_shortcuts_enabled"
     private const val DEFAULT_LAUNCHER_SHORTCUTS_ENABLED = false
     
+    // Power shortcuts settings
+    private const val KEY_POWER_SHORTCUTS_ENABLED = "power_shortcuts_enabled"
+    private const val DEFAULT_POWER_SHORTCUTS_ENABLED = false
+    
+    // UI settings
+    private const val KEY_USE_MINIMAL_UI = "use_minimal_ui"
+    private const val DEFAULT_USE_MINIMAL_UI = false
+    
+    // Tutorial settings
+    private const val KEY_TUTORIAL_COMPLETED = "tutorial_completed"
+    private const val DEFAULT_TUTORIAL_COMPLETED = false
+    
     // Nav mode settings
     private const val KEY_NAV_MODE_ENABLED = "nav_mode_enabled"
     private const val DEFAULT_NAV_MODE_ENABLED = true
@@ -739,6 +860,44 @@ object SettingsManager {
     }
     
     /**
+     * Swaps launcher shortcuts between two key codes atomically.
+     */
+    fun swapLauncherShortcuts(context: Context, fromKeyCode: Int, toKeyCode: Int) {
+        val shortcuts = getLauncherShortcuts(context).toMutableMap()
+        val fromShortcut = shortcuts[fromKeyCode]
+        val toShortcut = shortcuts[toKeyCode]
+        
+        // Swap shortcuts
+        if (fromShortcut != null) {
+            shortcuts[toKeyCode] = fromShortcut
+        } else {
+            shortcuts.remove(toKeyCode)
+        }
+        
+        if (toShortcut != null) {
+            shortcuts[fromKeyCode] = toShortcut
+        } else {
+            shortcuts.remove(fromKeyCode)
+        }
+        
+        // Save all shortcuts atomically
+        val json = JSONObject()
+        for ((keyCode, shortcut) in shortcuts) {
+            val shortcutObj = JSONObject()
+            shortcutObj.put("type", shortcut.type)
+            shortcut.packageName?.let { shortcutObj.put("packageName", it) }
+            shortcut.appName?.let { shortcutObj.put("appName", it) }
+            shortcut.action?.let { shortcutObj.put("action", it) }
+            shortcut.data?.let { shortcutObj.put("data", it) }
+            json.put(keyCode.toString(), shortcutObj)
+        }
+        
+        getPreferences(context).edit()
+            .putString(KEY_LAUNCHER_SHORTCUTS, json.toString())
+            .apply()
+    }
+    
+    /**
      * Restituisce se le scorciatoie del launcher sono abilitate.
      */
     fun getLauncherShortcutsEnabled(context: Context): Boolean {
@@ -751,6 +910,54 @@ object SettingsManager {
     fun setLauncherShortcutsEnabled(context: Context, enabled: Boolean) {
         getPreferences(context).edit()
             .putBoolean(KEY_LAUNCHER_SHORTCUTS_ENABLED, enabled)
+            .apply()
+    }
+    
+    /**
+     * Returns whether power shortcuts are enabled.
+     */
+    fun getPowerShortcutsEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_POWER_SHORTCUTS_ENABLED, DEFAULT_POWER_SHORTCUTS_ENABLED)
+    }
+    
+    /**
+     * Sets whether power shortcuts are enabled.
+     */
+    fun setPowerShortcutsEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_POWER_SHORTCUTS_ENABLED, enabled)
+            .apply()
+    }
+    
+    /**
+     * Returns whether minimal UI mode is enabled.
+     */
+    fun getUseMinimalUi(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_USE_MINIMAL_UI, DEFAULT_USE_MINIMAL_UI)
+    }
+    
+    /**
+     * Sets whether minimal UI mode is enabled.
+     */
+    fun setUseMinimalUi(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_USE_MINIMAL_UI, enabled)
+            .apply()
+    }
+    
+    /**
+     * Returns whether the tutorial has been completed.
+     */
+    fun isTutorialCompleted(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_TUTORIAL_COMPLETED, DEFAULT_TUTORIAL_COMPLETED)
+    }
+    
+    /**
+     * Sets whether the tutorial has been completed.
+     */
+    fun setTutorialCompleted(context: Context, completed: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_TUTORIAL_COMPLETED, completed)
             .apply()
     }
     
@@ -1003,6 +1210,40 @@ object SettingsManager {
     }
     
     /**
+     * Returns whether Arabic-Indic numerals (٠-٩) should be used instead of Western numerals (0-9)
+     * when the Arabic keyboard layout is active.
+     */
+    fun getUseArabicNumerals(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_USE_ARABIC_NUMERALS, DEFAULT_USE_ARABIC_NUMERALS)
+    }
+    
+    /**
+     * Sets whether Arabic-Indic numerals should be used for Arabic layout.
+     */
+    fun setUseArabicNumerals(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_USE_ARABIC_NUMERALS, enabled)
+            .apply()
+    }
+    
+    /**
+     * Returns whether Arabic punctuation (،؟) should be used instead of Western (,?)
+     * when the Arabic keyboard layout is active.
+     */
+    fun getUseArabicPunctuation(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_USE_ARABIC_PUNCTUATION, DEFAULT_USE_ARABIC_PUNCTUATION)
+    }
+    
+    /**
+     * Sets whether Arabic punctuation should be used for Arabic layout.
+     */
+    fun setUseArabicPunctuation(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_USE_ARABIC_PUNCTUATION, enabled)
+            .apply()
+    }
+    
+    /**
      * Sets the SYM page to restore when returning from settings.
      * @param context The context
      * @param page The SYM page to restore (0=disabled, 1=page1 emoji, 2=page2 characters)
@@ -1088,7 +1329,7 @@ object SettingsManager {
             SymPagesConfig(
                 emojiEnabled = jsonObject.optBoolean("emojiEnabled", true),
                 symbolsEnabled = jsonObject.optBoolean("symbolsEnabled", true),
-                emojiFirst = jsonObject.optBoolean("emojiFirst", true)
+                emojiFirst = jsonObject.optBoolean("emojiFirst", false)
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error loading SYM pages config", e)
@@ -1172,5 +1413,37 @@ object SettingsManager {
      */
     fun isReleaseDismissed(context: Context, tagName: String): Boolean {
         return getDismissedReleases(context).contains(tagName)
+    }
+    
+    /**
+     * Returns the state of emoji shortcodes feature.
+     */
+    fun getEmojiShortcodeEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_EMOJI_SHORTCODE_ENABLED, DEFAULT_EMOJI_SHORTCODE_ENABLED)
+    }
+    
+    /**
+     * Sets the state of emoji shortcodes feature.
+     */
+    fun setEmojiShortcodeEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_EMOJI_SHORTCODE_ENABLED, enabled)
+            .apply()
+    }
+    
+    /**
+     * Returns the state of symbol shortcodes feature.
+     */
+    fun getSymbolShortcodeEnabled(context: Context): Boolean {
+        return getPreferences(context).getBoolean(KEY_SYMBOL_SHORTCODE_ENABLED, DEFAULT_SYMBOL_SHORTCODE_ENABLED)
+    }
+    
+    /**
+     * Sets the state of symbol shortcodes feature.
+     */
+    fun setSymbolShortcodeEnabled(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_SYMBOL_SHORTCODE_ENABLED, enabled)
+            .apply()
     }
 }

@@ -453,26 +453,6 @@ fun SymCustomizationScreen(
             }
         }
         
-        // Emoji picker dialog
-        if (showEmojiPicker && selectedKeyCode != null) {
-            val selectedLetter = getLetterFromKeyCode(selectedKeyCode!!)
-            EmojiPickerDialog(
-                selectedLetter = selectedLetter,
-                onEmojiSelected = { emoji ->
-                    symMappingsPage1 = symMappingsPage1.toMutableMap().apply {
-                        put(selectedKeyCode!!, emoji)
-                    }
-                    SettingsManager.saveSymMappings(context, symMappingsPage1)
-                    showEmojiPicker = false
-                    selectedKeyCode = null
-                },
-                onDismiss = {
-                    showEmojiPicker = false
-                    selectedKeyCode = null
-                }
-            )
-        }
-        
         // Unicode character picker dialog
         if (showCharacterPicker && selectedKeyCode != null) {
             val selectedLetter = getLetterFromKeyCode(selectedKeyCode!!)

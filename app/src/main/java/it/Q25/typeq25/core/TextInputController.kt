@@ -44,7 +44,14 @@ class TextInputController(
                                 lastCharIndex--
                             }
 
-                            val shouldReplace = lastCharIndex >= 0 && textBeforeCursor[lastCharIndex].isLetter()
+                            // Allow period insertion after letters, numbers, and closing symbols
+                            // but not after existing punctuation like . ! ? , ; :
+                            val shouldReplace = if (lastCharIndex >= 0) {
+                                val lastChar = textBeforeCursor[lastCharIndex]
+                                lastChar.isLetterOrDigit() || lastChar in setOf(')', ']', '}', '"', '\'', '%', '$', '€', '£', '¥')
+                            } else {
+                                false
+                            }
                             if (shouldReplace) {
                                 inputConnection.deleteSurroundingText(1, 0)
                                 inputConnection.commitText(". ", 1)

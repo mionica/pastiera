@@ -10,9 +10,10 @@ enum class ShiftState { OFF, ONE_SHOT, CAPS }
  * bookkeeping in sync with the UI and auto-capitalization helpers.
  */
 class ModifierStateController(
-    private val doubleTapThreshold: Long
+    private val doubleTapThreshold: Long,
+    private val isCtrlKeyFunc: ((Int) -> Boolean)? = null
 ) {
-    private val modifierKeyHandler = ModifierKeyHandler(doubleTapThreshold)
+    private val modifierKeyHandler = ModifierKeyHandler(doubleTapThreshold, isCtrlKeyFunc)
     private var lastKeyWasModifier = false
     private var lastModifierKeyCode: Int = 0
 
@@ -145,9 +146,9 @@ class ModifierStateController(
         get() = ctrlState.latchFromNavMode
         set(value) { ctrlState.latchFromNavMode = value }
 
-    var ctrlLastReleaseTime: Long
-        get() = ctrlState.lastReleaseTime
-        set(value) { ctrlState.lastReleaseTime = value }
+    var ctrlLastPressTime: Long
+        get() = ctrlState.lastPressTime
+        set(value) { ctrlState.lastPressTime = value }
 
     var altLatchActive: Boolean
         get() = altState.latchActive
@@ -220,9 +221,6 @@ class ModifierStateController(
         isInputViewActive: Boolean,
         onNavModeDeactivated: (() -> Unit)? = null
     ): ModifierKeyHandler.ModifierKeyResult {
-        if (ctrlPressed) {
-            return ModifierKeyHandler.ModifierKeyResult()
-        }
         val isConsecutiveTap = registerModifierTap(keyCode)
         val result = modifierKeyHandler.handleCtrlKeyDown(
             keyCode,
@@ -231,7 +229,8 @@ class ModifierStateController(
             isConsecutiveTap = isConsecutiveTap,
             onNavModeDeactivated
         )
-        ctrlPressed = true
+        // Sync ctrlPressed with the actual state after handling
+        ctrlPressed = ctrlState.pressed
         return result
     }
 
@@ -268,7 +267,7 @@ class ModifierStateController(
     fun clearAltState(resetPressedState: Boolean = false) {
         altState.latchActive = false
         altState.oneShot = false
-        altState.lastReleaseTime = 0
+        altState.lastPressTime = 0
         if (resetPressedState) {
             altState.pressed = false
             altState.physicallyPressed = false
@@ -283,7 +282,7 @@ class ModifierStateController(
         ctrlState.latchActive = false
         ctrlState.oneShot = false
         ctrlState.latchFromNavMode = false
-        ctrlState.lastReleaseTime = 0
+        ctrlState.lastPressTime = 0
         if (resetPressedState) {
             ctrlState.pressed = false
             ctrlState.physicallyPressed = false

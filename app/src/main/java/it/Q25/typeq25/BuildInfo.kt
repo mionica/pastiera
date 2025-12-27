@@ -3,34 +3,34 @@ package it.srik.TypeQ25
 import it.srik.TypeQ25.BuildConfig
 
 /**
- * Fornisce informazioni sulla build dell'app.
+ * Provides information about the app build.
  */
 object BuildInfo {
     /**
-     * Ottiene il numero di build incrementale.
+     * Gets the incremental build number.
      */
     fun getBuildNumber(): Int {
         return BuildConfig.BUILD_NUMBER
     }
     
     /**
-     * Ottiene la data della build.
+     * Gets the build date.
      */
     fun getBuildDate(): String {
         return BuildConfig.BUILD_DATE
     }
     
     /**
-     * Ottiene la stringa formattata con build number e data.
-     * Formato: "build X - DD MMM YYYY"
+     * Gets the formatted string with build number and date.
+     * Format: "Build X - DD MMM YYYY"
      */
     fun getBuildInfoString(): String {
         val buildNumber = getBuildNumber()
         val buildDate = getBuildDate()
         return if (buildDate.isNotEmpty()) {
-            "build $buildNumber - $buildDate"
+            "Build $buildNumber - $buildDate"
         } else {
-            "build $buildNumber"
+            "Build $buildNumber"
         }
     }
 }

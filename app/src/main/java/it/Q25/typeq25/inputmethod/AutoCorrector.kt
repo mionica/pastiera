@@ -14,7 +14,7 @@ import org.json.JSONObject
 object AutoCorrector {
     private const val TAG = "AutoCorrector"
 
-    private val corrections = mutableMapOf<String, Map<String, String>>()
+    internal val corrections = mutableMapOf<String, Map<String, String>>()
 
     /**
      * Information about the last applied correction.

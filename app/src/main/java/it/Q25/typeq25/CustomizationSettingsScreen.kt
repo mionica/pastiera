@@ -35,11 +35,29 @@ fun CustomizationSettingsScreen(
     val context = LocalContext.current
     
     var showNavModeSettings by remember { mutableStateOf(false) }
+    var showVariationCustomization by remember { mutableStateOf(false) }
+    var showCustomEmojiManagement by remember { mutableStateOf(false) }
     
     if (showNavModeSettings) {
         NavModeSettingsScreen(
             modifier = modifier,
             onBack = { showNavModeSettings = false }
+        )
+        return
+    }
+    
+    if (showVariationCustomization) {
+        VariationCustomizationScreen(
+            modifier = modifier,
+            onBack = { showVariationCustomization = false }
+        )
+        return
+    }
+    
+    if (showCustomEmojiManagement) {
+        CustomEmojiManagementScreen(
+            modifier = modifier,
+            onBack = { showCustomEmojiManagement = false }
         )
         return
     }
@@ -80,7 +98,8 @@ fun CustomizationSettingsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // SYM Customization
+            // SYM Customization - Hidden since SymbolPickerPopup is now used
+            /*
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,6 +139,7 @@ fun CustomizationSettingsScreen(
                     )
                 }
             }
+            */
         
             // Nav Mode Settings
             Surface(
@@ -150,6 +170,90 @@ fun CustomizationSettingsScreen(
                         )
                         Text(
                             text = stringResource(R.string.settings_nav_mode_configure),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        
+            // Customize Variations
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clickable { showVariationCustomization = true }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Keyboard,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Customize Variations",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = "Edit character variations and default special characters",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            // Custom Emojis
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+                    .clickable { showCustomEmojiManagement = true }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Keyboard,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Custom Emojis",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = "Add and manage custom emojis with shortcodes",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1

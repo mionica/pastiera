@@ -44,7 +44,8 @@ class MultiTapController(
         keyCode: Int,
         mapping: LayoutMapping,
         useUppercase: Boolean,
-        inputConnection: InputConnection
+        inputConnection: InputConnection,
+        isPasswordField: Boolean = false
     ): Boolean {
         if (!mapping.isRealMultiTap) {
             finalizeCycle()
@@ -63,7 +64,12 @@ class MultiTapController(
         }
 
         val activeUppercase = if (isSameKeyWithinWindow && state.active) state.useUppercase else useUppercase
-        val text = LayoutMappingRepository.resolveText(mapping, activeUppercase, nextTapIndex) ?: return false
+        var text = LayoutMappingRepository.resolveText(mapping, activeUppercase, nextTapIndex) ?: return false
+        
+        // Convert Arabic-Indic numerals to Western numerals in password fields
+        if (isPasswordField) {
+            text = LayoutMappingRepository.convertArabicNumeralsToWestern(text)
+        }
 
         if (isSameKeyWithinWindow) {
             // Replace previous character atomically to avoid flicker in apps like Messages.

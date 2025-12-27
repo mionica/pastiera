@@ -1,6 +1,6 @@
 {
   "name": "Arabic",
-  "description": "Arabic keyboard layout (Unihertz Titan 2)",
+  "description": "Arabic keyboard layout",
   "mappings": {
     "KEYCODE_Q": {
       "lowercase": "ض",
@@ -62,7 +62,10 @@
       "multiTapEnabled": true,
       "taps": [
         { "lowercase": "ا", "uppercase": "ا" },
-        { "lowercase": "أ", "uppercase": "أ" }
+        { "lowercase": "أ", "uppercase": "أ" },
+        { "lowercase": "إ", "uppercase": "إ" },
+        { "lowercase": "آ", "uppercase": "آ" },
+        { "lowercase": "ٱ", "uppercase": "ٱ" }
       ]
     },
     "KEYCODE_H": {

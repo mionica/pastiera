@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.KeyEvent
 import android.view.inputmethod.InputConnection
+import it.srik.TypeQ25.DeviceManager
 import it.srik.TypeQ25.SettingsManager
 import it.srik.TypeQ25.data.mappings.KeyMappingLoader
 import it.srik.TypeQ25.inputmethod.NavModeHandler
@@ -22,6 +23,19 @@ class NavModeController(
     companion object {
         private const val TAG = "NavModeController"
     }
+    
+    private fun isCtrlKey(keyCode: Int): Boolean {
+        val device = DeviceManager.getDevice(context)
+        val result = if (device == "Q25") {
+            keyCode == 60
+        } else {
+            keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT
+        }
+        if (keyCode == 60 || keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT) {
+            Log.d(TAG, "NavModeController.isCtrlKey: keyCode=$keyCode, device=$device, result=$result")
+        }
+        return result
+    }
 
     fun isNavModeActive(): Boolean {
         return modifierStateController.ctrlLatchActive && modifierStateController.ctrlLatchFromNavMode
@@ -35,8 +49,8 @@ class NavModeController(
         if (!navModeEnabled && !navModeActive) {
             return false
         }
-        val isCtrlKey = keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT
-        return isCtrlKey || navModeActive
+        val isCtrlKeyPressed = isCtrlKey(keyCode)
+        return isCtrlKeyPressed || navModeActive
     }
 
     fun handleNavModeKey(
@@ -52,15 +66,15 @@ class NavModeController(
             return false
         }
 
-        val isCtrlKey = keyCode == KeyEvent.KEYCODE_CTRL_LEFT || keyCode == KeyEvent.KEYCODE_CTRL_RIGHT
-        if (isCtrlKey) {
+        val isCtrlKeyPressed = isCtrlKey(keyCode)
+        if (isCtrlKeyPressed) {
             return if (isKeyDown) {
                 val isConsecutiveTap = modifierStateController.registerModifierTap(keyCode)
                 val (shouldConsume, result) = NavModeHandler.handleCtrlKeyDown(
                     keyCode,
                     modifierStateController.ctrlPressed,
                     modifierStateController.ctrlLatchActive,
-                    modifierStateController.ctrlLastReleaseTime,
+                    modifierStateController.ctrlLastPressTime,
                     isConsecutiveTap
                 )
                 applyNavModeResult(result)
@@ -122,6 +136,23 @@ class NavModeController(
             NotificationHelper.cancelNavModeNotification(context)
         }
     }
+    
+    /**
+     * Re-activate nav mode (used when power shortcut ends and nav mode was active before).
+     * Reuses applyNavModeResult to keep logic consistent.
+     */
+    fun enterNavMode() {
+        val navModeEnabled = SettingsManager.getNavModeEnabled(context)
+        if (navModeEnabled && !isNavModeActive()) {
+            // Reuse existing logic to activate nav mode
+            applyNavModeResult(
+                NavModeHandler.NavModeResult(
+                    ctrlLatchActive = true
+                )
+            )
+            Log.d(TAG, "Nav mode re-activated")
+        }
+    }
 
     private fun applyNavModeResult(result: NavModeHandler.NavModeResult) {
         result.ctrlLatchActive?.let { latchActive ->
@@ -136,7 +167,7 @@ class NavModeController(
         }
         result.ctrlPhysicallyPressed?.let { modifierStateController.ctrlPhysicallyPressed = it }
         result.ctrlPressed?.let { modifierStateController.ctrlPressed = it }
-        result.lastCtrlReleaseTime?.let { modifierStateController.ctrlLastReleaseTime = it }
+        result.lastCtrlReleaseTime?.let { modifierStateController.ctrlLastPressTime = it }
     }
 
     private fun sendMappedKey(
