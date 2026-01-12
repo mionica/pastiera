@@ -816,6 +816,9 @@ class InputEventRouter(
             ) {
                 return EditableFieldRoutingResult.Consume
             }
+            // Alt was active but key didn't have Alt mapping - still consume to avoid double input
+            // The key was already handled by defaultHandler (super.onKeyDown) in handleAltModifiedKey
+            return EditableFieldRoutingResult.Consume
         }
 
         // Check if CTRL is active: either physically pressed (event.isCtrlPressed OR params.ctrlPressed), or in latch/one-shot mode
@@ -1145,6 +1148,42 @@ class InputEventRouter(
         isPasswordField: Boolean = false
     ): Boolean {
         val ic = inputConnection ?: return false
+
+        // Handle Alt+Backspace to delete last word
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            val extractedText: android.view.inputmethod.ExtractedText? = ic.getExtractedText(
+                android.view.inputmethod.ExtractedTextRequest().apply {
+                    flags = android.view.inputmethod.ExtractedText.FLAG_SELECTING
+                },
+                0
+            )
+
+            val hasSelection = extractedText?.let {
+                it.selectionStart >= 0 && it.selectionEnd >= 0 && it.selectionStart != it.selectionEnd
+            } ?: false
+
+            if (hasSelection) {
+                KeyboardEventTracker.notifyKeyEvent(
+                    keyCode,
+                    event,
+                    "KEY_DOWN",
+                    outputKeyCode = null,
+                    outputKeyCodeName = "delete_selection"
+                )
+                ic.commitText("", 0)
+            } else {
+                KeyboardEventTracker.notifyKeyEvent(
+                    keyCode,
+                    event,
+                    "KEY_DOWN",
+                    outputKeyCode = null,
+                    outputKeyCodeName = "delete_last_word"
+                )
+                TextSelectionHelper.deleteLastWord(ic)
+            }
+            updateStatusBar()
+            return true
+        }
 
         // Handle Alt+keycode 7 for Q25 device based on user preference
         if (isQ25Device && keyCode == 7) {

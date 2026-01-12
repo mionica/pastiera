@@ -283,6 +283,7 @@ fun AddCustomEmojiDialog(
 ) {
     val context = LocalContext.current
     var shortcodeInput by remember { mutableStateOf("") }
+    var unicodeInput by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     
     // Try to get clipboard content
@@ -296,6 +297,32 @@ fun AddCustomEmojiDialog(
         } catch (e: Exception) {
             ""
         }
+    }
+    
+    // Function to convert Unicode codepoint to emoji
+    fun unicodeToEmoji(unicode: String): String? {
+        return try {
+            val cleaned = unicode.trim().replace("U+", "", ignoreCase = true)
+                .replace("\\u", "", ignoreCase = true)
+                .replace("0x", "", ignoreCase = true)
+                .trim()
+            
+            // Handle multiple codepoints separated by spaces or commas
+            val codepoints = cleaned.split(Regex("[,\\s]+"))
+                .filter { it.isNotBlank() }
+                .map { it.toInt(16) }
+            
+            if (codepoints.isEmpty()) return null
+            String(codepoints.toIntArray(), 0, codepoints.size)
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    // Determine which emoji to use: Unicode input, clipboard, or manual input
+    val effectiveEmoji = when {
+        unicodeInput.isNotBlank() -> unicodeToEmoji(unicodeInput) ?: ""
+        else -> clipboardEmoji
     }
     
     Dialog(onDismissRequest = onDismiss) {
@@ -318,9 +345,24 @@ fun AddCustomEmojiDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = "Copy emoji to clipboard first",
+                    text = "Copy emoji to clipboard or enter Unicode",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // Unicode input field
+                TextField(
+                    value = unicodeInput,
+                    onValueChange = {
+                        unicodeInput = it
+                        errorMessage = null
+                    },
+                    label = { Text("Unicode (optional)") },
+                    placeholder = { Text("e.g. U+1F600 or 1F600") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -337,9 +379,9 @@ fun AddCustomEmojiDialog(
                             .padding(16.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (clipboardEmoji.isNotEmpty()) {
+                        if (effectiveEmoji.isNotEmpty()) {
                             Text(
-                                text = clipboardEmoji.take(10),
+                                text = effectiveEmoji.take(10),
                                 style = MaterialTheme.typography.displayMedium
                             )
                         } else {
@@ -387,8 +429,8 @@ fun AddCustomEmojiDialog(
                     
                     Button(
                         onClick = {
-                            if (clipboardEmoji.isEmpty()) {
-                                errorMessage = "Clipboard is empty"
+                            if (effectiveEmoji.isEmpty()) {
+                                errorMessage = "Please provide an emoji (clipboard or Unicode)"
                                 return@Button
                             }
                             
@@ -402,7 +444,7 @@ fun AddCustomEmojiDialog(
                                 return@Button
                             }
                             
-                            if (emojiParser.addCustomEmoji(clipboardEmoji, shortcodeInput, category)) {
+                            if (emojiParser.addCustomEmoji(effectiveEmoji, shortcodeInput, category)) {
                                 onEmojiAdded()
                             } else {
                                 errorMessage = "Shortcode already exists or emoji already added"

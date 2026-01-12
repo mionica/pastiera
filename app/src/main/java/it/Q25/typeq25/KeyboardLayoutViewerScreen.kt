@@ -3,6 +3,7 @@ package it.srik.TypeQ25
 import android.view.KeyEvent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -372,6 +373,22 @@ private fun KeyEditDialog(
 ) {
     var lowercase by remember { mutableStateOf(currentMapping.lowercase) }
     var uppercase by remember { mutableStateOf(currentMapping.uppercase) }
+    var multiTapEnabled by remember { mutableStateOf(currentMapping.multiTapEnabled) }
+    
+    // Initialize tap fields with existing data or empty strings
+    val initialTaps = currentMapping.taps.take(4).toMutableList()
+    while (initialTaps.size < 4) {
+        initialTaps.add(TapMapping("", ""))
+    }
+    
+    var tap1Lower by remember { mutableStateOf(initialTaps.getOrNull(0)?.lowercase ?: "") }
+    var tap1Upper by remember { mutableStateOf(initialTaps.getOrNull(0)?.uppercase ?: "") }
+    var tap2Lower by remember { mutableStateOf(initialTaps.getOrNull(1)?.lowercase ?: "") }
+    var tap2Upper by remember { mutableStateOf(initialTaps.getOrNull(1)?.uppercase ?: "") }
+    var tap3Lower by remember { mutableStateOf(initialTaps.getOrNull(2)?.lowercase ?: "") }
+    var tap3Upper by remember { mutableStateOf(initialTaps.getOrNull(2)?.uppercase ?: "") }
+    var tap4Lower by remember { mutableStateOf(initialTaps.getOrNull(3)?.lowercase ?: "") }
+    var tap4Upper by remember { mutableStateOf(initialTaps.getOrNull(3)?.uppercase ?: "") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -383,6 +400,9 @@ private fun KeyEditDialog(
         },
         text = {
             Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
@@ -399,6 +419,146 @@ private fun KeyEditDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
+                
+                // Multi-tap toggle
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { multiTapEnabled = !multiTapEnabled }
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Enable Multi-Tap",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    androidx.compose.material3.Switch(
+                        checked = multiTapEnabled,
+                        onCheckedChange = { multiTapEnabled = it }
+                    )
+                }
+                
+                // Multi-tap configuration (shown when enabled)
+                if (multiTapEnabled) {
+                    Text(
+                        text = "Multi-Tap Characters (up to 4)",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    
+                    // Tap 1
+                    Text(
+                        text = "Tap 1",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = tap1Lower,
+                            onValueChange = { tap1Lower = it },
+                            label = { Text("Lowercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = tap1Upper,
+                            onValueChange = { tap1Upper = it },
+                            label = { Text("Uppercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    // Tap 2
+                    Text(
+                        text = "Tap 2",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = tap2Lower,
+                            onValueChange = { tap2Lower = it },
+                            label = { Text("Lowercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = tap2Upper,
+                            onValueChange = { tap2Upper = it },
+                            label = { Text("Uppercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    // Tap 3
+                    Text(
+                        text = "Tap 3",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = tap3Lower,
+                            onValueChange = { tap3Lower = it },
+                            label = { Text("Lowercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = tap3Upper,
+                            onValueChange = { tap3Upper = it },
+                            label = { Text("Uppercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    // Tap 4
+                    Text(
+                        text = "Tap 4",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = tap4Lower,
+                            onValueChange = { tap4Lower = it },
+                            label = { Text("Lowercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                        OutlinedTextField(
+                            value = tap4Upper,
+                            onValueChange = { tap4Upper = it },
+                            label = { Text("Uppercase") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    
+                    Text(
+                        text = "Leave empty if not needed",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                
                 Text(
                     text = stringResource(R.string.keyboard_layout_edit_hint),
                     style = MaterialTheme.typography.bodySmall,
@@ -409,9 +569,28 @@ private fun KeyEditDialog(
         confirmButton = {
             TextButton(
                 onClick = {
+                    // Build taps list from non-empty entries
+                    val taps = mutableListOf<TapMapping>()
+                    if (multiTapEnabled) {
+                        if (tap1Lower.isNotBlank() || tap1Upper.isNotBlank()) {
+                            taps.add(TapMapping(tap1Lower, tap1Upper))
+                        }
+                        if (tap2Lower.isNotBlank() || tap2Upper.isNotBlank()) {
+                            taps.add(TapMapping(tap2Lower, tap2Upper))
+                        }
+                        if (tap3Lower.isNotBlank() || tap3Upper.isNotBlank()) {
+                            taps.add(TapMapping(tap3Lower, tap3Upper))
+                        }
+                        if (tap4Lower.isNotBlank() || tap4Upper.isNotBlank()) {
+                            taps.add(TapMapping(tap4Lower, tap4Upper))
+                        }
+                    }
+                    
                     val newMapping = currentMapping.copy(
                         lowercase = lowercase,
-                        uppercase = uppercase
+                        uppercase = uppercase,
+                        multiTapEnabled = multiTapEnabled,
+                        taps = taps
                     )
                     onSave(newMapping)
                 }

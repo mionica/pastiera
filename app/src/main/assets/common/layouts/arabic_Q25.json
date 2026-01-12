@@ -3,11 +3,11 @@
   "description": "Arabic keyboard layout for BlackBerry Classic/Q25",
   "mappings": {
     "KEYCODE_Q": {
-      "lowercase": "ص",
+      "lowercase": "ض",
       "uppercase": "ص",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "ض", "uppercase": "ض" }
+        { "lowercase": "ض", "uppercase": "ص" }
       ]
     },
     "KEYCODE_W": { "lowercase": "ث", "uppercase": "ث" },
@@ -15,10 +15,10 @@
     "KEYCODE_R": { "lowercase": "ف", "uppercase": "ف" },
     "KEYCODE_T": {
       "lowercase": "غ",
-      "uppercase": "غ",
+      "uppercase": "ع",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "ع", "uppercase": "ع" }
+        { "lowercase": "غ", "uppercase": "ع" }
     ]
     },
     "KEYCODE_Y": { "lowercase": "ه", "uppercase": "ه" },
@@ -26,26 +26,26 @@
     "KEYCODE_I": { "lowercase": "ح", "uppercase": "ح" },
     "KEYCODE_O": { "lowercase": "ج", "uppercase": "ج" },
     "KEYCODE_P": {
-      "lowercase": "ذ",
+      "lowercase": "د",
       "uppercase": "ذ",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "د", "uppercase": "د" }
+        { "lowercase": "د", "uppercase": "ذ" }
       ]
     },
     "KEYCODE_A": {
       "lowercase": "ش",
-      "uppercase": "ش",
+      "uppercase": "س",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "س", "uppercase": "س" }
+        { "lowercase": "ش", "uppercase": "س" }
       ]
     },
-    "KEYCODE_S": { "lowercase": "ي", "uppercase": "ي" },
+    "KEYCODE_S": { "lowercase": "ي", "uppercase": "ى" },
     "KEYCODE_D": { "lowercase": "ب", "uppercase": "ب" },
     "KEYCODE_F": { "lowercase": "ل", "uppercase": "ل" },
     "KEYCODE_G": {
-      "lowercase": "أ",
+      "lowercase": "ا",
       "uppercase": "أ",
       "multiTapEnabled": true,
       "taps": [
@@ -62,22 +62,30 @@
     "KEYCODE_X": { "lowercase": "ر", "uppercase": "ر" },
     "KEYCODE_C": { "lowercase": "لا", "uppercase": "لا" },
     "KEYCODE_V": {
-      "lowercase": "ئ",
+      "lowercase": "ى",
       "uppercase": "ئ",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "ى", "uppercase": "ى" }
+        { "lowercase": "ى", "uppercase": "ئ" }
       ]
     },
     "KEYCODE_B": { "lowercase": "ة", "uppercase": "ة" },
     "KEYCODE_N": {
-      "lowercase": "ؤ",
+      "lowercase": "و",
       "uppercase": "ؤ",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "و", "uppercase": "و" }
+        { "lowercase": "و", "uppercase": "ؤ" }
       ]
     },
-    "KEYCODE_M": { "lowercase": "ز", "uppercase": "ز" }
+    "KEYCODE_M": { "lowercase": "ز", "uppercase": "ز" },
+    "KEYCODE_CURRENCY": { 
+      "lowercase": "ط", 
+      "uppercase": "ط",
+      "multiTapEnabled": true,
+      "taps": [
+        { "lowercase": "ظ", "uppercase": "ظ" }
+      ]
+    }
   }
 }

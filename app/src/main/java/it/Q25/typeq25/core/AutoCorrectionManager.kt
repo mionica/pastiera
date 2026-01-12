@@ -45,24 +45,20 @@ class AutoCorrectionManager(
             return false
         }
 
-        val charsToDelete = if (lastChars.endsWith(correction.correctedWord)) {
-            correction.correctedWord.length
-        } else {
-            var deleteCount = correction.correctedWord.length
-            var i = textBeforeCursor.length - 1
-            while (i >= 0 &&
-                i >= textBeforeCursor.length - deleteCount - 1 &&
-                (textBeforeCursor[i].isWhitespace() ||
-                        textBeforeCursor[i] in ".,;:!?()[]{}\"'")
-            ) {
-                deleteCount++
-                i--
-            }
-            deleteCount
-        }
+        // Only delete the corrected word itself, not trailing punctuation/whitespace
+        // This ensures backspace deletes one character at a time as expected
+        val charsToDelete = correction.correctedWord.length
 
-        inputConnection.deleteSurroundingText(charsToDelete, 0)
-        inputConnection.commitText(correction.originalWord, 1)
+        // Use batch edit to ensure operations are atomic and prevent issues with 
+        // interleaved input processing that could cause duplicate characters
+        inputConnection.beginBatchEdit()
+        try {
+            inputConnection.deleteSurroundingText(charsToDelete, 0)
+            inputConnection.commitText(correction.originalWord, 1)
+        } finally {
+            inputConnection.endBatchEdit()
+        }
+        
         AutoCorrector.undoLastCorrection()
         onStatusBarUpdate()
         Log.d(TAG, "Auto-correction undone: '${correction.correctedWord}' → '${correction.originalWord}'")
@@ -93,15 +89,22 @@ class AutoCorrectionManager(
         val correction = AutoCorrector.processText(textBeforeCursor, context = context) ?: return false
 
         val (wordToReplace, correctedWord) = correction
-        inputConnection.deleteSurroundingText(wordToReplace.length, 0)
-        inputConnection.commitText(correctedWord, 1)
-        AutoCorrector.recordCorrection(wordToReplace, correctedWord)
+        
+        // Use batch edit to ensure operations are atomic
+        inputConnection.beginBatchEdit()
+        try {
+            inputConnection.deleteSurroundingText(wordToReplace.length, 0)
+            inputConnection.commitText(correctedWord, 1)
+            AutoCorrector.recordCorrection(wordToReplace, correctedWord)
 
-        when {
-            isSpace -> inputConnection.commitText(" ", 1)
-            isPunctuation && event?.unicodeChar != null && event.unicodeChar != 0 -> {
-                inputConnection.commitText(event.unicodeChar.toChar().toString(), 1)
+            when {
+                isSpace -> inputConnection.commitText(" ", 1)
+                isPunctuation && event?.unicodeChar != null && event.unicodeChar != 0 -> {
+                    inputConnection.commitText(event.unicodeChar.toChar().toString(), 1)
+                }
             }
+        } finally {
+            inputConnection.endBatchEdit()
         }
 
         onStatusBarUpdate()

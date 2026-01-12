@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager
+import it.srik.TypeQ25.clipboard.ClipboardHistoryManager.ClipboardItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -52,7 +53,12 @@ class ClipboardHistoryPopup(
     
     private var popupView: View? = null
     private var windowManager: WindowManager? = null
-    private var selectedIndex by mutableStateOf(0)
+    private var selectedIndexState = mutableStateOf(0)
+    private var selectedIndex: Int
+        get() = selectedIndexState.value
+        set(value) { selectedIndexState.value = value }
+    
+    private var historyState = mutableStateOf<List<ClipboardItem>>(emptyList())
     
     /**
      * Shows the popup.
@@ -69,6 +75,10 @@ class ClipboardHistoryPopup(
             onDismiss()
             return
         }
+        
+        // Reset selection and update history state when showing
+        selectedIndex = 0
+        historyState.value = history
         
         windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         
@@ -92,10 +102,10 @@ class ClipboardHistoryPopup(
             
             setContent {
                 ClipboardHistoryContent(
-                    history = history,
-                    selectedIndex = selectedIndex,
+                    history = historyState.value,
+                    selectedIndexState = selectedIndexState,
                     onItemClick = { index ->
-                        val item = history.getOrNull(index)
+                        val item = historyState.value.getOrNull(index)
                         if (item != null) {
                             onItemSelected(item.text)
                             dismiss()
@@ -161,16 +171,20 @@ class ClipboardHistoryPopup(
     /**
      * Handles physical keyboard input for navigation.
      */
-    fun handlePhysicalKey(keyCode: Int, isCtrlActive: Boolean): Boolean {
-        val history = clipboardManager.getHistory()
+    fun handlePhysicalKey(keyCode: Int, isCtrlActive: Boolean, isAltActive: Boolean = false): Boolean {
+        val history = historyState.value
         if (history.isEmpty()) return false
+        
+        Log.d(TAG, "handlePhysicalKey: keyCode=$keyCode, selectedIndex=$selectedIndex, historySize=${history.size}, isAltActive=$isAltActive")
         
         when (keyCode) {
             KeyEvent.KEYCODE_ESCAPE -> {
+                Log.d(TAG, "Escape pressed, dismissing")
                 dismiss()
                 return true
             }
             KeyEvent.KEYCODE_ENTER, KeyEvent.KEYCODE_DPAD_CENTER -> {
+                Log.d(TAG, "Enter/Center pressed, selecting item at $selectedIndex")
                 val item = history.getOrNull(selectedIndex)
                 if (item != null) {
                     onItemSelected(item.text)
@@ -178,37 +192,70 @@ class ClipboardHistoryPopup(
                 }
                 return true
             }
-            KeyEvent.KEYCODE_DPAD_UP, KeyEvent.KEYCODE_K -> {
+            KeyEvent.KEYCODE_DPAD_UP -> {
                 if (selectedIndex > 0) {
                     selectedIndex--
+                    Log.d(TAG, "DPAD_UP: selectedIndex now $selectedIndex")
                 }
                 return true
             }
-            KeyEvent.KEYCODE_DPAD_DOWN, KeyEvent.KEYCODE_J -> {
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
                 if (selectedIndex < history.size - 1) {
                     selectedIndex++
+                    Log.d(TAG, "DPAD_DOWN: selectedIndex now $selectedIndex")
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_K -> {
+                if (selectedIndex > 0) {
+                    selectedIndex--
+                    Log.d(TAG, "K pressed: selectedIndex now $selectedIndex")
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_J -> {
+                if (selectedIndex < history.size - 1) {
+                    selectedIndex++
+                    Log.d(TAG, "J pressed: selectedIndex now $selectedIndex")
                 }
                 return true
             }
             KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_FORWARD_DEL -> {
+                Log.d(TAG, "Delete pressed, removing item at $selectedIndex")
                 clipboardManager.removeItem(selectedIndex)
-                if (selectedIndex >= history.size && selectedIndex > 0) {
+                val newHistory = clipboardManager.getHistory()
+                historyState.value = newHistory  // Update state to trigger recomposition
+                if (selectedIndex >= newHistory.size && selectedIndex > 0) {
                     selectedIndex--
                 }
-                if (history.isEmpty()) {
+                if (newHistory.isEmpty()) {
                     dismiss()
                 }
                 return true
             }
-            // Number keys 1-9 for quick selection
+            // Number keys 1-9 for quick selection (with or without Alt)
             in KeyEvent.KEYCODE_1..KeyEvent.KEYCODE_9 -> {
                 val index = keyCode - KeyEvent.KEYCODE_1
+                Log.d(TAG, "Number key pressed: ${index + 1}, selecting index $index (Alt=$isAltActive)")
                 val item = history.getOrNull(index)
                 if (item != null) {
                     onItemSelected(item.text)
                     dismiss()
+                    return true
                 }
-                return true
+                return false
+            }
+            // Number 0 key for item 10 (if exists, with or without Alt)
+            KeyEvent.KEYCODE_0 -> {
+                val index = 9
+                Log.d(TAG, "Number key 0 pressed, selecting index $index (Alt=$isAltActive)")
+                val item = history.getOrNull(index)
+                if (item != null) {
+                    onItemSelected(item.text)
+                    dismiss()
+                    return true
+                }
+                return false
             }
         }
         
@@ -219,11 +266,12 @@ class ClipboardHistoryPopup(
 @Composable
 private fun ClipboardHistoryContent(
     history: List<ClipboardHistoryManager.ClipboardItem>,
-    selectedIndex: Int,
+    selectedIndexState: MutableState<Int>,
     onItemClick: (Int) -> Unit,
     onClear: () -> Unit,
     onClose: () -> Unit
 ) {
+    val selectedIndex by selectedIndexState
     val isDarkTheme = isSystemInDarkTheme()
     val backgroundColor = if (isDarkTheme) Color(0xFF1E1E1E) else Color(0xFFF5F5F5)
     val surfaceColor = if (isDarkTheme) Color(0xFF2D2D2D) else Color.White

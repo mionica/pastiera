@@ -284,7 +284,7 @@ fun AdvancedFeaturesPage() {
         TutorialItem(
             icon = Icons.Default.Language,
             title = "Keyboard Layout Editing",
-            description = "• Convert between QWERTY, AZERTY, QWERTZ layouts\n• Settings → Keyboard Layout\n• Edit non-English layouts to customize key mappings\n• Match your physical keyboard layout\n• Seamless typing in different languages\n• Switch layouts quickly with Ctrl+Space"
+            description = "• Convert between QWERTY, AZERTY, QWERTZ layouts\n• Settings → Keyboard Layout\n• Edit non-English layouts to customize key mappings\n• Match your physical keyboard layout\n• Seamless typing in different languages\n• Switch layouts quickly with Ctrl+Space\n• Arabic layout: Dedicated editing screen to reorder characters per key\n  - Matches your physical keyboard's Arabic labels\n  - Drag and drop characters to reposition\n  - Preview changes in real-time"
         )
         TutorialItem(
             icon = Icons.Default.ViewCompact,

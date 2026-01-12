@@ -735,6 +735,13 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
                         Log.e(TAG, "Error recreating input view after minimal UI change", e)
                     }
                 }
+            } else if (key != null && key.startsWith("custom_emojis_")) {
+                Log.d(TAG, "Custom emoji changed, reloading shortcodes...")
+                // Reload emoji shortcodes when custom emojis are added/removed
+                if (::emojiShortcodeManager.isInitialized) {
+                    emojiShortcodeManager.reloadShortcodes()
+                    Log.d(TAG, "Emoji shortcode manager reloaded with ${emojiShortcodeManager.getShortcodeCount()} shortcodes")
+                }
             }
         }
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
@@ -759,8 +766,24 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
                             fun tryInsertText() {
                                 val inputConnection = currentInputConnection
                                 if (inputConnection != null) {
-                                    inputConnection.commitText(text, 1)
-                                    Log.d(TAG, "Speech text inserted successfully: $text")
+                                    try {
+                                        // Use batch edit for atomic operation
+                                        inputConnection.beginBatchEdit()
+                                        try {
+                                            // First try setComposingText, which works better with some apps like Discord
+                                            inputConnection.setComposingText(text, 1)
+                                            // Then finishComposingText to commit it
+                                            inputConnection.finishComposingText()
+                                            Log.d(TAG, "Speech text inserted successfully using setComposingText: $text")
+                                        } catch (e: Exception) {
+                                            // Fallback to commitText if setComposingText fails
+                                            Log.d(TAG, "setComposingText failed, trying commitText", e)
+                                            inputConnection.commitText(text, 1)
+                                            Log.d(TAG, "Speech text inserted successfully using commitText: $text")
+                                        }
+                                    } finally {
+                                        inputConnection.endBatchEdit()
+                                    }
                                 } else {
                                     attempts++
                                     if (attempts < maxAttempts) {
@@ -1495,6 +1518,34 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
             return false
         }
         
+        // Check if we're in a call
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+        val currentMode = audioManager?.mode ?: AudioManager.MODE_NORMAL
+        var inCall = currentMode == AudioManager.MODE_IN_CALL || 
+                    currentMode == AudioManager.MODE_IN_COMMUNICATION
+        
+        // Additional check using TelecomManager if available
+        if (!inCall) {
+            try {
+                val telecomManager = getSystemService(Context.TELECOM_SERVICE) as? android.telecom.TelecomManager
+                if (telecomManager != null && androidx.core.content.ContextCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.READ_PHONE_STATE
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    inCall = telecomManager.isInCall
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking call state with TelecomManager", e)
+            }
+        }
+        
+        // If in a call, toggle speakerphone directly (no Alt needed)
+        if (inCall) {
+            Log.d(TAG, "handleCurrencyKey: In call, toggling speakerphone")
+            toggleSpeakerphone()
+            return true
+        }
+        
         // Check if Alt is pressed - check both our internal state and the event's metastate
         val eventAltPressed = event?.isAltPressed == true || 
                              (event?.metaState?.and(KeyEvent.META_ALT_ON) != 0) ||
@@ -1503,6 +1554,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
         val altActive = altLatchActive || altOneShot || altPressed || altPhysicallyPressed || eventAltPressed
         Log.d(TAG, "handleCurrencyKey: altLatchActive=$altLatchActive, altOneShot=$altOneShot, altPressed=$altPressed, altPhysicallyPressed=$altPhysicallyPressed, event.isAltPressed=${event?.isAltPressed}, event.metaState=${event?.metaState}, eventAltPressed=$eventAltPressed, altActive=$altActive")
         
+        // If not in a call but Alt is active, try to toggle (will show "not in call" message)
         if (altActive) {
             toggleSpeakerphone()
             // Clear Alt state after using it
@@ -1511,8 +1563,25 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
             return true
         }
         
+        // Check if current layout is Arabic or arabic_Q25
+        val currentLayout = SettingsManager.getKeyboardLayout(this)
+        val isArabicLayout = currentLayout.equals("arabic", ignoreCase = true) || 
+                            currentLayout.equals("arabic_Q25", ignoreCase = true)
+        
+        if (isArabicLayout) {
+            // Use KEYCODE_68 mapping from the layout
+            val keycode68Char = getCharacterFromLayout(68, event, shiftPressed || capsLockEnabled)
+            if (keycode68Char != null) {
+                currentInputConnection?.commitText(keycode68Char.toString(), 1)
+                Log.d(TAG, "handleCurrencyKey: Arabic layout detected, using KEYCODE_68 mapping: $keycode68Char")
+                return true
+            }
+        }
+        
+        // Fall back to currency key for other layouts
         val currency = CurrencyManager.getCurrency(this)
         currentInputConnection?.commitText(currency, 1)
+        Log.d(TAG, "handleCurrencyKey: Using currency key: $currency")
         return true
     }
     
@@ -1712,6 +1781,50 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        // Handle clipboard history popup key events FIRST (before any other processing)
+        if (clipboardHistoryPopup?.isShowing() == true) {
+            // Block Alt key itself when popup is showing
+            if (keyCode == KeyEvent.KEYCODE_ALT_LEFT || keyCode == KeyEvent.KEYCODE_ALT_RIGHT) {
+                return true // Consume Alt key to prevent background interaction
+            }
+            
+            // Check if Alt is active - if so, block ALL letter/number keys to prevent Alt mappings
+            val isAltActive = altLatchActive || altOneShot || altPressed || altPhysicallyPressed || event?.isAltPressed == true
+            if (isAltActive) {
+                // Block ALL letter keys (Q-P, A-L, Z-M) and number keys when Alt is active
+                if (keyCode in KeyEvent.KEYCODE_Q..KeyEvent.KEYCODE_P ||
+                    keyCode in KeyEvent.KEYCODE_A..KeyEvent.KEYCODE_L ||
+                    keyCode in KeyEvent.KEYCODE_Z..KeyEvent.KEYCODE_M ||
+                    keyCode == KeyEvent.KEYCODE_0 ||
+                    keyCode in KeyEvent.KEYCODE_1..KeyEvent.KEYCODE_9) {
+                    Log.d(TAG, "Clipboard popup: blocking Alt+key combination (keyCode=$keyCode)")
+                    return true // Consume to prevent Alt mapping from triggering
+                }
+            }
+            
+            // Block ALL DPAD keys and number keys when clipboard popup is showing
+            if (keyCode == KeyEvent.KEYCODE_DPAD_UP ||
+                keyCode == KeyEvent.KEYCODE_DPAD_DOWN ||
+                keyCode == KeyEvent.KEYCODE_DPAD_LEFT ||
+                keyCode == KeyEvent.KEYCODE_DPAD_RIGHT ||
+                keyCode == KeyEvent.KEYCODE_DPAD_CENTER ||
+                keyCode == KeyEvent.KEYCODE_ENTER ||
+                keyCode == KeyEvent.KEYCODE_ESCAPE ||
+                keyCode == KeyEvent.KEYCODE_DEL ||
+                keyCode == KeyEvent.KEYCODE_FORWARD_DEL ||
+                keyCode == KeyEvent.KEYCODE_K ||
+                keyCode == KeyEvent.KEYCODE_J ||
+                keyCode == KeyEvent.KEYCODE_0 ||
+                keyCode in KeyEvent.KEYCODE_1..KeyEvent.KEYCODE_9) {
+                val isCtrlActive = ctrlLatchActive || ctrlOneShot || ctrlPressed || ctrlPhysicallyPressed || event?.isCtrlPressed == true
+                if (clipboardHistoryPopup?.handlePhysicalKey(keyCode, isCtrlActive, isAltActive) == true) {
+                    return true // Consumed by popup
+                }
+                // Even if not handled, consume these keys to prevent background interaction
+                return true
+            }
+        }
+        
         // Handle emoji shortcode popup navigation early (before other processing)
         if (emojiShortcodePopup?.isShowing() == true) {
             // Allow DPAD UP/DOWN for navigation, ENTER/DPAD_CENTER for selection
@@ -1840,15 +1953,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), LifecycleOwner,
             }
         }
         
-        // Handle clipboard history popup key events if it's showing
-        if (clipboardHistoryPopup?.isShowing() == true) {
-            val isCtrlActive = ctrlLatchActive || ctrlOneShot || ctrlPressed || ctrlPhysicallyPressed || event?.isCtrlPressed == true
-            if (clipboardHistoryPopup?.handlePhysicalKey(keyCode, isCtrlActive) == true) {
-                return true
-            }
-        }
-        
-        // Handle emoji shortcode popup key events if it's showing
+        // Handle emoji shortcode popup key events if it's showing (for keys not handled above)
         if (emojiShortcodePopup?.isShowing() == true) {
             Log.d(TAG, "Emoji popup is showing, handling keyCode=$keyCode")
             

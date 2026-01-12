@@ -110,6 +110,14 @@
     },
     "KEYCODE_B": { "lowercase": "ز", "uppercase": "ز" },
     "KEYCODE_N": { "lowercase": "ظ", "uppercase": "ظ" },
-    "KEYCODE_M": { "lowercase": "ط", "uppercase": "ط" }
+    "KEYCODE_M": { "lowercase": "ط", "uppercase": "ط" },
+        "KEYCODE_CURRENCY": { 
+      "lowercase": "ط", 
+      "uppercase": "ط",
+      "multiTapEnabled": true,
+      "taps": [
+        { "lowercase": "ظ", "uppercase": "ظ" }
+      ]
+    }
   }
 }

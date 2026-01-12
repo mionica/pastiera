@@ -45,6 +45,7 @@ object LayoutFileStore {
         "KEYCODE_N" to KeyEvent.KEYCODE_N,
         "KEYCODE_M" to KeyEvent.KEYCODE_M,
         "KEYCODE_68" to 68,
+        "KEYCODE_CURRENCY" to 68,  // Q25 currency key (same as KEYCODE_GRAVE)
         "KEYCODE_SPACE" to KeyEvent.KEYCODE_SPACE,
         "KEYCODE_COMMA" to KeyEvent.KEYCODE_COMMA,
         "KEYCODE_PERIOD" to KeyEvent.KEYCODE_PERIOD,

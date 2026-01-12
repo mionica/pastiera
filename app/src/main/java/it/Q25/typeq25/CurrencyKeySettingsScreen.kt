@@ -35,9 +35,7 @@ import androidx.compose.ui.unit.dp
 fun CurrencyKeySettingsScreen(modifier: Modifier = Modifier, onBack: () -> Unit) {
     val context = LocalContext.current
     val currencies = listOf(
-        "$", "€", "£", "¥", "₹", "₽", "₩", "₪", "฿", "₺", "₱", "₴", "₦", "₵",
-        "ر.س", "د.إ", "د.ك", "ر.ق", "د.ب", "ر.ع", "د.ج", "د.م", "د.ل", "د.ت", "ج.م", "ل.س", "ل.ل"
-    )
+        "$", "€", "£", "¥", "₹", "₽", "₩", "₪", "฿", "₺", "₱", "₴", "₦", "₵"    )
     var expanded by remember { mutableStateOf(false) }
     var selectedCurrency by remember { mutableStateOf(CurrencyManager.getCurrency(context)) }
 
