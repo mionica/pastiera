@@ -153,11 +153,14 @@ class SymLayoutController(
         return if (currentPageType() == SymPage.EMOJI) alternateCharacterManager.buildEmojiMapText() else ""
     }
 
-    fun currentSymMappings(): Map<Int, String>? {
+    fun currentSymMappings(uppercase: Boolean): Map<Int, String>? {
         return when (currentPageType()) {
             SymPage.DEVICE -> alternateCharacterManager.getDeviceSymMappings()
             SymPage.EMOJI -> alternateCharacterManager.getSymMappings()
-            SymPage.SYMBOLS -> alternateCharacterManager.getSymMappings2()
+            SymPage.SYMBOLS -> { 
+                if (!uppercase) alternateCharacterManager.getSymMappings2()
+                else alternateCharacterManager.getSymMappings2Uppercase()
+            }
             SymPage.CLIPBOARD -> null // Clipboard doesn't use mappings
             SymPage.EMOJI_PICKER -> null // Emoji picker doesn't use mappings
             else -> null
@@ -260,8 +263,11 @@ class SymLayoutController(
         keyCode: Int,
         event: KeyEvent?,
         inputConnection: InputConnection?,
+        capsLockEnabled: Boolean,
+        shiftOneShot: Boolean,
         ctrlLatchActive: Boolean,
         altLatchActive: Boolean,
+        clearShiftOneShot: ()  -> Unit,
         updateStatusBar: () -> Unit,
         handleBoundaryText: (String, InputConnection?) -> Boolean = { _, _ -> false }
     ): SymKeyResult {
@@ -285,10 +291,14 @@ class SymLayoutController(
             }
         }
 
+        val uppercase = capsLockEnabled or shiftOneShot
         val symChar = when (page) {
             SymPage.DEVICE -> alternateCharacterManager.getDeviceSymMappings()[keyCode]
             SymPage.EMOJI -> alternateCharacterManager.getSymMappings()[keyCode]
-            SymPage.SYMBOLS -> alternateCharacterManager.getSymMappings2()[keyCode]
+            SymPage.SYMBOLS -> {
+                if (!uppercase) alternateCharacterManager.getSymMappings2()[keyCode]
+                else alternateCharacterManager.getSymMappings2Uppercase()[keyCode]
+            }
             SymPage.CLIPBOARD -> null // Clipboard doesn't use key mappings
             SymPage.EMOJI_PICKER -> null // Emoji picker doesn't use key mappings
             else -> null
@@ -304,6 +314,8 @@ class SymLayoutController(
                 )
             ) {
                 inputConnection.commitText(symChar, 1)
+                if (shiftOneShot)
+                    clearShiftOneShot()
             }
             if (autoCloseEnabled) {
                 closeSymAndUpdate(updateStatusBar)

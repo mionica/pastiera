@@ -459,6 +459,8 @@ class InputEventRouter(
                 isNumericField = params.isNumericField,
                 alternateCharacterManager = controllers.alternateCharacterManager,
                 symLayoutController = controllers.symLayoutController,
+                capsLockEnabled = params.capsLockEnabled,
+                shiftOneShot =  params.shiftOneShot,
                 ctrlLatchActive = params.ctrlLatchActive,
                 ctrlPressed = params.ctrlPressed,
                 ctrlPhysicallyPressed = params.ctrlPhysicallyPressed,
@@ -468,10 +470,13 @@ class InputEventRouter(
                 altMappingsOverride = params.altMappingsOverride,
                 cursorUpdateDelayMs = params.cursorUpdateDelayMs,
                 updateStatusBar = callbacks.updateStatusBar,
+                clearShiftOneShot = callbacks.disableShiftOneShot,
                 handleBoundaryText = callbacks.handleBoundaryText,
                 callSuper = callbacks.callSuper
             )
         ) {
+            if (shiftOneShotActive)
+                callbacks.disableShiftOneShot()
             return EditableFieldRoutingResult.Consume
         }
 
@@ -1166,6 +1171,8 @@ class InputEventRouter(
         isNumericField: Boolean,
         alternateCharacterManager: AlternateCharacterManager,
         symLayoutController: SymLayoutController,
+        capsLockEnabled: Boolean,
+        shiftOneShot: Boolean,
         ctrlLatchActive: Boolean,
         ctrlPressed: Boolean,
         ctrlPhysicallyPressed: Boolean,
@@ -1174,6 +1181,7 @@ class InputEventRouter(
         altLatchActive: Boolean,
         altMappingsOverride: Map<Int, String>? = null,
         cursorUpdateDelayMs: Long,
+        clearShiftOneShot: ()  -> Unit,
         updateStatusBar: () -> Unit,
         handleBoundaryText: (String, InputConnection?) -> Boolean = { _, _ -> false },
         callSuper: () -> Boolean
@@ -1215,8 +1223,11 @@ class InputEventRouter(
                     keyCode,
                     event,
                     ic,
+                    capsLockEnabled = capsLockEnabled,
+                    shiftOneShot = shiftOneShot,
                     ctrlLatchActive = ctrlLatchActive,
                     altLatchActive = altLatchActive,
+                    clearShiftOneShot = clearShiftOneShot,
                     updateStatusBar = updateStatusBar,
                     handleBoundaryText = handleBoundaryText
                 )
