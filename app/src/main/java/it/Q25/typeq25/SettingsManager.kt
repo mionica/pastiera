@@ -560,7 +560,7 @@ object SettingsManager {
         
         // Default: system language + x-TypeQ25, with fallback to English
         val systemLanguage = context.resources.configuration.locales[0].language.lowercase()
-        val supportedLanguages = setOf("it", "en", "es", "fr", "de", "pl")
+        val supportedLanguages = setOf("it", "en", "es", "fr", "de", "pl", "ro")
         
         val defaultLanguage = if (systemLanguage in supportedLanguages) {
             systemLanguage

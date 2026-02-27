@@ -124,7 +124,8 @@ private fun getLanguageDisplayName(context: Context, languageCode: String): Stri
         "fr" to "Français",
         "de" to "Deutsch",
         "pl" to "Polski",
-        "es" to "Español"
+        "es" to "Español",
+        "ro" to "Română"
     )
     
     if (languageCode in standardLanguages) {
