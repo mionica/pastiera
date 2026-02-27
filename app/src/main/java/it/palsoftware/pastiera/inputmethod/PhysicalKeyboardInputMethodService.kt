@@ -3102,7 +3102,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         // Passa anche la mappa emoji quando SYM è attivo (solo pagina 1)
         val emojiMapText = symLayoutController.emojiMapText()
         // Passa le mappature SYM per la griglia emoji/caratteri
-        val symMappings = symLayoutController.currentSymMappings()?.toMap()
+        val uppercase = capsLockEnabled or shiftPhysicallyPressed or shiftOneShot
+        val symMappings = symLayoutController.currentSymMappings(uppercase)?.toMap()
         // Passa l'inputConnection per rendere i pulsanti clickabili
         val inputConnection = currentInputConnection
         val unchangedRenderedState =
@@ -4591,6 +4592,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 val inputConnection = currentInputConnection
                 if (!handleBoundaryTextBeforeCommit(symChar, inputConnection)) {
                     inputConnection?.commitText(symChar, 1)
+                    if (shiftOneShot)
+                        shiftOneShot = false
                 }
                 updateStatusBarText()
                 return true

@@ -131,7 +131,7 @@ object KeyMappingLoader {
                     // Support both String and Object format for backward compatibility.
                     val value = mappingsObject.get(keyName)
                     val character = when (value) {
-                        is String -> value
+                        is String -> value.lowercase()
                         is JSONObject -> value.optString("lowercase", "")
                         else -> ""
                     }
@@ -198,11 +198,13 @@ object KeyMappingLoader {
                 val keyCode = keyCodeMap[keyName]
                 if (keyCode != null) {
                     val value = mappingsObject.get(keyName)
-                    if (value is JSONObject) {
-                        val uppercase = value.optString("uppercase", "")
-                        if (uppercase.isNotEmpty()) {
-                            symKeyMap[keyCode] = uppercase
-                        }
+                    val uppercase = when (value) {
+                        is String -> value.uppercase()
+                        is JSONObject -> value.optString("uppercase", "")
+                        else -> ""
+                    }
+                    if (uppercase.isNotEmpty()) {
+                        symKeyMap[keyCode] = uppercase
                     }
                 }
             }
