@@ -28,6 +28,8 @@ class AutoFocusAccessibilityService : AccessibilityService() {
             "com.brave.browser",
             "com.opera.browser",
             "com.opera.mini.native",
+            "com.vivaldi.browser", // Vivaldi
+            "org.mozilla.focus", // Firefox Focus
             "com.sec.android.app.sbrowser",
             "com.kiwibrowser.browser",
             "com.duckduckgo.mobile.android"
@@ -44,6 +46,8 @@ class AutoFocusAccessibilityService : AccessibilityService() {
             "com.instagram.android",
             "com.discord",
             "com.twitter.android",
+            "xyz.klinker.messenger",  // PulseSMS
+            "org.thoughtcrime.securesms", // Signal
             "jp.naver.line.android"
         )
     }
