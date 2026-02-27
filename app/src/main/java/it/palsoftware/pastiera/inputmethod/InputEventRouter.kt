@@ -380,14 +380,19 @@ class InputEventRouter(
                 isNumericField = params.isNumericField,
                 altSymManager = controllers.altSymManager,
                 symLayoutController = controllers.symLayoutController,
+                capsLockEnabled = params.capsLockEnabled,
+                shiftOneShot =  params.shiftOneShot,
                 ctrlLatchActive = params.ctrlLatchActive,
                 ctrlOneShot = params.ctrlOneShot,
                 altLatchActive = altLatchActive,
                 cursorUpdateDelayMs = params.cursorUpdateDelayMs,
                 updateStatusBar = callbacks.updateStatusBar,
+                clearShiftOneShot = callbacks.disableShiftOneShot,
                 callSuper = callbacks.callSuper
             )
         ) {
+            if (shiftOneShotActive)
+                callbacks.disableShiftOneShot()
             return EditableFieldRoutingResult.Consume
         }
 
@@ -891,10 +896,13 @@ class InputEventRouter(
         isNumericField: Boolean,
         altSymManager: AltSymManager,
         symLayoutController: SymLayoutController,
+        capsLockEnabled: Boolean,
+        shiftOneShot: Boolean,
         ctrlLatchActive: Boolean,
         ctrlOneShot: Boolean,
         altLatchActive: Boolean,
         cursorUpdateDelayMs: Long,
+        clearShiftOneShot: ()  -> Unit,
         updateStatusBar: () -> Unit,
         callSuper: () -> Boolean
     ): Boolean {
@@ -925,8 +933,11 @@ class InputEventRouter(
                     keyCode,
                     event,
                     ic,
+                    capsLockEnabled = capsLockEnabled,
+                    shiftOneShot = shiftOneShot,
                     ctrlLatchActive = ctrlLatchActive,
                     altLatchActive = altLatchActive,
+                    clearShiftOneShot = clearShiftOneShot,
                     updateStatusBar = updateStatusBar
                 )
             ) {

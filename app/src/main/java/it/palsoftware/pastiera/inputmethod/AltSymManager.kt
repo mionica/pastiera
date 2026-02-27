@@ -103,6 +103,9 @@ class AltSymManager(
                 symKeyMap2.clear()
                 symKeyMap2.putAll(customMappings)
                 symKeyMap2Uppercase.clear()
+                symKeyMap2.forEach { (i, string) ->
+                    symKeyMap2Uppercase[i] = string.uppercase()
+                }
                 Log.d(TAG, "Loaded custom SYM page 2 mappings: ${customMappings.size} entries")
             } else {
                 // Use default mappings from JSON
