@@ -28,6 +28,7 @@ import android.widget.TextView
 import it.srik.TypeQ25.DeviceManager
 import it.srik.TypeQ25.R
 import it.srik.TypeQ25.SettingsActivity
+import it.srik.TypeQ25.SettingsManager
 import it.srik.TypeQ25.inputmethod.StatusBarController
 import it.srik.TypeQ25.inputmethod.TextSelectionHelper
 import it.srik.TypeQ25.inputmethod.VariationButtonHandler
@@ -717,19 +718,22 @@ class VariationBarView(
         }
 
         // Add microphone button AFTER the scrollable area (fixed position)
-        val microphoneButton = microphoneButtonView ?: createMicrophoneButton(buttonWidth)
-        microphoneButtonView = microphoneButton
-        (microphoneButton.parent as? ViewGroup)?.removeView(microphoneButton)
-        val micParams = LinearLayout.LayoutParams(buttonWidth, buttonWidth).apply {
-            gravity = Gravity.CENTER_VERTICAL
-            setMargins(0, 0, micRightMargin, 0)
+        // UNLESS voice services are disabled altogether
+        if (! SettingsManager.getHideVoiceAltogether(context)) {
+            val microphoneButton = microphoneButtonView ?: createMicrophoneButton(buttonWidth)
+            microphoneButtonView = microphoneButton
+            (microphoneButton.parent as? ViewGroup)?.removeView(microphoneButton)
+            val micParams = LinearLayout.LayoutParams(buttonWidth, buttonWidth).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                setMargins(0, 0, micRightMargin, 0)
+            }
+            containerView.addView(microphoneButton, micParams)
+            microphoneButton.setOnClickListener {
+                startSpeechRecognition(inputConnection)
+            }
+            microphoneButton.alpha = 1f
+            microphoneButton.visibility = View.VISIBLE
         }
-        containerView.addView(microphoneButton, micParams)
-        microphoneButton.setOnClickListener {
-            startSpeechRecognition(inputConnection)
-        }
-        microphoneButton.alpha = 1f
-        microphoneButton.visibility = View.VISIBLE
 
         if (variationsChanged) {
             animateVariationsIn(variationsRow)

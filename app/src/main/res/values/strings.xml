@@ -50,6 +50,10 @@
     <string name="auto_focus_input_fields_description">Automatically focus on input fields when opening apps (requires Accessibility permission). Works with browsers, messaging apps, and more.</string>
     <string name="accessibility_service_description">Automatically focuses on input fields when you open apps like browsers and messaging apps, so you can start typing immediately.</string>
     
+    <!-- Hide all voice options Section -->
+    <string name="hide_voice_altogether_title">Disable all voice options</string>
+    <string name="hide_voice_altogether_description">Disable everything related to voice recognition</string>
+
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl Speech Recognition</string>
     <string name="alt_ctrl_speech_shortcut_description">Enable Alt+Ctrl keyboard shortcut to start speech recognition</string>

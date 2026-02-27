@@ -26,6 +26,7 @@ object SettingsManager {
     private const val KEY_AUTO_SHOW_KEYBOARD = "auto_show_keyboard"
     private const val KEY_AUTO_FOCUS_INPUT_FIELDS = "auto_focus_input_fields"
     private const val KEY_CLEAR_ALT_ON_SPACE = "clear_alt_on_space"
+    private const val HIDE_VOICE_ALTOGETHER = "hide_voice" // hide everything voice-related
     private const val KEY_ALT_CTRL_SPEECH_SHORTCUT = "alt_ctrl_speech_shortcut"
     private const val KEY_PREFERRED_SPEECH_APP = "preferred_speech_app"
     private const val KEY_SYM_MAPPINGS_CUSTOM = "sym_mappings_custom"
@@ -44,7 +45,7 @@ object SettingsManager {
     private const val KEY_SPELL_CHECK_ENABLED = "spell_check_enabled" // Enable offline spell checker
     private const val KEY_EMOJI_SHORTCODE_ENABLED = "emoji_shortcode_enabled" // Enable emoji shortcodes (:smile: -> 😊)
     private const val KEY_SYMBOL_SHORTCODE_ENABLED = "symbol_shortcode_enabled" // Enable symbol shortcodes (:tm: -> ™)
-    private const val KEY_KEYCODE_7_BEHAVIOR = "keycode_7_behavior" // Behavior for KEYCODE_7 (Q25 ONLY): "zero" or "alt_zero"
+    private const val KEY_KEYCODE_7_BEHAVIOR = "keycode_7_behavior" // Behavior for KEYCODE_7 (Q25 ONLY): "zero", "alt_zero"  or "always_zero"
     private const val KEY_USE_ARABIC_NUMERALS = "use_arabic_numerals" // Use Arabic-Indic numerals (٠-٩) instead of Western (0-9) when Arabic layout is active
     private const val KEY_USE_ARABIC_PUNCTUATION = "use_arabic_punctuation" // Use Arabic punctuation (،؟) instead of Western (,?) when Arabic layout is active
     
@@ -58,6 +59,7 @@ object SettingsManager {
     private const val DEFAULT_AUTO_SHOW_KEYBOARD = true
     private const val DEFAULT_AUTO_FOCUS_INPUT_FIELDS = false
     private const val DEFAULT_CLEAR_ALT_ON_SPACE = false
+    private const val DEFAULT_HIDE_VOICE_ALTOGETHER = false // hide everything voice-related
     private const val DEFAULT_ALT_CTRL_SPEECH_SHORTCUT = true
     private const val DEFAULT_AUTO_CORRECT_ENABLED = true
     private const val DEFAULT_AUTO_CAPITALIZE_AFTER_PERIOD = true
@@ -67,7 +69,7 @@ object SettingsManager {
     private const val DEFAULT_SPELL_CHECK_ENABLED = true
     private const val DEFAULT_EMOJI_SHORTCODE_ENABLED = true
     private const val DEFAULT_SYMBOL_SHORTCODE_ENABLED = true
-    private const val DEFAULT_KEYCODE_7_BEHAVIOR = "alt_zero" // Default: keycode 7 triggers speech-to-text, Alt+7 inserts 0
+    private const val DEFAULT_KEYCODE_7_BEHAVIOR = "always_zero" // Default: keycode 7 inserts 0, Alt+7 inserts 0
     private const val DEFAULT_USE_ARABIC_NUMERALS = false
     private const val DEFAULT_USE_ARABIC_PUNCTUATION = false
     private val DEFAULT_SYM_PAGES_CONFIG = SymPagesConfig()
@@ -220,9 +222,27 @@ object SettingsManager {
     }
 
     /**
+     * Returns whether all voice things are hidden
+     */
+    fun getHideVoiceAltogether(context: Context): Boolean {
+        return getPreferences(context).getBoolean(HIDE_VOICE_ALTOGETHER, DEFAULT_HIDE_VOICE_ALTOGETHER)
+    }
+
+    /**
+     * Sets whether all voice things are hidden
+     */
+    fun setHideVoiceAltogether(context: Context, enabled: Boolean) {
+        getPreferences(context).edit()
+            .putBoolean(HIDE_VOICE_ALTOGETHER, enabled)
+            .apply()
+    }
+
+    /**
      * Returns whether Alt+Ctrl shortcut for speech recognition is enabled.
      */
     fun getAltCtrlSpeechShortcutEnabled(context: Context): Boolean {
+        if (getPreferences(context).getBoolean(HIDE_VOICE_ALTOGETHER, DEFAULT_HIDE_VOICE_ALTOGETHER))
+            return false
         return getPreferences(context).getBoolean(KEY_ALT_CTRL_SPEECH_SHORTCUT, DEFAULT_ALT_CTRL_SPEECH_SHORTCUT)
     }
 
@@ -255,8 +275,9 @@ object SettingsManager {
     /**
      * Returns the behavior mode for KEYCODE_7.
      * This setting is only applicable to Q25 devices.
-     * @return "zero" (inserts 0, Alt+7 for speech) or "alt_zero" (triggers speech, Alt+7 for 0)
-     *         Returns default "alt_zero" for non-Q25 devices.
+     * @return "zero" (inserts 0, Alt+7 for speech), "alt_zero" (triggers speech, Alt+7 for 0) or
+     *         "always_zero" (inserts 0, ignore Alt)
+     *         Returns default "always_zero" for non-Q25 devices.
      */
     fun getKeycode7Behavior(context: Context): String {
         // Only apply this setting on Q25/Jelly2 devices
@@ -265,13 +286,16 @@ object SettingsManager {
         if (!isQ25Device) {
             return DEFAULT_KEYCODE_7_BEHAVIOR
         }
+        if (getPreferences(context).getBoolean(HIDE_VOICE_ALTOGETHER, DEFAULT_HIDE_VOICE_ALTOGETHER))
+            return DEFAULT_KEYCODE_7_BEHAVIOR
         return getPreferences(context).getString(KEY_KEYCODE_7_BEHAVIOR, DEFAULT_KEYCODE_7_BEHAVIOR) ?: DEFAULT_KEYCODE_7_BEHAVIOR
     }
 
     /**
      * Sets the behavior mode for KEYCODE_7.
      * This setting is only applicable to Q25 devices.
-     * @param mode "zero" (inserts 0, Alt+7 for speech) or "alt_zero" (triggers speech, Alt+7 for 0)
+     * @param mode "zero" (inserts 0, Alt+7 for speech), "alt_zero" (triggers speech, Alt+7 for 0) or
+     *             "always_zero" (inserts 0, ignores Alt)
      */
     fun setKeycode7Behavior(context: Context, mode: String) {
         // Only allow setting on Q25/Jelly2 devices

@@ -1088,7 +1088,7 @@ class InputEventRouter(
             val isAltActive = altLatchActive || altOneShot || event?.isAltPressed == true
             
             when (behavior) {
-                "zero" -> {
+                "zero", "always_zero" -> {
                     // Insert 0 on keycode 7, Alt+7 triggers speech
                     if (!isAltActive) {
                         ic?.commitText("0", 1)
@@ -1190,7 +1190,7 @@ class InputEventRouter(
             val behavior = SettingsManager.getKeycode7Behavior(context)
             
             when (behavior) {
-                "zero" -> {
+                "always_zero", "alt_zero" -> {
                     // Alt+7 triggers speech-to-text (plain 7 inserts 0)
                     (context as? it.srik.TypeQ25.inputmethod.PhysicalKeyboardInputMethodService)?.let { service ->
                         service.startSpeechRecognitionFromRouter()

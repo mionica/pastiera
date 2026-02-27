@@ -120,6 +120,10 @@ fun SettingsScreen(
         }
     }
     
+    var hideVoiceAltogether by remember {
+        mutableStateOf(SettingsManager.getHideVoiceAltogether(context))
+    }
+
     // Navigazione condizionale
     if (showKeyboardTimingSettings) {
         KeyboardTimingSettingsScreen(
@@ -268,6 +272,49 @@ fun SettingsScreen(
                     }
                 }
             
+                // Disable voice recognition altogether
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.TextFields,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.hide_voice_altogether_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = stringResource(R.string.hide_voice_altogether_description),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1
+                            )
+                        }
+                        Switch(
+                            checked = hideVoiceAltogether,
+                            onCheckedChange = { enabled ->
+                                hideVoiceAltogether = enabled
+                                SettingsManager.setHideVoiceAltogether(context, enabled)
+                            }
+                        )
+                    }
+                }
+
                 // Text Input
                 Surface(
                     modifier = Modifier

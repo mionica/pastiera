@@ -558,7 +558,7 @@ fun TextInputSettingsScreen(
             }
 
             // Alt+Ctrl Speech Recognition Shortcut - Only show for non-Q25 devices
-            if (device != "Q25") {
+            if ((device != "Q25") && (! SettingsManager.getHideVoiceAltogether(context))) {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -603,69 +603,14 @@ fun TextInputSettingsScreen(
             }
             
             // Speech Recognition App Selection
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp)
-                    .clickable {
-                        val intent = Intent(context, SpeechAppChooserActivity::class.java)
-                        speechAppChooserLauncher.launch(intent)
-                    }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TextFields,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.speech_app_selection_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1
-                        )
-                        Text(
-                            text = preferredSpeechApp?.let {
-                                stringResource(R.string.speech_app_selection_current, it)
-                            } ?: stringResource(R.string.speech_app_selection_not_set),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1
-                        )
-                    }
-                    Icon(
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            
-            // Default 0 key behaviour (Q25 Device)
-            if (Build.MODEL.contains("Jelly2", ignoreCase = true) || Build.MODEL.contains("Q25", ignoreCase = true)) {
-                Text(
-                    text = "Default 0 key behaviour",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
-                )
-                
-                // Option 1: Insert 0
+            if (! SettingsManager.getHideVoiceAltogether(context)) {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(80.dp)
+                        .height(64.dp)
                         .clickable {
-                            keycode7Behavior = "zero"
-                            SettingsManager.setKeycode7Behavior(context, "zero")
+                            val intent = Intent(context, SpeechAppChooserActivity::class.java)
+                            speechAppChooserLauncher.launch(intent)
                         }
                 ) {
                     Row(
@@ -675,63 +620,165 @@ fun TextInputSettingsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        RadioButton(
-                            selected = keycode7Behavior == "zero",
-                            onClick = {
+                        Icon(
+                            imageVector = Icons.Filled.TextFields,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.speech_app_selection_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = preferredSpeechApp?.let {
+                                    stringResource(R.string.speech_app_selection_current, it)
+                                } ?: stringResource(R.string.speech_app_selection_not_set),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            if (! SettingsManager.getHideVoiceAltogether(context)) {
+                // Default 0 key behaviour (Q25 Device)
+                if (Build.MODEL.contains("Jelly2", ignoreCase = true) || Build.MODEL.contains(
+                        "Q25",
+                        ignoreCase = true
+                    )
+                ) {
+                    Text(
+                        text = "Default 0 key behaviour",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+                    )
+
+                    // Option 1: Insert 0
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .clickable {
                                 keycode7Behavior = "zero"
                                 SettingsManager.setKeycode7Behavior(context, "zero")
                             }
-                        )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Insert 0",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            RadioButton(
+                                selected = keycode7Behavior == "zero",
+                                onClick = {
+                                    keycode7Behavior = "zero"
+                                    SettingsManager.setKeycode7Behavior(context, "zero")
+                                }
                             )
-                            Text(
-                                text = "Inserts 0 by default, Alt+0 launches speech to text",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Insert 0",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Inserts 0 by default, Alt+0 launches speech to text",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
-                }
-                
-                // Option 2: Activate speech to text
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .clickable {
-                            keycode7Behavior = "alt_zero"
-                            SettingsManager.setKeycode7Behavior(context, "alt_zero")
-                        }
-                ) {
-                    Row(
+
+                    // Option 2: Activate speech to text
+                    Surface(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        RadioButton(
-                            selected = keycode7Behavior == "alt_zero",
-                            onClick = {
+                            .height(80.dp)
+                            .clickable {
                                 keycode7Behavior = "alt_zero"
                                 SettingsManager.setKeycode7Behavior(context, "alt_zero")
                             }
-                        )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Activate speech to text",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            RadioButton(
+                                selected = keycode7Behavior == "alt_zero",
+                                onClick = {
+                                    keycode7Behavior = "alt_zero"
+                                    SettingsManager.setKeycode7Behavior(context, "alt_zero")
+                                }
                             )
-                            Text(
-                                text = "Activates speech to text by default, Alt+0 inserts 0",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Activate speech to text",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Activates speech to text by default, Alt+0 inserts 0",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+
+                    // Option 3: Always 0
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(80.dp)
+                            .clickable {
+                                keycode7Behavior = "always_zero"
+                                SettingsManager.setKeycode7Behavior(context, "always_zero")
+                            }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            RadioButton(
+                                selected = keycode7Behavior == "always_zero",
+                                onClick = {
+                                    keycode7Behavior = "always_zero"
+                                    SettingsManager.setKeycode7Behavior(context, "always_zero")
+                                }
                             )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Always insert 0 (disable speech to text)",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = "Inserts 0 regardless of Alt state",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
