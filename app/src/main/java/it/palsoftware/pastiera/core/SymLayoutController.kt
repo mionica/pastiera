@@ -142,10 +142,13 @@ class SymLayoutController(
         return if (currentPageType() == SymPage.EMOJI) altSymManager.buildEmojiMapText() else ""
     }
 
-    fun currentSymMappings(): Map<Int, String>? {
+    fun currentSymMappings(uppercase: Boolean): Map<Int, String>? {
         return when (currentPageType()) {
             SymPage.EMOJI -> altSymManager.getSymMappings()
-            SymPage.SYMBOLS -> altSymManager.getSymMappings2()
+            SymPage.SYMBOLS -> {
+                if (!uppercase) altSymManager.getSymMappings2()
+                else altSymManager.getSymMappings2Uppercase()
+            }
             SymPage.CLIPBOARD -> null // Clipboard doesn't use mappings
             SymPage.EMOJI_PICKER -> null // Emoji picker doesn't use mappings
             else -> null
@@ -186,8 +189,11 @@ class SymLayoutController(
         keyCode: Int,
         event: KeyEvent?,
         inputConnection: InputConnection?,
+        capsLockEnabled: Boolean,
+        shiftOneShot: Boolean,
         ctrlLatchActive: Boolean,
         altLatchActive: Boolean,
+        clearShiftOneShot: ()  -> Unit,
         updateStatusBar: () -> Unit
     ): SymKeyResult {
         val autoCloseEnabled = SettingsManager.getSymAutoClose(context)
@@ -210,9 +216,13 @@ class SymLayoutController(
             }
         }
 
+        val uppercase = capsLockEnabled or shiftOneShot
         val symChar = when (page) {
             SymPage.EMOJI -> altSymManager.getSymMappings()[keyCode]
-            SymPage.SYMBOLS -> altSymManager.getSymMappings2()[keyCode]
+            SymPage.SYMBOLS -> {
+                if (!uppercase) altSymManager.getSymMappings2()[keyCode]
+                else altSymManager.getSymMappings2Uppercase()[keyCode]
+            }
             SymPage.CLIPBOARD -> null // Clipboard doesn't use key mappings
             SymPage.EMOJI_PICKER -> null // Emoji picker doesn't use key mappings
             else -> null
@@ -220,6 +230,8 @@ class SymLayoutController(
 
         if (symChar != null && inputConnection != null) {
             inputConnection.commitText(symChar, 1)
+            if (shiftOneShot)
+                clearShiftOneShot()
             if (autoCloseEnabled) {
                 closeSymAndUpdate(updateStatusBar)
             }
