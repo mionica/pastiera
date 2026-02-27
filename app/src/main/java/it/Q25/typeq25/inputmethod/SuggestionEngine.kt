@@ -2,6 +2,7 @@ package it.srik.TypeQ25.inputmethod
 
 import android.content.Context
 import android.util.Log
+import java.text.Normalizer
 import it.srik.TypeQ25.SettingsManager
 
 /**
@@ -18,9 +19,17 @@ class SuggestionEngine(private val context: Context) {
         private const val MIN_WORD_LENGTH = 2
         private const val USER_HISTORY_PREFS = "user_word_history"
     }
-    
+
+    // need this to map diacritics-containing words to the plain representation
+    private val REGEX_UNACCENT = "\\p{InCombiningDiacriticalMarks}+".toRegex()
+
     // Word frequency map from dictionaries (word -> frequency score)
     private val dictionaryWords = mutableMapOf<String, Int>()
+    // For Romanian, since you could have multiple words with the same
+    // diacrictic-less representation (example: [si, și]; [inca, încă] etc)
+    // we'll use a map of latin representations, each pointing to a list of
+    // actual (word, frequency) representations
+    private val dictionaryWordsRO = mutableListOf<Pair<String,List<Pair<String,Int>>>>()
     
     // User's personal word usage (word -> usage count)
     private val userHistory = mutableMapOf<String, Int>()
@@ -36,7 +45,15 @@ class SuggestionEngine(private val context: Context) {
         loadUserHistory()
         loadSuggestionsFromAssets()
     }
-    
+
+    /**
+     * map diacritics-containing words to the plain representation
+     */
+    private fun CharSequence.unaccent(): String {
+        val temp = Normalizer.normalize(this, Normalizer.Form.NFD)
+        return REGEX_UNACCENT.replace(temp, "")
+    }
+
     /**
      * Loads additional suggestion words from dedicated JSON files.
      */
@@ -44,7 +61,8 @@ class SuggestionEngine(private val context: Context) {
         try {
             val assetManager = context.assets
             val suggestionsFile = "common/autocorrect/suggestions_en.json"
-            
+            val suggestionsFileRO = "common/autocorrect/suggestions_ro.json"
+
             if (assetManager.list("common/autocorrect")?.contains("suggestions_en.json") == true) {
                 val json = assetManager.open(suggestionsFile).bufferedReader().use { it.readText() }
                 val suggestions = org.json.JSONObject(json)
@@ -54,7 +72,26 @@ class SuggestionEngine(private val context: Context) {
                     dictionaryWords[key.lowercase()] = frequency
                 }
                 
-                Log.d(TAG, "Loaded ${suggestions.length()} suggestions from assets")
+                Log.d(TAG, "Loaded ${suggestions.length()} suggestions from assets[en]")
+            }
+
+            if (assetManager.list("common/autocorrect")?.contains("suggestions_ro.json") == true) {
+                val json = assetManager.open(suggestionsFileRO).bufferedReader().use { it.readText() }
+                val suggestions = org.json.JSONObject(json)
+                val romanian = mutableMapOf<String, MutableList<Pair<String,Int>>>()
+                for (key in suggestions.keys()) {
+                    val normalized_word = key.lowercase().unaccent()
+                    val frequency = suggestions.getInt(key)
+                    if (! romanian.containsKey(normalized_word))
+                        romanian[normalized_word] = mutableListOf(Pair(key, frequency))
+                    else
+                        romanian[normalized_word]!!.add(Pair(key, frequency))
+                }
+                romanian.toSortedMap().forEach { (norm, keywords) ->
+                    dictionaryWordsRO.add(Pair(norm, keywords))
+                }
+
+                Log.d(TAG, "Loaded ${suggestions.length()} suggestions from assets[ro]")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error loading suggestions from assets", e)
@@ -139,7 +176,80 @@ class SuggestionEngine(private val context: Context) {
         
         return androidSpellChecker.checkWord(word)
     }
-    
+
+    /**
+     * Gets suggestions using offline Romanian dictionary.
+     */
+    private fun getRomanianSuggestions(prefix: String, limit: Int): List<Pair<String,Int>> {
+        val emptyResult = listOf<Pair<String,Int>>()
+        val str = prefix.lowercase().unaccent()
+        val len = str.length
+        if (len == 0)
+            return emptyResult
+        // the logic in here is simple and sequential
+        // - find the index of a word, any word, that matches
+        // - knowing that, find the index of the first word that matches
+        // - also, find the index of the last word that matches
+        // all these are to be done using binary searches
+        var i = 0
+        var j = dictionaryWordsRO.size - 1
+        var lastBefore = -1
+        var lastAfter = dictionaryWordsRO.size
+        // 1) do a binary search until we find a match - any match
+        while (i < j) {
+            val k = (i + j) / 2
+            val crt = dictionaryWordsRO[k].first.take(len)
+            if (crt < str) {
+                lastBefore = k
+                i = k + 1
+            } else if (crt > str) {
+                lastAfter = k
+                j = k - 1
+            } else {
+                i = k
+                j = k
+            }
+        }
+        // check that we actually have at least a match
+        if ((i != j) || (dictionaryWordsRO[i].first.take(len) != str))
+            return emptyResult
+        val firstEncountered = i
+        // 2) find the index of the first match
+        i = if (lastBefore >= 0) lastBefore else 0
+        while (i < j) {
+            val k = (i + j) / 2
+            if (dictionaryWordsRO[k].first.take(len) < str) {
+                lastBefore = k
+                i = k + 1
+            } else
+                j = k
+        }
+        // 3) find the index of the last match
+        i = firstEncountered
+        j = if (lastAfter < dictionaryWordsRO.size) lastAfter else dictionaryWordsRO.size-1
+        while (i < j) {
+            val k = (i + j + 1) / 2
+            if (dictionaryWordsRO[k].first.take(len) > str) {
+                lastAfter = k
+                j = k - 1
+            } else
+                i = k
+        }
+        // now that we have the indices, let's gather all the words in an array
+        val results = mutableListOf<Pair<String,Int>>()
+        dictionaryWordsRO.slice(lastBefore+1..<lastAfter).forEach { words ->
+            words.second.forEach { word ->
+                results.add(word)
+            }
+        }
+        // sort the array by frequency desc
+        results.sortWith { a, b -> b.second.compareTo(a.second) }
+        // construct the response - a list of up to `limit' strings
+        val result = mutableListOf<Pair<String,Int>>()
+        for (it in results.take(limit))
+            result.add(it)
+        return result
+    }
     /**
      * Gets suggestions using offline dictionary and user history.
      */
@@ -168,8 +278,15 @@ class SuggestionEngine(private val context: Context) {
                 }
             }
         }
-        
-        // Search dictionary words (lower priority)
+
+        // Search Romanian dictionary words (lower priority)
+        val suggestionsRO = getRomanianSuggestions(prefix, limit)
+        for (word in suggestionsRO) {
+            val score = calculateScore(word.first, prefix, word.second)
+            suggestions.add(ScoredWord(word.first, score))
+        }
+
+        // Search dictionary words (lowest priority)
         for ((word, freq) in dictionaryWords) {
             if (word.startsWith(lowerPrefix) && word != lowerPrefix) {
                 val existingScore = suggestions.find { it.word.lowercase() == word.lowercase() }?.score
