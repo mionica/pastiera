@@ -542,6 +542,7 @@
     <string name="online_layouts_uninstall_failed">Suppression impossible</string>
     <string name="input_method_name_da">Dansk</string>
     <string name="input_method_name_no">Norsk</string>
+    <string name="input_method_name_ro">Română</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="delete_alternatives_title">Supprimer</string>
     <string name="delete_alternatives_description">Méthodes alternatives pour supprimer les caractères à droite du curseur</string>
@@ -575,4 +576,8 @@
     <string name="status_bar_button_language_state_description">Langue %1$s, disposition %2$s</string>
     <string name="status_bar_button_hamburger">Menu</string>
     <string name="status_bar_button_hamburger_description">Actions rapides</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Haut-parleur ACTIF</string>
+    <string name="speaker_toggle_off">Haut-parleur INACTIF</string>
+    <string name="speaker_toggle_not_in_call">Pas en appel</string>
 </resources>

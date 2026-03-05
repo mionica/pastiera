@@ -118,7 +118,8 @@ fun SymCustomizationScreen(
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+		"KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE
             )
             val result = mutableMapOf<Int, String>()
             val keys = mappingsObject.keys()
@@ -203,6 +204,7 @@ fun SymCustomizationScreen(
             KeyEvent.KEYCODE_B -> "B"
             KeyEvent.KEYCODE_N -> "N"
             KeyEvent.KEYCODE_M -> "M"
+	    KeyEvent.KEYCODE_GRAVE -> "$"
             else -> "?"
         }
     }

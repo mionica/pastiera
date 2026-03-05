@@ -31,7 +31,7 @@ class SuggestionEngine(
      * Physical key positions match the actual Pastiera compact keyboard layout:
      * - Row 0: Q W E R T Y U I O P
      * - Row 1: A S D F G H J K L
-     * - Row 2: Z X C V [space] B N M
+     * - Row 2: Z X C V [space] B N M $
      */
     private fun buildKeyboardPositions(layout: String): Map<Char, Pair<Int, Int>> {
         // Physical key positions (row, column) for compact keyboard with split bottom row
@@ -49,7 +49,8 @@ class SuggestionEngine(
             "KEYCODE_Z" to (2 to 0), "KEYCODE_X" to (2 to 1), "KEYCODE_C" to (2 to 2),
             "KEYCODE_V" to (2 to 3),
             // Row 2 (bottom row right, after spacebar): B N M
-            "KEYCODE_B" to (2 to 6), "KEYCODE_N" to (2 to 7), "KEYCODE_M" to (2 to 8)
+            "KEYCODE_B" to (2 to 6), "KEYCODE_N" to (2 to 7), "KEYCODE_M" to (2 to 8),
+	    "KEYCODE_GRAVE" to (2 to 9)
         )
 
         // Map keycodes to characters for each layout
@@ -61,7 +62,7 @@ class SuggestionEngine(
                 "KEYCODE_D" to 'd', "KEYCODE_F" to 'f', "KEYCODE_G" to 'g', "KEYCODE_H" to 'h',
                 "KEYCODE_J" to 'j', "KEYCODE_K" to 'k', "KEYCODE_L" to 'l', "KEYCODE_Z" to 'z',
                 "KEYCODE_X" to 'x', "KEYCODE_C" to 'c', "KEYCODE_V" to 'v', "KEYCODE_B" to 'b',
-                "KEYCODE_N" to 'n', "KEYCODE_M" to 'm'
+                "KEYCODE_N" to 'n', "KEYCODE_M" to 'm', "KEYCODE_GRAVE" to '$'
             )
             "azerty" -> mapOf(
                 "KEYCODE_Q" to 'a', "KEYCODE_W" to 'z', "KEYCODE_E" to 'e', "KEYCODE_R" to 'r',
@@ -70,7 +71,7 @@ class SuggestionEngine(
                 "KEYCODE_D" to 'd', "KEYCODE_F" to 'f', "KEYCODE_G" to 'g', "KEYCODE_H" to 'h',
                 "KEYCODE_J" to 'j', "KEYCODE_K" to 'k', "KEYCODE_L" to 'l', "KEYCODE_Z" to 'w',
                 "KEYCODE_X" to 'x', "KEYCODE_C" to 'c', "KEYCODE_V" to 'v', "KEYCODE_B" to 'b',
-                "KEYCODE_N" to 'n', "KEYCODE_M" to 'm'
+                "KEYCODE_N" to 'n', "KEYCODE_M" to 'm', "KEYCODE_GRAVE" to '$'
             )
             "qwertz" -> mapOf(
                 "KEYCODE_Q" to 'q', "KEYCODE_W" to 'w', "KEYCODE_E" to 'e', "KEYCODE_R" to 'r',
@@ -79,7 +80,7 @@ class SuggestionEngine(
                 "KEYCODE_D" to 'd', "KEYCODE_F" to 'f', "KEYCODE_G" to 'g', "KEYCODE_H" to 'h',
                 "KEYCODE_J" to 'j', "KEYCODE_K" to 'k', "KEYCODE_L" to 'l', "KEYCODE_Z" to 'y',
                 "KEYCODE_X" to 'x', "KEYCODE_C" to 'c', "KEYCODE_V" to 'v', "KEYCODE_B" to 'b',
-                "KEYCODE_N" to 'n', "KEYCODE_M" to 'm'
+                "KEYCODE_N" to 'n', "KEYCODE_M" to 'm', "KEYCODE_GRAVE" to '$'
             )
             else -> return buildKeyboardPositions("qwerty") // Fallback to QWERTY
         }

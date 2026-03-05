@@ -255,6 +255,7 @@ fun LauncherShortcutsScreen(
                                 "B" -> KeyEvent.KEYCODE_B
                                 "N" -> KeyEvent.KEYCODE_N
                                 "M" -> KeyEvent.KEYCODE_M
+				"$" -> KeyEvent.KEYCODE_GRAVE
                                 else -> null
                             }
                             

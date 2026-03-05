@@ -498,6 +498,7 @@
     <string name="input_method_name_da">Dansk</string>
     <string name="input_method_name_no">Norsk</string>
     <string name="input_method_name_pt">Português</string>
+    <string name="input_method_name_ro">Română</string>
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="delete_alternatives_title">Löschen</string>
@@ -579,4 +580,8 @@
     <string name="status_bar_button_language_state_description">Sprache %1$s, Layout %2$s</string>
     <string name="status_bar_button_hamburger">Menü</string>
     <string name="status_bar_button_hamburger_description">Schnellaktionen</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Lautsprecher EIN</string>
+    <string name="speaker_toggle_off">Lautsprecher AUS</string>
+    <string name="speaker_toggle_not_in_call">Nicht im Anruf</string>
 </resources>

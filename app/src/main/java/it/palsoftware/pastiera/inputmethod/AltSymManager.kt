@@ -107,18 +107,34 @@ class AltSymManager(
             val customMappings = it.palsoftware.pastiera.SettingsManager.getSymMappingsPage2(context)
             if (customMappings.isNotEmpty()) {
                 symKeyMap2.clear()
-                symKeyMap2.putAll(customMappings)
+                customMappings.forEach { (i, string) ->
+                    if (string != "$")
+                        symKeyMap2[i] = string.lowercase()
+                    else
+                        symKeyMap2[i] = "$"
+                }
+                // on Q25, add the currency key
+                if (DeviceSpecific.hasBlackberryKeyboard())
+                    symKeyMap2.put(DeviceSpecific.getCurrencyKey()!!, "$")
                 symKeyMap2Uppercase.clear()
                 symKeyMap2.forEach { (i, string) ->
-                    symKeyMap2Uppercase[i] = string.uppercase()
+                    if (string != "$")
+                        symKeyMap2Uppercase[i] = string.uppercase()
+                    else
+                        symKeyMap2Uppercase[i] = "€"
                 }
                 Log.d(TAG, "Loaded custom SYM page 2 mappings: ${customMappings.size} entries")
             } else {
                 // Use default mappings from JSON
                 symKeyMap2.clear()
                 symKeyMap2.putAll(KeyMappingLoader.loadSymKeyMappingsPage2(assets))
+                // on Q25, add the currency key
+                if (DeviceSpecific.hasBlackberryKeyboard())
+                    symKeyMap2.put(DeviceSpecific.getCurrencyKey()!!, "$")
                 symKeyMap2Uppercase.clear()
                 symKeyMap2Uppercase.putAll(KeyMappingLoader.loadSymKeyMappingsPage2Uppercase(assets))
+                if (DeviceSpecific.hasBlackberryKeyboard())
+                    symKeyMap2Uppercase.put(DeviceSpecific.getCurrencyKey()!!, "€")
                 Log.d(TAG, "Loaded default SYM page 2 mappings")
             }
         }
@@ -174,14 +190,14 @@ class AltSymManager(
             KeyEvent.KEYCODE_H to "H", KeyEvent.KEYCODE_J to "J", KeyEvent.KEYCODE_K to "K",
             KeyEvent.KEYCODE_L to "L", KeyEvent.KEYCODE_Z to "Z", KeyEvent.KEYCODE_X to "X",
             KeyEvent.KEYCODE_C to "C", KeyEvent.KEYCODE_V to "V", KeyEvent.KEYCODE_B to "B",
-            KeyEvent.KEYCODE_N to "N", KeyEvent.KEYCODE_M to "M"
+            KeyEvent.KEYCODE_N to "N", KeyEvent.KEYCODE_M to "M", KeyEvent.KEYCODE_GRAVE to "$"
         )
 
         val rows = mutableListOf<String>()
         val keys = listOf(
             listOf(KeyEvent.KEYCODE_Q, KeyEvent.KEYCODE_W, KeyEvent.KEYCODE_E, KeyEvent.KEYCODE_R, KeyEvent.KEYCODE_T, KeyEvent.KEYCODE_Y, KeyEvent.KEYCODE_U, KeyEvent.KEYCODE_I, KeyEvent.KEYCODE_O, KeyEvent.KEYCODE_P),
             listOf(KeyEvent.KEYCODE_A, KeyEvent.KEYCODE_S, KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H, KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L),
-            listOf(KeyEvent.KEYCODE_Z, KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B, KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M)
+            listOf(KeyEvent.KEYCODE_Z, KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B, KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, KeyEvent.KEYCODE_GRAVE )
         )
 
         for (row in keys) {

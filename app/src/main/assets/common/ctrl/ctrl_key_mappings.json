@@ -97,6 +97,9 @@
     },
     "KEYCODE_M": {
       "type": "none"
+    },
+    "KEYCODE_GRAVE": {
+      "type": "none"
     }
   }
 }

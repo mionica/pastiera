@@ -469,6 +469,7 @@
     <string name="sym_key_content_description">%1$s, %2$s</string>
     <string name="input_method_name_da">Dansk</string>
     <string name="input_method_name_no">Norsk</string>
+    <string name="input_method_name_ro">Română</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="delete_alternatives_title">Видалення</string>
     <string name="delete_alternatives_description">Альтернативні способи видалення символів праворуч від курсора</string>
@@ -575,4 +576,8 @@
     <string name="status_bar_button_symbols">Symbols</string>
     <string name="status_bar_button_symbols_description">Symbols keyboard</string>
     <string name="status_bar_buttons_reset">Reset</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Гучномовець увімкнено</string>
+    <string name="speaker_toggle_off">Гучномовець вимкнено</string>
+    <string name="speaker_toggle_not_in_call">Не в дзвінку</string>
 </resources>

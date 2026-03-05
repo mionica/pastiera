@@ -182,6 +182,7 @@
     "KEYCODE_M": {
       "lowercase": "б",
       "uppercase": "Б"
-    }
+    },
+    "KEYCODE_GRAVE": { "lowercase": "₽", "uppercase": "$" }
   }
 }

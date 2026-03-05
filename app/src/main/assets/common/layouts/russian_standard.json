@@ -161,6 +161,7 @@
           "uppercase": "Ю"
         }
       ]
-    }
+    },
+    "KEYCODE_GRAVE": { "lowercase": "₽", "uppercase": "$" }
   }
 }

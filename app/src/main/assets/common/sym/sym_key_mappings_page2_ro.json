@@ -1,0 +1,31 @@
+{
+  "mappings": {
+    "KEYCODE_Q": "â",
+    "KEYCODE_W": "[",
+    "KEYCODE_E": "]",
+    "KEYCODE_R": "~",
+    "KEYCODE_T": "ț",
+    "KEYCODE_Y": "{",
+    "KEYCODE_U": "}",
+    "KEYCODE_I": "î",
+    "KEYCODE_O": "<",
+    "KEYCODE_P": ">",
+    "KEYCODE_A": "ă",
+    "KEYCODE_S": "ș",
+    "KEYCODE_D": "|",
+    "KEYCODE_F": "\\",
+    "KEYCODE_G": "`",
+    "KEYCODE_H": "%",
+    "KEYCODE_J": "^",
+    "KEYCODE_K": "&",
+    "KEYCODE_L": "=",
+    "KEYCODE_Z": "°",
+    "KEYCODE_X": "§",
+    "KEYCODE_C": "¡",
+    "KEYCODE_V": "¿",
+    "KEYCODE_B": "±",
+    "KEYCODE_N": "×",
+    "KEYCODE_M": "÷",
+    "KEYCODE_GRAVE": "$"
+  }
+}

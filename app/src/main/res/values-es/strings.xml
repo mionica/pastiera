@@ -479,6 +479,7 @@
     <string name="input_method_name_da">Dansk</string>
     <string name="input_method_name_no">Norsk</string>
     <string name="input_method_name_pt">Português</string>
+    <string name="input_method_name_ro">Română</string>
     <string name="input_method_name_ru">Русский</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="keyboard_timing_long_press_value">%1$dms</string>
@@ -575,4 +576,8 @@
     <string name="status_bar_button_language_state_description">Idioma %1$s, diseño %2$s</string>
     <string name="status_bar_button_hamburger">Menú</string>
     <string name="status_bar_button_hamburger_description">Acciones rápidas</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altavoz ENCENDIDO</string>
+    <string name="speaker_toggle_off">Altavoz APAGADO</string>
+    <string name="speaker_toggle_not_in_call">No en llamada</string>
 </resources>

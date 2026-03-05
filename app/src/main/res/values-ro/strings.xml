@@ -111,9 +111,9 @@
     
     <!-- Long Press Mappings Section -->
     <string name="long_press_mappings_title">Long Press Mappings</string>
-    <string name="long_press_mappings_line1">Q→0, W→1, E→2, R→3, T→(, Y→), U→-, I→_, O→\', P→:</string>
-    <string name="long_press_mappings_line2">A→@, S→4, D→5, F→6, G→*, H→#, J→+, K→\", L→\'</string>
-    <string name="long_press_mappings_line3">Z→!, X→7, C→8, V→9, B→., N→\', M→?</string>
+    <string name="long_press_mappings_line1">Q→Â, W→[, E→], R→~, T→Ț, Y→{, U→}, I→Î, O→&lt;, P→&gt;</string>
+    <string name="long_press_mappings_line2">A→Ă, S→Ș, D→|, F→\, G→`, H→%, J→^, K→&amp;, L→=\'</string>
+    <string name="long_press_mappings_line3">Z→º, X→§, C→¡, V→¿, B→± N→×, M→÷, $→€</string>
     
     <!-- Buttons -->
     <string name="settings_button">Settings</string>

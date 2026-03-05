@@ -68,6 +68,9 @@ object SettingsManager {
     private const val KEY_GLOBAL_VARIATION_LAYOUT_OVERRIDE = "global_variation_layout_override" // Optional layout id used for variation ordering across all layouts
     private const val KEY_APP_LANGUAGE_TAG = "app_language_tag" // BCP-47 language tag for app UI (null/blank = system)
     
+    private const val KEY_CURRENCY_KEY = "currency_key" // "$", "€", etc.
+    private const val KEY_CURRENCY_KEY_ALT = "currency_key_alt" // "$", "€", etc.
+
     // Status bar button slot configuration keys
     private const val KEY_STATUS_BAR_SLOT_LEFT = "status_bar_slot_left"
     private const val KEY_STATUS_BAR_SLOT_RIGHT_1 = "status_bar_slot_right_1"
@@ -143,6 +146,9 @@ object SettingsManager {
     private const val DEFAULT_GLOBAL_VARIATION_LAYOUT_OVERRIDE = ""
     private const val MIN_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = 100L
     private const val MAX_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = 2000L
+    private const val DEFAULT_CURRENCY_KEY = "€"
+    private const val DEFAULT_CURRENCY_KEY_ALT = "$"
+
     private val STATIC_VARIATION_BASE_PRESET_DEFAULT = listOf("@", "\"", ":", "!", "?", ",", ".")
     private val STATIC_VARIATION_BASE_PRESET_ALTERNATIVE = listOf("[", "]", "$", "%", "^", "&", "\\")
     private val STATIC_VARIATION_SHIFT_PRESET_DEFAULT = listOf("{", "}", "€", "=", "~", ";", "¿")
@@ -625,7 +631,33 @@ object SettingsManager {
             .putBoolean(KEY_CLEAR_ALT_ON_SPACE, enabled)
             .apply()
     }
-    
+
+    /*
+    /**
+     * Get the currencies for regular/shift (Blackberry keyboard only)
+     */
+    fun getCurrencyKey(context: Context): String {
+        return getPreferences(context).getString(KEY_CURRENCY_KEY, DEFAULT_CURRENCY_KEY)
+    }
+    fun getCurrencyKeyAlt(context: Context): String {
+        return getPreferences(context).getString(KEY_CURRENCY_KEY_ALT, DEFAULT_CURRENCY_KEY_ALT)
+    }
+
+    /**
+     * Set the currencies for regular/shift (Blackberry keyboard only)
+     */
+    fun setCurrencyKey(context: Context, value: String) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CURRENCY_KEY, DEFAULT_CURRENCY_KEY)
+            .apply()
+    }
+    fun setCurrencyKeyAlt(context: Context, value: String) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CURRENCY_KEY_ALT, DEFAULT_CURRENCY_KEY_ALT)
+            .apply()
+    }
+    */
+
     /**
      * Returns custom SYM mappings.
      * Returns an empty map if there are no custom mappings.
@@ -650,7 +682,8 @@ object SettingsManager {
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+                "KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE
             )
             
             val result = mutableMapOf<Int, String>()
@@ -688,7 +721,8 @@ object SettingsManager {
                 KeyEvent.KEYCODE_L to "KEYCODE_L", KeyEvent.KEYCODE_Z to "KEYCODE_Z",
                 KeyEvent.KEYCODE_X to "KEYCODE_X", KeyEvent.KEYCODE_C to "KEYCODE_C",
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
-                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M"
+                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M",
+		KeyEvent.KEYCODE_GRAVE to "KEYCODE_GRAVE",
             )
             
             val mappingsObject = JSONObject()
@@ -751,7 +785,8 @@ object SettingsManager {
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+		"KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE
             )
             
             val result = mutableMapOf<Int, String>()
@@ -789,7 +824,8 @@ object SettingsManager {
                 KeyEvent.KEYCODE_L to "KEYCODE_L", KeyEvent.KEYCODE_Z to "KEYCODE_Z",
                 KeyEvent.KEYCODE_X to "KEYCODE_X", KeyEvent.KEYCODE_C to "KEYCODE_C",
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
-                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M"
+                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M",
+		KeyEvent.KEYCODE_GRAVE to "KEYCODE_GRAVE"
             )
             
             val mappingsObject = JSONObject()
@@ -1449,7 +1485,8 @@ object SettingsManager {
                 KeyEvent.KEYCODE_L to "KEYCODE_L", KeyEvent.KEYCODE_Z to "KEYCODE_Z",
                 KeyEvent.KEYCODE_X to "KEYCODE_X", KeyEvent.KEYCODE_C to "KEYCODE_C",
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
-                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M"
+                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M",
+		KeyEvent.KEYCODE_GRAVE to "KEYCODE_GRAVE"
             )
             
             val mappingsObject = JSONObject()
@@ -1476,7 +1513,7 @@ object SettingsManager {
                 KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
                 KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_Z,
                 KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
-                KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M
+                KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, 
             )
             
             // Ensure all alphabetic keys are in the JSON (even if "none")

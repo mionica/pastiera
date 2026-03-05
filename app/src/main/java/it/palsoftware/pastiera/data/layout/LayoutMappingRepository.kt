@@ -38,7 +38,8 @@ object LayoutMappingRepository {
         KeyEvent.KEYCODE_V to LayoutMapping("v", "V"),
         KeyEvent.KEYCODE_B to LayoutMapping("b", "B"),
         KeyEvent.KEYCODE_N to LayoutMapping("n", "N"),
-        KeyEvent.KEYCODE_M to LayoutMapping("m", "M")
+        KeyEvent.KEYCODE_M to LayoutMapping("m", "M"),
+	KeyEvent.KEYCODE_GRAVE to LayoutMapping("$", "€")
     )
 
     private var currentLayout: Map<Int, LayoutMapping> = defaultLayout

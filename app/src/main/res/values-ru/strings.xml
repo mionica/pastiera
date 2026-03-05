@@ -544,6 +544,7 @@
     <string name="online_layouts_uninstall_failed">Не удалось удалить раскладку</string>
     <string name="input_method_name_da">Dansk</string>
     <string name="input_method_name_no">Norsk</string>
+    <string name="input_method_name_ro">Română</string>
     <string name="input_method_name_sr">Српски</string>
     <string name="delete_alternatives_title">Удаление</string>
     <string name="delete_alternatives_description">Альтернативные способы удаления символов справа от курсора</string>
@@ -575,4 +576,8 @@
     <string name="event_keycode_label">KeyCode: </string>
     <string name="event_scancode_label">ScanCode: </string>
     <string name="status_bar_button_language_state_description">Язык %1$s, раскладка %2$s</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Громкоговоритель включен</string>
+    <string name="speaker_toggle_off">Громкоговоритель выключен</string>
+    <string name="speaker_toggle_not_in_call">Не в ходе звонка</string>
 </resources>

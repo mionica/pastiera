@@ -547,6 +547,7 @@
     <string name="status_bar_button_symbols_description">Bàn phím ký hiệu</string>
     <string name="status_bar_buttons_reset">Đặt lại</string>
     <string name="input_method_name_da">Dansk</string>
+    <string name="input_method_name_ro">Română</string>
     <string name="input_method_name_no">Norsk</string>
     <string name="ignore_back_short">Ignore BACK</string>
     <string name="keyboard_layout_mode_title">Ánh xạ bố cục tự động</string>
@@ -575,4 +576,8 @@
     <string name="status_bar_button_clipboard_state_items">%1$d items</string>
     <string name="sym_key_content_description">%1$s, %2$s</string>
     <string name="status_bar_button_minimal_ui_description">Toggle compact keyboard UI</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Loa đang bật</string>
+    <string name="speaker_toggle_off">Loa đã tắt</string>
+    <string name="speaker_toggle_not_in_call">Không phải trong cuộc gọi</string>
 </resources>

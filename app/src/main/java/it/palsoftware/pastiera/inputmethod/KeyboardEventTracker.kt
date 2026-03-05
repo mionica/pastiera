@@ -93,6 +93,7 @@ object KeyboardEventTracker {
             KeyEvent.KEYCODE_PAGE_DOWN -> "PAGE_DOWN"
             KeyEvent.KEYCODE_ESCAPE -> "ESCAPE"
             KeyEvent.KEYCODE_FORWARD_DEL -> "FORWARD_DEL"
+            KeyEvent.KEYCODE_GRAVE -> "KEYCODE_GRAVE"
             63 -> "KEYCODE_SYM"
             else -> "KEYCODE_$keyCode"
         }

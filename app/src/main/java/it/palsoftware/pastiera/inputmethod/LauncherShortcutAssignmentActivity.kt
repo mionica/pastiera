@@ -207,6 +207,7 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> 'B'
             KeyEvent.KEYCODE_N -> 'N'
             KeyEvent.KEYCODE_M -> 'M'
+            KeyEvent.KEYCODE_GRAVE -> '$'
             else -> null
         }
     }
@@ -270,6 +271,7 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> "B"
             KeyEvent.KEYCODE_N -> "N"
             KeyEvent.KEYCODE_M -> "M"
+            KeyEvent.KEYCODE_GRAVE -> "$"
             else -> null
         }
         return keyName ?: stringResource(R.string.launcher_shortcut_assignment_key_name, keyCode)
