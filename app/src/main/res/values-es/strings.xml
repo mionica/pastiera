@@ -573,4 +573,9 @@
     <string name="online_layouts_uninstall_confirm_message">¿Está seguro de que desea eliminar %1$s? Esta acción no se puede deshacer.</string>
     <string name="online_layouts_uninstall_success">%1$s eliminado</string>
     <string name="online_layouts_uninstall_failed">Error al eliminar layout</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altavoz ENCENDIDO</string>
+    <string name="speaker_toggle_off">Altavoz APAGADO</string>
+    <string name="speaker_toggle_not_in_call">No en llamada</string>
 </resources>

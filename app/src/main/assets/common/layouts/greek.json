@@ -87,6 +87,7 @@
     },
     "KEYCODE_B": { "lowercase": "β", "uppercase": "Β" },
     "KEYCODE_N": { "lowercase": "ν", "uppercase": "Ν" },
-    "KEYCODE_M": { "lowercase": "μ", "uppercase": "Μ" }
+    "KEYCODE_M": { "lowercase": "μ", "uppercase": "Μ" },
+    "KEYCODE_GRAVE": { "lowercase": "€", "uppercase": "$" }
   }
 }

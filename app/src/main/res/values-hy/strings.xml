@@ -434,4 +434,9 @@
     <string name="online_layouts_uninstall_confirm_message">Իսկապե՞ս ցանկանում եք հեռացնել %1$s: Այս գործողությունը չի կարող հետարկվել:</string>
     <string name="online_layouts_uninstall_success">Հեռացվեց %1$s</string>
     <string name="online_layouts_uninstall_failed">Չհաջողվեց հեռացնել դասավորությունը</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Բարձրախոսը միացված է</string>
+    <string name="speaker_toggle_off">Բարձրախոսն անջատված է</string>
+    <string name="speaker_toggle_not_in_call">Զանգի մեջ չէ</string>
 </resources>

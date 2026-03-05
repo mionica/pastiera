@@ -650,4 +650,9 @@
     <string name="online_layouts_uninstall_confirm_message">Вы уверены, что хотите удалить %1$s? Это действие нельзя отменить.</string>
     <string name="online_layouts_uninstall_success">Удалено %1$s</string>
     <string name="online_layouts_uninstall_failed">Не удалось удалить раскладку</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Громкоговоритель включен</string>
+    <string name="speaker_toggle_off">Громкоговоритель выключен</string>
+    <string name="speaker_toggle_not_in_call">Не в ходе звонка</string>
 </resources>

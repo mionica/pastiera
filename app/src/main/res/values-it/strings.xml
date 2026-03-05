@@ -606,4 +606,9 @@
     <string name="sym_key_content_description">%1$s, %2$s</string>
     <string name="status_bar_button_minimal_ui_description">Attiva/disattiva interfaccia tastiera compatta</string>
     <string name="status_bar_buttons_reset">Reset</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altoparlante ATTIVO</string>
+    <string name="speaker_toggle_off">Altoparlante DISATTIVO</string>
+    <string name="speaker_toggle_not_in_call">Non in chiamata</string>
 </resources>

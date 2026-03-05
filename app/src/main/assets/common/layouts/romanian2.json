@@ -1,40 +1,72 @@
 {
-  "name": "German (QWERTZ, multi-tap)",
-  "description": "QWERTZ layout with multi-tap access to German umlauts and Eszett.",
+  "name": "Romanian alt",
+  "description": "Romanian QWERTY keyboard layout (â-on-q multi-tap)",
   "mappings": {
-    "KEYCODE_Q": { "lowercase": "q", "uppercase": "Q" },
+    "KEYCODE_Q": {
+      "lowercase": "q",
+      "uppercase": "Q",
+      "multiTapEnabled": true,
+      "taps": [
+        {
+          "lowercase": "q",
+          "uppercase": "Q"
+        },
+        {
+          "lowercase": "â",
+          "uppercase": "Â"
+        }
+      ]
+    },
     "KEYCODE_W": { "lowercase": "w", "uppercase": "W" },
     "KEYCODE_E": { "lowercase": "e", "uppercase": "E" },
     "KEYCODE_R": { "lowercase": "r", "uppercase": "R" },
-    "KEYCODE_T": { "lowercase": "t", "uppercase": "T" },
-    "KEYCODE_Y": { "lowercase": "z", "uppercase": "Z" },
-    "KEYCODE_U": {
-      "lowercase": "u",
-      "uppercase": "U",
+    "KEYCODE_T": {
+      "lowercase": "t",
+      "uppercase": "T",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "u", "uppercase": "U" },
-        { "lowercase": "ü", "uppercase": "Ü" }
+        {
+          "lowercase": "t",
+          "uppercase": "T"
+        },
+        {
+          "lowercase": "ț",
+          "uppercase": "Ț"
+        }
       ]
     },
-    "KEYCODE_I": { "lowercase": "i", "uppercase": "I" },
-    "KEYCODE_O": {
-      "lowercase": "o",
-      "uppercase": "O",
+    "KEYCODE_Y": { "lowercase": "y", "uppercase": "Y" },
+    "KEYCODE_U": { "lowercase": "u", "uppercase": "U" },
+    "KEYCODE_I": {
+      "lowercase": "i",
+      "uppercase": "I",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "o", "uppercase": "O" },
-        { "lowercase": "ö", "uppercase": "Ö" }
+        {
+          "lowercase": "i",
+          "uppercase": "I"
+        },
+        {
+          "lowercase": "î",
+          "uppercase": "Î"
+        }
       ]
     },
+    "KEYCODE_O": { "lowercase": "o", "uppercase": "O" },
     "KEYCODE_P": { "lowercase": "p", "uppercase": "P" },
     "KEYCODE_A": {
       "lowercase": "a",
       "uppercase": "A",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "a", "uppercase": "A" },
-        { "lowercase": "ä", "uppercase": "Ä" }
+        {
+          "lowercase": "a",
+          "uppercase": "A"
+        },
+        {
+          "lowercase": "ă",
+          "uppercase": "Ă"
+        }
       ]
     },
     "KEYCODE_S": {
@@ -42,8 +74,14 @@
       "uppercase": "S",
       "multiTapEnabled": true,
       "taps": [
-        { "lowercase": "s", "uppercase": "S" },
-        { "lowercase": "ß", "uppercase": "ẞ" }
+        {
+          "lowercase": "s",
+          "uppercase": "S"
+        },
+        {
+          "lowercase": "ș",
+          "uppercase": "Ș"
+        }
       ]
     },
     "KEYCODE_D": { "lowercase": "d", "uppercase": "D" },
@@ -53,7 +91,7 @@
     "KEYCODE_J": { "lowercase": "j", "uppercase": "J" },
     "KEYCODE_K": { "lowercase": "k", "uppercase": "K" },
     "KEYCODE_L": { "lowercase": "l", "uppercase": "L" },
-    "KEYCODE_Z": { "lowercase": "y", "uppercase": "Y" },
+    "KEYCODE_Z": { "lowercase": "z", "uppercase": "Z" },
     "KEYCODE_X": { "lowercase": "x", "uppercase": "X" },
     "KEYCODE_C": { "lowercase": "c", "uppercase": "C" },
     "KEYCODE_V": { "lowercase": "v", "uppercase": "V" },
