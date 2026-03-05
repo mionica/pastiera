@@ -43,7 +43,8 @@ object LayoutFileStore {
         "KEYCODE_V" to KeyEvent.KEYCODE_V,
         "KEYCODE_B" to KeyEvent.KEYCODE_B,
         "KEYCODE_N" to KeyEvent.KEYCODE_N,
-        "KEYCODE_M" to KeyEvent.KEYCODE_M
+        "KEYCODE_M" to KeyEvent.KEYCODE_M,
+        "KEYCODE_CURRENCY" to KeyEvent.KEYCODE_GRAVE
     )
     private val keyboardLayoutKeyCodeToName = keyboardLayoutNameToKeyCode.entries.associate { (name, code) ->
         code to name

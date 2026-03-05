@@ -1,8 +1,22 @@
 {
-  "name": "Romanian",
-  "description": "Romanian QWERTY keyboard layout (multi-tap)",
+  "name": "Romanian alt",
+  "description": "Romanian QWERTY keyboard layout (â-on-q multi-tap)",
   "mappings": {
-    "KEYCODE_Q": { "lowercase": "q", "uppercase": "Q" },
+    "KEYCODE_Q": {
+      "lowercase": "q",
+      "uppercase": "Q",
+      "multiTapEnabled": true,
+      "taps": [
+        {
+          "lowercase": "q",
+          "uppercase": "Q"
+        },
+        {
+          "lowercase": "â",
+          "uppercase": "Â"
+        }
+      ]
+    },
     "KEYCODE_W": { "lowercase": "w", "uppercase": "W" },
     "KEYCODE_E": { "lowercase": "e", "uppercase": "E" },
     "KEYCODE_R": { "lowercase": "r", "uppercase": "R" },
@@ -52,10 +66,6 @@
         {
           "lowercase": "ă",
           "uppercase": "Ă"
-        },
-        {
-          "lowercase": "â",
-          "uppercase": "Â"
         }
       ]
     },

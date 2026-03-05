@@ -98,5 +98,8 @@
     "KEYCODE_M": {
       "type": "none"
     }
+    "KEYCODE_CURRENCY": {
+      "type": "none"
+    }
   }
 }

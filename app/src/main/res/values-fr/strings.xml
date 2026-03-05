@@ -670,4 +670,9 @@
     <string name="online_layouts_uninstall_confirm_message">Supprimer %1$s ? Action irréversible.</string>
     <string name="online_layouts_uninstall_success">%1$s supprimé</string>
     <string name="online_layouts_uninstall_failed">Suppression impossible</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Haut-parleur ACTIF</string>
+    <string name="speaker_toggle_off">Haut-parleur INACTIF</string>
+    <string name="speaker_toggle_not_in_call">Pas en appel</string>
 </resources>

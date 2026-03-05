@@ -65,6 +65,9 @@ object SettingsManager {
     private const val KEY_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = "accessibility_suggestions_announcement_delay_ms" // Delay before suggestions become accessible again while typing
     private const val KEY_GLOBAL_VARIATION_LAYOUT_OVERRIDE = "global_variation_layout_override" // Optional layout id used for variation ordering across all layouts
     
+    private const val KEY_CURRENCY_KEY = "currency_key" // "$", "€", etc.
+    private const val KEY_CURRENCY_KEY_ALT = "currency_key_alt" // "$", "€", etc.
+
     // Status bar button slot configuration keys
     private const val KEY_STATUS_BAR_SLOT_LEFT = "status_bar_slot_left"
     private const val KEY_STATUS_BAR_SLOT_RIGHT_1 = "status_bar_slot_right_1"
@@ -138,6 +141,9 @@ object SettingsManager {
     private const val DEFAULT_GLOBAL_VARIATION_LAYOUT_OVERRIDE = ""
     private const val MIN_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = 100L
     private const val MAX_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = 2000L
+    private const val DEFAULT_CURRENCY_KEY = "€"
+    private const val DEFAULT_CURRENCY_KEY_ALT = "$"
+
     private val STATIC_VARIATION_BASE_PRESET_DEFAULT = listOf("@", "\"", ":", "!", "?", ",", ".")
     private val STATIC_VARIATION_BASE_PRESET_ALTERNATIVE = listOf("[", "]", "$", "%", "^", "&", "\\")
     private val STATIC_VARIATION_SHIFT_PRESET_DEFAULT = listOf("{", "}", "€", "=", "~", ";", "¿")
@@ -610,7 +616,33 @@ object SettingsManager {
             .putBoolean(KEY_CLEAR_ALT_ON_SPACE, enabled)
             .apply()
     }
-    
+
+    /*
+    /**
+     * Get the currencies for regular/shift (Blackberry keyboard only)
+     */
+    fun getCurrencyKey(context: Context): String {
+        return getPreferences(context).getString(KEY_CURRENCY_KEY, DEFAULT_CURRENCY_KEY)
+    }
+    fun getCurrencyKeyAlt(context: Context): String {
+        return getPreferences(context).getString(KEY_CURRENCY_KEY_ALT, DEFAULT_CURRENCY_KEY_ALT)
+    }
+
+    /**
+     * Set the currencies for regular/shift (Blackberry keyboard only)
+     */
+    fun setCurrencyKey(context: Context, value: String) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CURRENCY_KEY, DEFAULT_CURRENCY_KEY)
+            .apply()
+    }
+    fun setCurrencyKeyAlt(context: Context, value: String) {
+        getPreferences(context).edit()
+            .putBoolean(KEY_CURRENCY_KEY_ALT, DEFAULT_CURRENCY_KEY_ALT)
+            .apply()
+    }
+    */
+
     /**
      * Returns custom SYM mappings.
      * Returns an empty map if there are no custom mappings.
@@ -635,7 +667,8 @@ object SettingsManager {
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+                "KEYCODE_CURRENCY" to DeviceSpecific.getCurrencyKey()
             )
             
             val result = mutableMapOf<Int, String>()

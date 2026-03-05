@@ -26,6 +26,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
+import android.media.AudioManager
 import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.inputmethod.NotificationHelper
 import it.palsoftware.pastiera.core.AutoCorrectionManager
@@ -1957,7 +1958,86 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             language
         }
     }
-    
+
+    /**
+     * Handle the currency key on Blackberry keyboards
+     */
+    private fun handleCurrencyKey(event: KeyEvent?): Boolean {
+        // Check if we're in a call
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+        val currentMode = audioManager?.mode ?: AudioManager.MODE_NORMAL
+        var inCall = currentMode == AudioManager.MODE_IN_CALL ||
+                currentMode == AudioManager.MODE_IN_COMMUNICATION
+
+        // Additional check using TelecomManager if available
+        if (!inCall) {
+            try {
+                val telecomManager = getSystemService(Context.TELECOM_SERVICE) as? android.telecom.TelecomManager
+                if (telecomManager != null && androidx.core.content.ContextCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.READ_PHONE_STATE
+                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    inCall = telecomManager.isInCall
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error checking call state with TelecomManager", e)
+            }
+        }
+
+        // If in a call, toggle speakerphone directly (no Alt needed)
+        if (inCall) {
+            Log.d(TAG, "handleCurrencyKey: In call, toggling speakerphone")
+            toggleSpeakerphone()
+            return true
+        }
+
+        // Check if Alt is pressed - check both our internal state and the event's metastate
+        val eventAltPressed = event?.isAltPressed == true ||
+                (event?.metaState?.and(KeyEvent.META_ALT_ON) != 0) ||
+                (event?.metaState?.and(KeyEvent.META_ALT_LEFT_ON) != 0) ||
+                (event?.metaState?.and(KeyEvent.META_ALT_RIGHT_ON) != 0)
+        val altActive = altLatchActive || altOneShot || altPressed || altPhysicallyPressed || eventAltPressed
+        Log.d(TAG, "handleCurrencyKey: altLatchActive=$altLatchActive, altOneShot=$altOneShot, altPressed=$altPressed, altPhysicallyPressed=$altPhysicallyPressed, event.isAltPressed=${event?.isAltPressed}, event.metaState=${event?.metaState}, eventAltPressed=$eventAltPressed, altActive=$altActive")
+
+        // If not in a call but Alt is active, try to toggle (will show "not in call" message)
+        if (altActive) {
+            toggleSpeakerphone()
+            // Clear Alt state after using it
+            modifierStateController.clearAltState(resetPressedState = true)
+            updateStatusBarText()
+            return true
+        }
+
+        // Check if current layout is Arabic or arabic_Q25
+        val currentLayout = SettingsManager.getKeyboardLayout(this)
+        val isArabicLayout = currentLayout.equals("arabic", ignoreCase = true) ||
+                currentLayout.equals("arabic_Q25", ignoreCase = true)
+
+        if (isArabicLayout) {
+            // Use KEYCODE_68 mapping from the layout
+            val keycode68Char = getCharacterFromLayout(68, event, shiftPressed || capsLockEnabled)
+            if (keycode68Char != null) {
+                currentInputConnection?.commitText(keycode68Char.toString(), 1)
+                Log.d(TAG, "handleCurrencyKey: Arabic layout detected, using KEYCODE_68 mapping: $keycode68Char")
+                return true
+            }
+        }
+
+        // Fall back to currency key for other layouts
+        val eventShiftPressed = event?.isShiftPressed == true ||
+                (event?.metaState?.and(KeyEvent.META_SHIFT_ON) != 0) ||
+                (event?.metaState?.and(KeyEvent.META_SHIFT_LEFT_ON) != 0) ||
+                (event?.metaState?.and(KeyEvent.META_SHIFT_RIGHT_ON) != 0)
+        val shiftActive = shiftOneShot || shiftPressed || shiftPhysicallyPressed || eventShiftPressed
+        val currency = if (shiftActive) "€" else "$"
+        currentInputConnection?.commitText(currency, 1)
+        if (shiftOneShot)
+            shiftOneShot  = false
+
+        Log.d(TAG, "handleCurrencyKey: Using currency key: $currency")
+        return true
+    }
+
     /**
      * Gets the locale from the current IME subtype.
      * Falls back to Italian if no subtype is available.
@@ -2206,6 +2286,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             keyCode == KeyEvent.KEYCODE_CTRL_RIGHT ||
             keyCode == KeyEvent.KEYCODE_ALT_LEFT ||
             keyCode == KeyEvent.KEYCODE_ALT_RIGHT
+
+        // handle currency key (only relevant on a Blackberry keyboard)
+        if (keyCode == DeviceSpecific.getCurrencyKey()) {
+            if (handleCurrencyKey(event))
+                return true
+        }
 
         if (event?.repeatCount == 0 && isModifierKey) {
             // Pressing a latched key again cancels the visual latch and restores logical state.
@@ -2881,4 +2967,141 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             Log.d(TAG, "Suggestion '$suggestion' inserted successfully")
         }
     }
+
+    private fun toggleSpeakerphone() {
+        try {
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+            if (audioManager == null) {
+                Log.e(TAG, "AudioManager is null")
+                return
+            }
+
+            val currentMode = audioManager.mode
+            Log.d(TAG, "Current audio mode: $currentMode (MODE_IN_CALL=${AudioManager.MODE_IN_CALL}, MODE_IN_COMMUNICATION=${AudioManager.MODE_IN_COMMUNICATION})")
+
+            // Check if we're in a call using TelecomManager as well
+            var inCall = currentMode == AudioManager.MODE_IN_CALL ||
+                    currentMode == AudioManager.MODE_IN_COMMUNICATION
+
+            // Additional check using TelecomManager if available
+            if (!inCall) {
+                try {
+                    val telecomManager = getSystemService(Context.TELECOM_SERVICE) as? android.telecom.TelecomManager
+                    if (telecomManager != null && androidx.core.content.ContextCompat.checkSelfPermission(
+                            this,
+                            android.Manifest.permission.READ_PHONE_STATE
+                        ) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                        inCall = telecomManager.isInCall
+                        Log.d(TAG, "TelecomManager.isInCall: $inCall")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error checking call state with TelecomManager", e)
+                }
+            }
+
+            if (inCall) {
+                // Check current speaker state
+                val isSpeakerOn = audioManager.isSpeakerphoneOn
+                Log.d(TAG, "Current speaker state: ${if (isSpeakerOn) "ON" else "OFF"}, mode: $currentMode")
+
+                // Toggle speaker using multiple methods for compatibility
+                val targetState = !isSpeakerOn
+
+                try {
+                    // Ensure we're in the right audio mode
+                    if (currentMode != AudioManager.MODE_IN_CALL) {
+                        audioManager.mode = AudioManager.MODE_IN_CALL
+                        Log.d(TAG, "Set audio mode to MODE_IN_CALL")
+                    }
+
+                    // Request audio focus before changing speaker state
+                    val audioFocusRequest = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        android.media.AudioFocusRequest.Builder(android.media.AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                            .setAudioAttributes(
+                                android.media.AudioAttributes.Builder()
+                                    .setUsage(android.media.AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                                    .build()
+                            )
+                            .build()
+                    } else {
+                        null
+                    }
+
+                    if (audioFocusRequest != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        audioManager.requestAudioFocus(audioFocusRequest)
+                        Log.d(TAG, "Requested audio focus")
+                    }
+
+                    // Method 1: Use setSpeakerphoneOn
+                    audioManager.setSpeakerphoneOn(targetState)
+                    Log.d(TAG, "Called setSpeakerphoneOn($targetState)")
+
+                    // Method 2: Also set the property
+                    audioManager.isSpeakerphoneOn = targetState
+                    Log.d(TAG, "Set isSpeakerphoneOn = $targetState")
+
+                    // Method 3: Try using audio routing (more reliable on some devices)
+                    try {
+                        if (targetState) {
+                            // Route audio to speaker
+                            audioManager.setParameters("AudioSetParam=SET_LOUDSPEAKER_STATUS=1")
+                        } else {
+                            // Route audio to earpiece
+                            audioManager.setParameters("AudioSetParam=SET_LOUDSPEAKER_STATUS=0")
+                        }
+                        Log.d(TAG, "Set audio routing parameter for speaker: $targetState")
+                    } catch (e: Exception) {
+                        Log.w(TAG, "Audio routing parameter not supported: ${e.message}")
+                    }
+
+                    // Give audio system time to apply changes
+                    Thread.sleep(150)
+
+                    // Verify the change
+                    val newState = audioManager.isSpeakerphoneOn
+                    Log.d(TAG, "Verified speaker state after toggle: ${if (newState) "ON" else "OFF"}")
+
+                    // Note: On many devices, speaker state during calls is controlled by the phone app
+                    // and cannot be changed by IME. This is a system limitation.
+                    if (newState != targetState) {
+                        Log.w(TAG, "Speaker state didn't change - this may be a system limitation during calls")
+                    }
+
+                    // Show feedback toast based on target state (not verified state, as verification may not work)
+                    val messageResId = if (targetState)
+                        R.string.speaker_toggle_on
+                    else
+                        R.string.speaker_toggle_off
+                    Handler(Looper.getMainLooper()).post {
+                        android.widget.Toast.makeText(this, messageResId, android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error in speaker toggle operation", e)
+                    throw e
+                }
+            } else {
+                // Not in a call, show message
+                Log.w(TAG, "Speaker toggle attempted but not in call")
+                Handler(Looper.getMainLooper()).post {
+                    android.widget.Toast.makeText(
+                        this,
+                        R.string.speaker_toggle_not_in_call,
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e(TAG, "SecurityException toggling speakerphone - missing MODIFY_AUDIO_SETTINGS permission?", e)
+            Handler(Looper.getMainLooper()).post {
+                android.widget.Toast.makeText(this, "Permission denied for speaker toggle", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error toggling speakerphone", e)
+            Handler(Looper.getMainLooper()).post {
+                android.widget.Toast.makeText(this, "Error toggling speaker: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }

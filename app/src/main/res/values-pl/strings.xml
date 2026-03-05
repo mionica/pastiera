@@ -583,4 +583,9 @@
     <string name="online_layouts_uninstall_confirm_message">Czy na pewno chcesz usunąć %1$s? Tej operacji nie można cofnąć.</string>
     <string name="online_layouts_uninstall_success">Usunięto %1$s</string>
     <string name="online_layouts_uninstall_failed">Nie udało się usunąć layoutu</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Głośnik WŁĄCZONY</string>
+    <string name="speaker_toggle_off">Głośnik WYŁĄCZONY</string>
+    <string name="speaker_toggle_not_in_call">Nie w rozmowie</string>
 </resources>

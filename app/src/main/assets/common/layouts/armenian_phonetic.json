@@ -208,6 +208,7 @@
     "KEYCODE_M": {
       "lowercase": "մ",
       "uppercase": "Մ"
-    }
+    },
+    "KEYCODE_GRAVE": { "lowercase": "€", "uppercase": "$" }
   }
 }

@@ -590,4 +590,9 @@
     <string name="online_layouts_uninstall_confirm_message">Möchten Sie %1$s wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="online_layouts_uninstall_success">%1$s gelöscht</string>
     <string name="online_layouts_uninstall_failed">Layout konnte nicht gelöscht werden</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Lautsprecher EIN</string>
+    <string name="speaker_toggle_off">Lautsprecher AUS</string>
+    <string name="speaker_toggle_not_in_call">Nicht im Anruf</string>
 </resources>

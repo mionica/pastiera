@@ -665,4 +665,9 @@
     <string name="status_bar_button_symbols">Ký hiệu</string>
     <string name="status_bar_button_symbols_description">Bàn phím ký hiệu</string>
     <string name="status_bar_buttons_reset">Đặt lại</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Loa đang bật</string>
+    <string name="speaker_toggle_off">Loa đã tắt</string>
+    <string name="speaker_toggle_not_in_call">Không phải trong cuộc gọi</string>
 </resources>
