@@ -182,6 +182,8 @@
     "KEYCODE_M": {
       "lowercase": "б",
       "uppercase": "Б"
-    }
+    },
+    "KEYCODE_0": { "lowercase": "0", "uppercase": "0" },
+    "KEYCODE_CURRENCY": { "lowercase": "₽", "uppercase": "$" }
   }
 }

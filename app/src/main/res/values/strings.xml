@@ -812,7 +812,7 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="nav_mode_keycode_tab">Tab</string>
     <string name="nav_mode_keycode_forward_delete">Del→</string>
     <string name="nav_mode_key_unknown">?</string>
-    
+
     <!-- Tutorial -->
     <string name="tutorial_skip">Skip</string>
     <string name="tutorial_skip_update">Skip</string>
@@ -1154,4 +1154,9 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="sym_key_content_description">%1$s, %2$s</string>
     <string name="status_bar_button_minimal_ui_description">Toggle compact keyboard UI</string>
     <string name="status_bar_buttons_reset">Reset</string>
+
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Speaker On</string>
+    <string name="speaker_toggle_off">Speaker off</string>
+    <string name="speaker_toggle_not_in_call">Not in a call</string>
 </resources>

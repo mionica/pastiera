@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
 import android.view.KeyEvent
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -54,7 +55,8 @@ object LayoutFileStore {
         "KEYCODE_8" to KeyEvent.KEYCODE_8,
         "KEYCODE_9" to KeyEvent.KEYCODE_9,
         "KEYCODE_0" to KeyEvent.KEYCODE_0,
-        "KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE,
+        //"KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE, // conflicts with the currency key
+        "KEYCODE_CURRENCY" to DeviceSpecific.KEYCODE_BB_CURRENCY,
         "KEYCODE_MINUS" to KeyEvent.KEYCODE_MINUS,
         "KEYCODE_EQUALS" to KeyEvent.KEYCODE_EQUALS,
         "KEYCODE_LEFT_BRACKET" to KeyEvent.KEYCODE_LEFT_BRACKET,

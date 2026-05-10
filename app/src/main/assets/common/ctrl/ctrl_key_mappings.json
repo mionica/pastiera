@@ -102,6 +102,13 @@
     "KEYCODE_M": {
       "type": "action",
       "action": "move_word_right"
+      "type": "none"
+    },
+    "KEYCODE_0": {
+      "type": "none"
+    },
+    "KEYCODE_CURRENCY": {
+      "type": "none"
     }
   }
 }

@@ -35,6 +35,7 @@ import android.content.pm.PackageManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.BoxWithConstraints
 import it.palsoftware.pastiera.inputmethod.LauncherShortcutAssignmentActivity
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import androidx.compose.runtime.key
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.ui.geometry.Offset
@@ -264,6 +265,9 @@ fun LauncherShortcutsScreen(
                                 "⌫" -> KeyEvent.KEYCODE_DEL
                                 "␣" -> KeyEvent.KEYCODE_SPACE
                                 "⏎" -> KeyEvent.KEYCODE_ENTER
+				                // specific to the Blackberry keyboards
+                                "0" -> KeyEvent.KEYCODE_0
+				                "$" -> DeviceSpecific.KEYCODE_BB_CURRENCY
                                 else -> null
                             }
                             

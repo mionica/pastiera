@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
 import android.view.KeyEvent
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 
 /**
  * Central repository holding the currently selected layout mapping and
@@ -38,7 +39,9 @@ object LayoutMappingRepository {
         KeyEvent.KEYCODE_V to LayoutMapping("v", "V"),
         KeyEvent.KEYCODE_B to LayoutMapping("b", "B"),
         KeyEvent.KEYCODE_N to LayoutMapping("n", "N"),
-        KeyEvent.KEYCODE_M to LayoutMapping("m", "M")
+        KeyEvent.KEYCODE_M to LayoutMapping("m", "M"),
+        KeyEvent.KEYCODE_0 to LayoutMapping("0", "0"),
+	    DeviceSpecific.KEYCODE_BB_CURRENCY to LayoutMapping("€", "$")
     )
 
     private var currentLayout: Map<Int, LayoutMapping> = defaultLayout

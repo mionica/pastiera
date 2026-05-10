@@ -27,9 +27,8 @@
     "KEYCODE_V": { "lowercase": "в", "uppercase": "В" },
     "KEYCODE_B": { "lowercase": "б", "uppercase": "Б" },
     "KEYCODE_N": { "lowercase": "н", "uppercase": "Н" },
-    "KEYCODE_M": { "lowercase": "м", "uppercase": "М" }
+    "KEYCODE_M": { "lowercase": "м", "uppercase": "М" },
+    "KEYCODE_0": { "lowercase": "0", "uppercase": "0" },
+    "KEYCODE_CURRENCY": { "lowercase": "€", "uppercase": "$" }
   }
 }
-
-
-

@@ -107,6 +107,8 @@
     },
     "KEYCODE_B": { "lowercase": "ز", "uppercase": "ز" },
     "KEYCODE_N": { "lowercase": "ظ", "uppercase": "ظ" },
-    "KEYCODE_M": { "lowercase": "ط", "uppercase": "ط" }
+    "KEYCODE_M": { "lowercase": "ط", "uppercase": "ط" },
+    "KEYCODE_0": { "lowercase": "0", "uppercase": "0" },
+    "KEYCODE_CURRENCY": { "lowercase": "€", "uppercase": "$" }
   }
 }

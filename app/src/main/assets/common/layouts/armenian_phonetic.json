@@ -208,6 +208,8 @@
     "KEYCODE_M": {
       "lowercase": "մ",
       "uppercase": "Մ"
-    }
+    },
+    "KEYCODE_0": { "lowercase": "0", "uppercase": "0" },
+    "KEYCODE_CURRENCY": { "lowercase": "€", "uppercase": "$" }
   }
 }

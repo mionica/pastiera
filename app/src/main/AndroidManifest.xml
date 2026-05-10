@@ -20,6 +20,19 @@
     <!-- Permission to receive boot notifications (Direct Boot support) -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Permission to read phone state (required for isInCall) -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    
+    <!-- Permission to modify call state -->
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    
+    <!-- Permission to modify audio settings (mute calls) -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    
+    <!-- Permission to modify audio settings (toggle speakerphone) -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    
     <!-- Query per vedere tutte le app installate che possono essere avviate -->
     <queries>
         <intent>

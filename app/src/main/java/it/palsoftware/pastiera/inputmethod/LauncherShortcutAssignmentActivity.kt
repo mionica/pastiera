@@ -212,6 +212,9 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> 'B'
             KeyEvent.KEYCODE_N -> 'N'
             KeyEvent.KEYCODE_M -> 'M'
+	    // specific to Blackberry keyboards
+            KeyEvent.KEYCODE_0 -> '0'
+            DeviceSpecific.KEYCODE_BB_CURRENCY -> '$'
             else -> null
         }
     }
@@ -291,9 +294,11 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> "B"
             KeyEvent.KEYCODE_N -> "N"
             KeyEvent.KEYCODE_M -> "M"
+            KeyEvent.KEYCODE_0 -> "0"
             KeyEvent.KEYCODE_DEL -> "⌫"
             KeyEvent.KEYCODE_SPACE -> "␣"
             KeyEvent.KEYCODE_ENTER -> "⏎"
+            DeviceSpecific.KEYCODE_BB_CURRENCY -> "$"
             else -> null
         }
         return keyName ?: stringResource(R.string.launcher_shortcut_assignment_key_name, keyCode)

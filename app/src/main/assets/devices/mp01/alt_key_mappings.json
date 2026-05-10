@@ -27,6 +27,8 @@
         "KEYCODE_N": "?",
         "KEYCODE_M": ",",
         "KEYCODE_MIC": ".",
-        "KEYCODE_EM": "0"
+        "KEYCODE_EM": "0",
+        "KEYCODE_0": "0",
+        "KEYCODE_CURRENCY": "`"
     }
 }

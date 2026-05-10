@@ -48,6 +48,7 @@ import it.palsoftware.pastiera.commands.CommandSurface
 import it.palsoftware.pastiera.commands.CommandTarget
 import it.palsoftware.pastiera.data.layout.JsonLayoutLoader
 import it.palsoftware.pastiera.data.mappings.KeyMappingLoader
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import kotlin.math.min
 
 /**
@@ -331,7 +332,7 @@ fun NavModeSettingsScreen(
         
         // Keyboard visualization
         if (navModeEnabled) {
-            val keyboardRows = listOf(
+            val keyboardRows = mutableListOf(
                 listOf(
                     KeyEvent.KEYCODE_Q, KeyEvent.KEYCODE_W, KeyEvent.KEYCODE_E,
                     KeyEvent.KEYCODE_R, KeyEvent.KEYCODE_T, KeyEvent.KEYCODE_Y,
@@ -342,13 +343,25 @@ fun NavModeSettingsScreen(
                     KeyEvent.KEYCODE_A, KeyEvent.KEYCODE_S, KeyEvent.KEYCODE_D,
                     KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
                     KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L
-                ),
-                listOf(
-                    KeyEvent.KEYCODE_Z, KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C,
-                    KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B, KeyEvent.KEYCODE_N,
-                    KeyEvent.KEYCODE_M
                 )
             )
+            if (DeviceSpecific.hasBlackberryKeyboard()) {
+                val row2bb = listOf(
+                    KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_Z, KeyEvent.KEYCODE_X,
+		    KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
+		    KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, DeviceSpecific.KEYCODE_BB_CURRENCY
+                )
+                keyboardRows.add(row2bb)
+	    }
+            else {
+                val row2 = listOf(
+                    KeyEvent.KEYCODE_Z, KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, 
+		    KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B, KeyEvent.KEYCODE_N,
+		    KeyEvent.KEYCODE_M
+                )
+                keyboardRows.add(row2)
+            }
+                
             
             val spacing = 2.dp
             
@@ -869,6 +882,9 @@ private fun getKeyLabel(keyCode: Int): String {
         KeyEvent.KEYCODE_B -> "B"
         KeyEvent.KEYCODE_N -> "N"
         KeyEvent.KEYCODE_M -> "M"
+	    // specific to the Blackberry keyboards
+        KeyEvent.KEYCODE_0 -> "0"
+        DeviceSpecific.KEYCODE_BB_CURRENCY -> "$"
         else -> stringResource(R.string.nav_mode_key_unknown)
     }
 }
@@ -963,7 +979,9 @@ private fun loadAllKeyMappings(context: Context, useDefaults: Boolean = false): 
         KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
         KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_Z,
         KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
-        KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M
+        KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, 
+	    // specific to Blackberry keyboards
+	    KeyEvent.KEYCODE_0, DeviceSpecific.KEYCODE_BB_CURRENCY
     )
     
     val loadedMappings = try {

@@ -62,7 +62,6 @@ object KeyMappingLoader {
         "KEYCODE_8" to KeyEvent.KEYCODE_8,
         "KEYCODE_9" to KeyEvent.KEYCODE_9,
         "KEYCODE_0" to KeyEvent.KEYCODE_0,
-        "KEYCODE_GRAVE" to KeyEvent.KEYCODE_GRAVE,
         "KEYCODE_MINUS" to KeyEvent.KEYCODE_MINUS,
         "KEYCODE_EQUALS" to KeyEvent.KEYCODE_EQUALS,
         "KEYCODE_LEFT_BRACKET" to KeyEvent.KEYCODE_LEFT_BRACKET,
@@ -72,6 +71,8 @@ object KeyMappingLoader {
         "KEYCODE_COMMA" to KeyEvent.KEYCODE_COMMA,
         "KEYCODE_PERIOD" to KeyEvent.KEYCODE_PERIOD,
         "KEYCODE_SLASH" to KeyEvent.KEYCODE_SLASH,
+	    // specific to Blackberry keyboards
+	    "KEYCODE_CURRENCY" to DeviceSpecific.KEYCODE_BB_CURRENCY,
         // Minimal Phone (MP01) custom keycodes
         "KEYCODE_EM" to 666,  // Emoji key
         "KEYCODE_MIC" to 667  // Mic key
@@ -138,10 +139,10 @@ object KeyMappingLoader {
     }
 
     private fun applyCurrencySymbolOverride(altKeyMap: MutableMap<Int, String>, context: Context?) {
-        if (context == null || !altKeyMap.containsKey(KeyEvent.KEYCODE_GRAVE)) {
+        if (context == null || !altKeyMap.containsKey(DeviceSpecific.KEYCODE_BB_CURRENCY)) {
             return
         }
-        altKeyMap[KeyEvent.KEYCODE_GRAVE] = SettingsManager.getPhysicalKeyboardCurrencySymbol(context)
+        altKeyMap[DeviceSpecific.KEYCODE_BB_CURRENCY] = SettingsManager.getPhysicalKeyboardCurrencySymbol(context)
     }
 
     fun loadSymKeyMappings(assets: AssetManager): Map<Int, String> {

@@ -856,4 +856,8 @@ Cada tecla puede configurarse como Keycode, Acción, Native Ctrl o Ninguno. Usa 
     <string name="dynamic_variation_resize_to_content_description">Si está activado, las entradas dinámicas llenan la fila disponible según cuántas se muestren. Si está desactivado, conservan el tamaño de espacio del control deslizante y quedan alineadas a la izquierda.</string>
     <string name="keyboard_theme_tab_colors">Colores</string>
     <string name="keyboard_theme_tab_keys">Teclas</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altavoz ENCENDIDO</string>
+    <string name="speaker_toggle_off">Altavoz APAGADO</string>
+    <string name="speaker_toggle_not_in_call">No en llamada</string>
 </resources>

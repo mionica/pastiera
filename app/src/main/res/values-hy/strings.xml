@@ -856,4 +856,8 @@ Nav Mode-ը օգտագործում է ստեղնի ֆիզիկական դիրքը
     <string name="dynamic_variation_resize_to_content_description">Միացված լինելու դեպքում դինամիկ տարրերը լրացնում են հասանելի շարքը՝ ըստ ցուցադրվող քանակի։ Անջատված լինելու դեպքում դրանք պահում են սահիկի տեղամասի չափը և մնում ձախից հավասարեցված։</string>
     <string name="keyboard_theme_tab_colors">Գույներ</string>
     <string name="keyboard_theme_tab_keys">Ստեղներ</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Բարձրախոսը միացված է</string>
+    <string name="speaker_toggle_off">Բարձրախոսն անջատված է</string>
+    <string name="speaker_toggle_not_in_call">Զանգի մեջ չէ</string>
 </resources>

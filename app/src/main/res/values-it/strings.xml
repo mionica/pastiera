@@ -976,4 +976,8 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="software_keyboard_mode_auto_short">Auto (PKB: hardware, altrimenti virtuale)</string>
     <string name="keyboard_theme_tab_colors">Colori</string>
     <string name="keyboard_theme_tab_keys">Tasti</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altoparlante ATTIVO</string>
+    <string name="speaker_toggle_off">Altoparlante DISATTIVO</string>
+    <string name="speaker_toggle_not_in_call">Non in chiamata</string>
 </resources>

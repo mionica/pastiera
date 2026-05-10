@@ -856,4 +856,8 @@ Ctrl-ярлики застосунків із урахуванням розкл�
     <string name="dynamic_variation_resize_to_content_description">Якщо ввімкнено, динамічні елементи заповнюють доступний рядок залежно від їх кількості. Якщо вимкнено, вони зберігають розмір слота зі слайдера й лишаються вирівняними ліворуч.</string>
     <string name="keyboard_theme_tab_colors">Кольори</string>
     <string name="keyboard_theme_tab_keys">Клавіші</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Гучномовець увімкнено</string>
+    <string name="speaker_toggle_off">Гучномовець вимкнено</string>
+    <string name="speaker_toggle_not_in_call">Не в дзвінку</string>
 </resources>

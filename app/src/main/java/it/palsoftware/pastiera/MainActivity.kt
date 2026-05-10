@@ -185,6 +185,14 @@ class MainActivity : LocalizedComponentActivity() {
             KeyEvent.KEYCODE_BACK -> "KEYCODE_BACK"
             KeyEvent.KEYCODE_MOVE_HOME -> "MOVE_HOME"
             KeyEvent.KEYCODE_MOVE_END -> "MOVE_END"
+            KeyEvent.KEYCODE_0 -> "KEYCODE_0"
+            // specific to Blackberry keyboards
+            KeyEvent.KEYCODE_0 -> "0"
+            DeviceSpecific.KEYCODE_BB_CURRENCY -> "KEYCODE_CURRENCY"
+            57 -> "KEYCODE_ALT"
+            63 -> "KEYCODE_SYM"
+            59 -> "KEYCODE_SHIFT"
+            113 -> "KEYCODE_CTRL"
             else -> "KEYCODE_$keyCode"
         }
     }

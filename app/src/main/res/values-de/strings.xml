@@ -955,4 +955,8 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="tutorial_whats_new_bug_fixes_title">Fehlerbehebungen</string>
     <string name="tutorial_whats_new_docs_button">Pastiera-Dokumentation öffnen</string>
     <string name="tutorial_whats_new_continue_hint">Fahre mit dem Tutorial fort, um die wichtigsten Einstellungen dieser Version durchzugehen.</string>
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Lautsprecher EIN</string>
+    <string name="speaker_toggle_off">Lautsprecher AUS</string>
+    <string name="speaker_toggle_not_in_call">Nicht im Anruf</string>
 </resources>

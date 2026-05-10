@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import it.palsoftware.pastiera.R
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import it.palsoftware.pastiera.inputmethod.StatusBarController
 
 /**
@@ -131,7 +132,9 @@ fun SymCustomizationScreen(
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+		        // specific to Blackberry keyboards
+                "KEYCODE_0" to KeyEvent.KEYCODE_0, "KEYCODE_CURRENCY" to DeviceSpecific.KEYCODE_BB_CURRENCY
             )
             val result = mutableMapOf<Int, String>()
             val keys = mappingsObject.keys()
@@ -218,6 +221,9 @@ fun SymCustomizationScreen(
             KeyEvent.KEYCODE_B -> "B"
             KeyEvent.KEYCODE_N -> "N"
             KeyEvent.KEYCODE_M -> "M"
+	    // specific to the Blackberry keyboards
+            KeyEvent.KEYCODE_0 -> "0"
+            DeviceSpecific.KEYCODE_BB_CURRENCY -> "$"
             else -> "?"
         }
     }

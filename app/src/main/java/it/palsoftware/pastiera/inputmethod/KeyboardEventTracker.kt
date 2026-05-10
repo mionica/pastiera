@@ -194,7 +194,12 @@ object KeyboardEventTracker {
             KeyEvent.KEYCODE_PAGE_DOWN -> "PAGE_DOWN"
             KeyEvent.KEYCODE_ESCAPE -> "ESCAPE"
             KeyEvent.KEYCODE_FORWARD_DEL -> "FORWARD_DEL"
+            KeyEvent.KEYCODE_0 -> "KEYCODE_0"
+            DeviceSpecific.KEYCODE_BB_CURRENCY -> "KEYCODE_CURRENCY"
+            57 -> "KEYCODE_ALT"
             63 -> "KEYCODE_SYM"
+            59 -> "KEYCODE_SHIFT"
+            113 -> "KEYCODE_CTRL"
             else -> "KEYCODE_$keyCode"
         }
     }

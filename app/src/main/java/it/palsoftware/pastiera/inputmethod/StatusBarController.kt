@@ -1094,19 +1094,27 @@ class StatusBarController(
         emojiKeyButtons.clear()
         
         // Definizione delle righe della tastiera
-        val keyboardRows = listOf(
+        val keyboardRows = mutableListOf(
             listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
                    android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
                    android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
                    android.view.KeyEvent.KEYCODE_P),
             listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
                    android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
-                   android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L),
-            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
-                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
-                   android.view.KeyEvent.KEYCODE_M)
+                   android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L)
         )
-        
+        if (DeviceSpecific.hasBlackberryKeyboard()) {
+            val row2bb = listOf(android.view.KeyEvent.KEYCODE_0, android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X,
+    	                    android.view.KeyEvent.KEYCODE_C, android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B,
+    			    android.view.KeyEvent.KEYCODE_N, android.view.KeyEvent.KEYCODE_M, DeviceSpecific.KEYCODE_BB_CURRENCY)
+            keyboardRows.add(row2bb)
+	}
+        else {
+            val row2 = listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C,
+                                     android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N,
+                                     android.view.KeyEvent.KEYCODE_M)
+            keyboardRows.add(row2)
+        }
         val keyLabels = mapOf(
             android.view.KeyEvent.KEYCODE_Q to "Q", android.view.KeyEvent.KEYCODE_W to "W", android.view.KeyEvent.KEYCODE_E to "E",
             android.view.KeyEvent.KEYCODE_R to "R", android.view.KeyEvent.KEYCODE_T to "T", android.view.KeyEvent.KEYCODE_Y to "Y",
@@ -1116,7 +1124,9 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M",
+	    // specific to the Blackberry keyboards
+	    android.view.KeyEvent.KEYCODE_0 to "0", DeviceSpecific.KEYCODE_BB_CURRENCY to "$"
         )
         
         val keySpacing = TypedValue.applyDimension(
@@ -1159,41 +1169,57 @@ class StatusBarController(
             }
             
             if (isTitan2Layout) {
-                // Ortholinear layout for Titan 2
-                when (rowIndex) {
-                    0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
-                        for ((index, keyCode) in row.withIndex()) {
-                            addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, index == row.size - 1)
+                if (DeviceSpecific.hasBlackberryKeyboard()) {
+                    // Ortholinear layout for all Blackberry keyboards
+                    when (rowIndex) {
+                        0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, index == row.size - 1)
+                        }
+                        1 -> { // Row 2: A S D F G H J K L [Globe]
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing,  page, inputConnection, false)
+			    // Globe Button (right part of spacebar area)
+			    val selectionButton = createKeyboardSelectionButton(keyHeight, fixedKeyWidth, page)
+			    rowLayout.addView(selectionButton)
+                        }
+                        2 -> { // Row 3: 0 Z X C V B N M $ [room for close]
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+			    rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                         }
                     }
-                    1 -> { // Row 2: A S D F G H J K L (9 keys) -> Add placeholder at the end to make it 10
-                        for ((index, keyCode) in row.withIndex()) {
-                            addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+                } else {
+                    // Ortholinear layout for Titan 2
+                    when (rowIndex) {
+                        0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, index == row.size - 1)
                         }
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
-                    }
-                    2 -> { // Row 3: Z X C V [Editor] [Globe] B N M [Close]
-                        // Z X C V (4 keys)
-                        for (i in 0..3) {
-                            addKeyToRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+                        1 -> { // Row 2: A S D F G H J K L (9 keys) -> Add placeholder at the end to make it 10
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                         }
-                        
-                        // Editor button (left part of spacebar area)
-                        val editorButton = createSymEditorButton(keyHeight, fixedKeyWidth, page)
-                        rowLayout.addView(editorButton)
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
-                        // Globe Button (right part of spacebar area)
-                        val selectionButton = createKeyboardSelectionButton(keyHeight, fixedKeyWidth)
-                        rowLayout.addView(selectionButton)
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
-                        // B N M (3 keys)
-                        for (i in 4..6) {
-                            addKeyToRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+			2 -> { // Row 3: Z X C V [Editor] [Globe] B N M [Close]
+			    // Z X C V (4 keys)
+			    for (i in 0..3) {
+				addKeyToRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+			    }
+			    // Editor button (left part of spacebar area)
+			    val editorButton = createSymEditorButton(keyHeight, fixedKeyWidth, page)
+			    rowLayout.addView(editorButton)
+			    rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
+			    // Globe Button (right part of spacebar area)
+			    val selectionButton = createKeyboardSelectionButton(keyHeight, fixedKeyWidth, page)
+			    rowLayout.addView(selectionButton)
+			    rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
+			    // B N M (3 keys)
+			    for (i in 4..6) {
+				addKeyToRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+			    }
+			    rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                         }
-
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                     }
                 }
                 container.addView(rowLayout)
@@ -1204,7 +1230,9 @@ class StatusBarController(
             // (The rest of the loop for non-Titan 2 remains the same)
             
             // Per la terza riga, aggiungi placeholder con emoji picker button a sinistra
-            if (rowIndex == 2) {
+	    // unless we're on the q25, where we don't have room
+            if ((rowIndex == 2) && !DeviceSpecific.hasBlackberryKeyboard())
+	    {
                 val leftPlaceholder = createPlaceholderWithEmojiPickerButton(keyHeight, page)
                 rowLayout.addView(leftPlaceholder, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
                     marginEnd = keySpacing
@@ -1242,16 +1270,29 @@ class StatusBarController(
             }
             
             // Per la terza riga, aggiungi placeholder con icona matita a destra
-            if (rowIndex == 2) {
-                val rightPlaceholder = createPlaceholderWithPencilButton(keyHeight, page)
-                rowLayout.addView(rightPlaceholder, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
-                    marginStart = keySpacing
-                })
-                rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
-                    marginStart = keySpacing
-                })
-            }
-            
+	    // on q25 however, add the global selector to the 2nd row, and a spacer on the 3rd
+            if (! DeviceSpecific.hasBlackberryKeyboard()) {
+	      if (rowIndex == 2) {
+                  val rightPlaceholder = createPlaceholderWithPencilButton(keyHeight, page)
+                  rowLayout.addView(rightPlaceholder, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
+                      marginStart = keySpacing
+                  })
+                  rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
+                      marginStart = keySpacing
+                  })
+              }
+            } else {
+	      if (rowIndex == 1) {
+                  val rightPlaceholder = createKeyboardSelectionButton(keyHeight, fixedKeyWidth, page)
+                  rowLayout.addView(rightPlaceholder, LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
+                      marginStart = keySpacing
+                  })
+	      } else if (rowIndex == 2) {
+                  rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight).apply {
+                      marginStart = keySpacing
+                  })
+	      }
+	    }
             container.addView(rowLayout)
         }
 
@@ -1949,6 +1990,15 @@ class StatusBarController(
         button.setOnClickListener {
             openSymCustomization(page = page, keyCode = null, openPicker = false)
         }
+	// with blackberry keyboards, add globe selector as long-press option
+	// (there isn't room for both)
+	if (DeviceSpecific.hasBlackberryKeyboard()) {
+            button.setOnLongClickListener {
+              val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+              imm?.showInputMethodPicker()
+              true
+            }
+	}
         return button
     }
 
@@ -2150,7 +2200,7 @@ class StatusBarController(
         }
     }
 
-    private fun createKeyboardSelectionButton(height: Int, width: Int): View {
+    private fun createKeyboardSelectionButton(height: Int, width: Int, page: Int): View {
         val theme = activeThemeColors()
         val button = FrameLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(width, height)
@@ -2168,10 +2218,18 @@ class StatusBarController(
             )
         }
         button.addView(icon)
+	// with blackberry keyboards, add globe selector as long-press option
+	// (there isn't room for both)
         button.setOnClickListener {
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.showInputMethodPicker()
         }
+	if (DeviceSpecific.hasBlackberryKeyboard()) {
+            button.setOnLongClickListener {
+                openSymCustomization(page = page, keyCode = null, openPicker = false)
+                true
+            }
+	}
         return button
     }
 
@@ -2241,7 +2299,9 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M",
+	        // specific to the Blackberry keyboards
+	        android.view.KeyEvent.KEYCODE_0 to "0", DeviceSpecific.KEYCODE_BB_CURRENCY to "$"
         )
         val label = keyLabels[keyCode] ?: ""
         val content = symMappings[keyCode] ?: ""
@@ -2296,18 +2356,27 @@ class StatusBarController(
         }
         
         // Definizione delle righe della tastiera (stessa struttura della tastiera reale)
-        val keyboardRows = listOf(
+        val keyboardRows = mutableListOf(
             listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
                    android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
                    android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
                    android.view.KeyEvent.KEYCODE_P),
             listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
                    android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
-                   android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L),
-            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
-                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
-                   android.view.KeyEvent.KEYCODE_M)
+                   android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L)
         )
+        if (DeviceSpecific.hasBlackberryKeyboard()) {
+            val row2bb = listOf(android.view.KeyEvent.KEYCODE_0, android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X,
+                android.view.KeyEvent.KEYCODE_C, android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B,
+                android.view.KeyEvent.KEYCODE_N, android.view.KeyEvent.KEYCODE_M, DeviceSpecific.KEYCODE_BB_CURRENCY)
+            keyboardRows.add(row2bb)
+        }
+        else {
+            val row2 = listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C,
+                android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N,
+                android.view.KeyEvent.KEYCODE_M)
+            keyboardRows.add(row2)
+        }
         
         val keyLabels = mapOf(
             android.view.KeyEvent.KEYCODE_Q to "Q", android.view.KeyEvent.KEYCODE_W to "W", android.view.KeyEvent.KEYCODE_E to "E",
@@ -2318,7 +2387,9 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", 
+	    // specific to the Blackberry keyboards
+	    android.view.KeyEvent.KEYCODE_0 to "0", DeviceSpecific.KEYCODE_BB_CURRENCY to "$"
         )
         
         val keySpacing = TypedValue.applyDimension(
@@ -2392,42 +2463,62 @@ class StatusBarController(
             }
             
             if (isTitan2Layout) {
-                // Ortholinear layout for Titan 2 (Customization Preview)
-                when (rowIndex) {
-                    0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
-                        for ((index, keyCode) in row.withIndex()) {
-                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, index == row.size - 1)
+                if (DeviceSpecific.hasBlackberryKeyboard()) {
+                    // Ortholinear layout for all Blackberry keyboards
+                    when (rowIndex) {
+                        0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, index == row.size - 1)
+                        }
+                        1 -> { // Row 2: A S D F G H J K L [Close Placeholder]
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                        }
+                        2 -> { // Row 3: 0 Z X C V B N M $ [Globe Placeholder]
+                            for ((index, keyCode) in row.withIndex())
+                                addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
                         }
                     }
-                    1 -> { // Row 2: A S D F G H J K L (9 keys) -> Add placeholder at the end to make it 10
-                        for ((index, keyCode) in row.withIndex()) {
-                            addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                } else {
+                    // Ortholinear layout for Titan 2 (Customization Preview)
+                    when (rowIndex) {
+                        0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
+                            for ((index, keyCode) in row.withIndex()) {
+                                addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, index == row.size - 1)
+                            }
                         }
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                        1 -> { // Row 2: A S D F G H J K L (9 keys) -> Add placeholder at the end to make it 10
+                            for ((index, keyCode) in row.withIndex()) {
+                                addKeyToPreviewRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            }
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                        }
+                        2 -> { // Row 3: Z X C V [Close Placeholder] [Globe Placeholder] B N M [Gap]
+                            // Z X C V (4 keys)
+                            for (i in 0..3) {
+                                addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            }
+                            
+                            // Close Button Placeholder (no icon in customization preview)
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
+                            
+                            // Globe Button Placeholder (no icon in customization preview)
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
+                            
+                            // B N M (3 keys)
+                            for (i in 4..6) {
+                                addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
+                            }
+		    
+                            // Right Gap (placeholder for the physical cutout/space at the end of row 3)
+                            rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                        }
                     }
-                    2 -> { // Row 3: Z X C V [Close Placeholder] [Globe Placeholder] B N M [Gap]
-                        // Z X C V (4 keys)
-                        for (i in 0..3) {
-                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
-                        }
-                        
-                        // Close Button Placeholder (no icon in customization preview)
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
-                        // Globe Button Placeholder (no icon in customization preview)
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
-                        
-                        // B N M (3 keys)
-                        for (i in 4..6) {
-                            addKeyToPreviewRow(rowLayout, row[i], symMappings, fixedKeyWidth, keyHeight, keySpacing, page, onKeyClick, false)
-                        }
-
-                        // Right Gap (placeholder for the physical cutout/space at the end of row 3)
-                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
-                    }
-                }
+		}
                 container.addView(rowLayout)
                 continue
             }
@@ -2495,7 +2586,9 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", 
+	    // specific to the Blackberry keyboards
+	    android.view.KeyEvent.KEYCODE_0 to "0", DeviceSpecific.KEYCODE_BB_CURRENCY to "$"
         )
         val label = keyLabels[keyCode] ?: ""
         val emoji = symMappings[keyCode] ?: ""

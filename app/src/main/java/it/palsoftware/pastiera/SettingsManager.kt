@@ -358,6 +358,7 @@ object SettingsManager {
     private const val DEFAULT_GLOBAL_VARIATION_LAYOUT_OVERRIDE = ""
     private const val MIN_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = 100L
     private const val MAX_ACCESSIBILITY_SUGGESTIONS_ANNOUNCEMENT_DELAY_MS = 2000L
+
     private val STATIC_VARIATION_BASE_PRESET_DEFAULT = listOf("@", "\"", ":", "!", "?", ",", ".")
     private val STATIC_VARIATION_BASE_PRESET_NUMBERS = listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
     private val STATIC_VARIATION_BASE_PRESET_ALTERNATIVE = listOf("[", "]", "$", "%", "^", "&", "\\")
@@ -2307,7 +2308,7 @@ object SettingsManager {
             .putBoolean(KEY_CLEAR_ALT_ON_SPACE, enabled)
             .apply()
     }
-    
+
     /**
      * Returns custom SYM mappings.
      * Returns an empty map if there are no custom mappings.
@@ -2332,7 +2333,9 @@ object SettingsManager {
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+		        // specific to Blackberry keyboards
+                "KEYCODE_0" to KeyEvent.KEYCODE_0, "KEYCODE_CURRENCY" to DeviceSpecific.KEYCODE_BB_CURRENCY
             )
             
             val result = mutableMapOf<Int, String>()
@@ -2370,7 +2373,9 @@ object SettingsManager {
                 KeyEvent.KEYCODE_L to "KEYCODE_L", KeyEvent.KEYCODE_Z to "KEYCODE_Z",
                 KeyEvent.KEYCODE_X to "KEYCODE_X", KeyEvent.KEYCODE_C to "KEYCODE_C",
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
-                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M"
+                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M",
+                // specific to Blackberry keyboards
+                KeyEvent.KEYCODE_0 to "KEYCODE_0", DeviceSpecific.KEYCODE_BB_CURRENCY to "KEYCODE_CURRENCY"
             )
             
             val mappingsObject = JSONObject()
@@ -2433,7 +2438,9 @@ object SettingsManager {
                 "KEYCODE_L" to KeyEvent.KEYCODE_L, "KEYCODE_Z" to KeyEvent.KEYCODE_Z,
                 "KEYCODE_X" to KeyEvent.KEYCODE_X, "KEYCODE_C" to KeyEvent.KEYCODE_C,
                 "KEYCODE_V" to KeyEvent.KEYCODE_V, "KEYCODE_B" to KeyEvent.KEYCODE_B,
-                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M
+                "KEYCODE_N" to KeyEvent.KEYCODE_N, "KEYCODE_M" to KeyEvent.KEYCODE_M,
+		        // specific to Blackberry keyboards
+                "KEYCODE_0" to KeyEvent.KEYCODE_0, "KEYCODE_CURRENCY" to DeviceSpecific.KEYCODE_BB_CURRENCY
             )
             
             val result = mutableMapOf<Int, String>()
@@ -2471,7 +2478,9 @@ object SettingsManager {
                 KeyEvent.KEYCODE_L to "KEYCODE_L", KeyEvent.KEYCODE_Z to "KEYCODE_Z",
                 KeyEvent.KEYCODE_X to "KEYCODE_X", KeyEvent.KEYCODE_C to "KEYCODE_C",
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
-                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M"
+                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M",
+		        // specific to Blackberry keyboards
+                KeyEvent.KEYCODE_0 to "KEYCODE_0", DeviceSpecific.KEYCODE_BB_CURRENCY to "KEYCODE_CURRENCY"
             )
             
             val mappingsObject = JSONObject()
@@ -3708,7 +3717,9 @@ object SettingsManager {
                 KeyEvent.KEYCODE_L to "KEYCODE_L", KeyEvent.KEYCODE_Z to "KEYCODE_Z",
                 KeyEvent.KEYCODE_X to "KEYCODE_X", KeyEvent.KEYCODE_C to "KEYCODE_C",
                 KeyEvent.KEYCODE_V to "KEYCODE_V", KeyEvent.KEYCODE_B to "KEYCODE_B",
-                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M"
+                KeyEvent.KEYCODE_N to "KEYCODE_N", KeyEvent.KEYCODE_M to "KEYCODE_M",
+		        // specific to Blackberry keyboards
+                KeyEvent.KEYCODE_0 to "KEYCODE_0", DeviceSpecific.KEYCODE_BB_CURRENCY to "KEYCODE_CURRENCY"
             )
             
             val mappingsObject = JSONObject()

@@ -45,6 +45,8 @@ object DeviceSpecific {
     private const val KEYCODE_SYM: Int = KeyEvent.KEYCODE_SYM
     private const val KEYCODE_Q25_CTRL: Int = KeyEvent.KEYCODE_SHIFT_RIGHT
     private const val KEYCODE_Q25_SYM: Int = KeyEvent.KEYCODE_ALT_RIGHT
+    private const val KEYCODE_Q25_CURRENCY: Int = KeyEvent.KEYCODE_GRAVE
+    public  const val KEYCODE_BB_CURRENCY: Int = KEYCODE_Q25_CURRENCY
     private const val SCANCODE_KEY2_W: Int = 17
     private const val SCANCODE_KEY2_Z: Int = 44
     private const val SCANCODE_KEY2_M: Int = 50
@@ -80,19 +82,6 @@ object DeviceSpecific {
             KeyboardModel.KEY2 -> remapKey2KeyEvent(keyCode, event)
             else -> RemappedHardwareEvent(keyCode, event)
         }
-    }
-
-    // Backward-compatible API used by existing callers.
-    fun remapKeyEvent(
-        keyCode: Int,
-        event: KeyEvent?,
-        physicalProfileOverride: String? = null
-    ): Pair<Int, KeyEvent?>? {
-        val remapped = remapHardwareKeyEvent(keyCode, event, physicalProfileOverride)
-        if (remapped.keyCode == keyCode && remapped.event === event) {
-            return null
-        }
-        return remapped.keyCode to remapped.event
     }
 
     private fun remapQ25KeyEvent(keyCode: Int, event: KeyEvent?): RemappedHardwareEvent {
@@ -429,6 +418,27 @@ object DeviceSpecific {
     fun isMinimalPhoneDevice(physicalProfileOverride: String? = null): Boolean {
         return resolveKeyboardModel(physicalProfileOverride) == KeyboardModel.MINIMAL_PHONE
     }
+
+    /*
+    public final fun getBlackberryCurrencyKey(): Int {
+        return KEYCODE_BB_CURRENCY
+    }
+    */
+
+    fun getCurrencyKey(): Int {
+        return when (currentDeviceProfile().model) {
+            KeyboardModel.Q25 -> KEYCODE_Q25_CURRENCY
+            else -> KeyEvent.KEYCODE_UNKNOWN
+        }
+    }
+
+    fun hasBlackberryKeyboard(): Boolean {
+        return when (currentDeviceProfile().family) {
+            KeyboardFamily.BLACKBERRY -> true
+            else -> false
+        }
+    }
+
 
     fun isPhysicalKeyboardDevice(physicalProfileOverride: String? = null): Boolean {
         return when (resolveKeyboardModel(physicalProfileOverride)) {

@@ -536,8 +536,8 @@ class InputEventRouterModifierE2ETest {
         primeAltOneShot(callbacks)
 
         val currencyResult = routeKeyDown(
-            keyCode = KeyEvent.KEYCODE_GRAVE,
-            event = keyDown(KeyEvent.KEYCODE_GRAVE),
+            keyCode = DeviceSpecific.KEYCODE_BB_CURRENCY,
+            event = keyDown(DeviceSpecific.KEYCODE_BB_CURRENCY),
             callbacks = callbacks
         )
 
@@ -561,8 +561,8 @@ class InputEventRouterModifierE2ETest {
         primeAltOneShot(callbacks)
 
         val result = routeKeyDown(
-            keyCode = KeyEvent.KEYCODE_GRAVE,
-            event = keyDown(KeyEvent.KEYCODE_GRAVE),
+            keyCode = DeviceSpecific.KEYCODE_BB_CURRENCY,
+            event = keyDown(DeviceSpecific.KEYCODE_BB_CURRENCY),
             callbacks = callbacks
         )
 
