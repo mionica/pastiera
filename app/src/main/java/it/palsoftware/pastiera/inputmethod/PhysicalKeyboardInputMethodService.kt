@@ -4451,6 +4451,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             "es" to "es_ES",
             "pl" to "pl_PL",
             "it" to "it_IT",
+	    "ro" to "ro_RO",
             "en" to "en_US"
         )
         return localeMap[languageCode.lowercase()] ?: languageCode

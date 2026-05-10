@@ -8,6 +8,7 @@
         <item>en_US:qwerty</item>
         <item>fr_FR:azerty</item>
         <item>de_DE:qwertz</item>
+        <item>ro_RO:romanian_multitap_qwerty</item>
         -->
     </string-array>
 </resources>

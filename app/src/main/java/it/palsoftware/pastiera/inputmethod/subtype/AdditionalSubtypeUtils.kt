@@ -30,7 +30,8 @@ object AdditionalSubtypeUtils {
     private const val EXTRA_KEY_IS_ADDITIONAL_SUBTYPE = "isAdditionalSubtype"
     private val BASE_SUBTYPE_LOCALES = setOf(
         "en_US", "it_IT", "fr_FR", "de_DE", "pl_PL", "da_DK",
-        "no_NO", "es_ES", "pt_PT", "ru_RU", "sr_RS", "uk_UA"
+        "no_NO", "es_ES", "pt_PT", "ru_RU", "sr_RS", "uk_UA",
+        "ro_RO"
     )
 
     fun InputMethodSubtype.localeString(): String =
@@ -679,7 +680,7 @@ object AdditionalSubtypeUtils {
     private fun getLocaleVariantsForLanguage(langCode: String): List<String> {
         // Common locale variants for each language
         val variants = when (langCode.lowercase()) {
-            "en" -> listOf("en_US", "en_GB", "en_AU", "en_CA", "en")
+            "en" -> listOf("en_US", "en_GB", "en_IE", "en_AU", "en_CA", "en")
             "it" -> listOf("it_IT", "it_CH", "it")
             "fr" -> listOf("fr_FR", "fr_CA", "fr_CH", "fr_BE", "fr")
             "de" -> listOf("de_DE", "de_AT", "de_CH", "de")
@@ -690,6 +691,7 @@ object AdditionalSubtypeUtils {
             "nn" -> listOf("nn_NO", "no_NO", "nn", "no")
             "es" -> listOf("es_ES", "es_MX", "es_AR", "es")
             "pt" -> listOf("pt_PT", "pt_BR", "pt")
+            "ro" -> listOf("ro_RO", "ro_MD", "ro")
             "ru" -> listOf("ru_RU", "ru")
             else -> listOf(langCode)
         }
