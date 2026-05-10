@@ -160,6 +160,7 @@ private fun getLanguageDisplayName(context: Context, languageCode: String): Stri
         "fr" to "Français",
         "de" to "Deutsch",
         "pl" to "Polski",
+        "ro" to "Română",
         "es" to "Español"
     )
 

@@ -94,7 +94,7 @@ object AutoCorrector {
             customLanguages.clear()
 
             // List of supported languages by default
-            val standardLocales = listOf("it", "en", "es", "fr", "de", "pl", "x-pastiera")
+            val standardLocales = listOf("it", "en", "es", "fr", "de", "pl", "ro", "x-pastiera")
 
             for (locale in standardLocales) {
                 try {
@@ -178,7 +178,7 @@ object AutoCorrector {
         try {
             loadCorrectionsFromJson(locale, jsonString)
             // Add to customLanguages only if not a standard language
-            val standardLocales = listOf("it", "en", "es", "fr", "de", "pl", "x-pastiera")
+            val standardLocales = listOf("it", "en", "es", "fr", "de", "pl", "ro", "x-pastiera")
             if (locale !in standardLocales) {
                 customLanguages.add(locale)
             }

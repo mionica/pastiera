@@ -413,6 +413,7 @@ private fun getLocaleTagForLanguage(languageCode: String): String {
         "fr" to "fr_FR",
         "es" to "es_ES",
         "pl" to "pl_PL",
+        "ro" to "ro_RO",
         "it" to "it_IT",
         "en" to "en_US"
     )
