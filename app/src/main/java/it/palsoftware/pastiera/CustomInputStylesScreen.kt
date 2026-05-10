@@ -538,6 +538,7 @@ internal fun AppLanguageSelectorCard() {
             "es",
             "fr",
             "pl",
+            "ro",
             "ru",
             "uk",
             "vi",
