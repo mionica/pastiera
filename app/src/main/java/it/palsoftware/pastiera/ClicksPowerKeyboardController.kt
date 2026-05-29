@@ -58,7 +58,7 @@ object ClicksPowerKeyboardController {
         initialized = true
         context = appContext.applicationContext
         socCalibrationStore = SharedPreferencesClicksPowerSocCalibrationStore(
-            context.getSharedPreferences("pastiera_prefs", Context.MODE_PRIVATE)
+            SettingsManager.getPreferences(context)
         )
         SettingsManager.getMostRecentClicksPowerKeyboardSnapshot(context)?.let { snapshot ->
             state = state.copy(
@@ -100,7 +100,7 @@ object ClicksPowerKeyboardController {
                 }
             }
         }, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        context.getSharedPreferences("pastiera_prefs", Context.MODE_PRIVATE)
+        SettingsManager.getPreferences(context)
             .registerOnSharedPreferenceChangeListener(
                 SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                     if (key?.startsWith("clicks_charging_") == true) evaluateChargingAutomation()

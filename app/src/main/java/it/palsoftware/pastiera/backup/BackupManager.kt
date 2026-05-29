@@ -119,7 +119,7 @@ object PreferencesBackupHelper {
             if (!BackupPreferenceContract.shouldExportPreferenceFile(prefName)) {
                 return@forEach
             }
-            val prefs = context.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+            val prefs = SettingsManager.getPreferences(context, prefName)
             val prefsJson = buildPreferencesJson(prefName, prefs, hasTypingSoundPack)
             val outFile = File(destinationDir, "$prefName.json")
             outFile.writeText(prefsJson.toString(2))
@@ -198,7 +198,7 @@ object PreferencesBackupHelper {
         val skipped = mutableListOf<String>()
 
         backedUpPrefs.forEach { (prefName, entries) ->
-            val prefs = context.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+            val prefs = SettingsManager.getPreferences(context, prefName)
             val editor = prefs.edit()
 
             entries.forEach { (key, value) ->

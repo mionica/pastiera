@@ -53,7 +53,7 @@ object RecentEmojiManager {
      * @return List of emoji strings, ordered from most recent to oldest
      */
     fun getRecentEmojis(context: Context, maxCount: Int = MAX_RECENT_EMOJIS): List<String> {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = SettingsManager.getPreferences(context, PREFS_NAME)
         val jsonString = prefs.getString(PREF_KEY_RECENT_EMOJIS, null) ?: return emptyList()
 
         return try {
@@ -76,7 +76,7 @@ object RecentEmojiManager {
      * Clears all recent emojis.
      */
     fun clearRecentEmojis(context: Context) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = SettingsManager.getPreferences(context, PREFS_NAME)
         prefs.edit().remove(PREF_KEY_RECENT_EMOJIS).apply()
     }
 
@@ -110,7 +110,7 @@ object RecentEmojiManager {
             emojis.forEach { emoji ->
                 jsonArray.put(emoji)
             }
-            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
+            SettingsManager.getPreferences(context, PREFS_NAME).edit()
                 .putString(PREF_KEY_RECENT_EMOJIS, jsonArray.toString())
                 .apply()
         } catch (e: Exception) {
