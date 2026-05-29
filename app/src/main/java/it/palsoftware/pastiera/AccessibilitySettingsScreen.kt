@@ -1,7 +1,10 @@
 package it.palsoftware.pastiera
 
+import android.content.Intent
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +44,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToLong
+import it.palsoftware.pastiera.accessibility.LockscreenPinEntry
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 
 @Composable
 fun AccessibilitySettingsScreen(
@@ -77,6 +82,9 @@ fun AccessibilitySettingsScreen(
     }
     var bounceBackspaceEnabled by remember {
         mutableStateOf(SettingsManager.getBounceKeysBackspaceEnabled(context))
+    }
+    var pinInputOnLockscreenEnabled by remember {
+        mutableStateOf(SettingsManager.getLockscreenPinEntry(context))
     }
 
     BackHandler { onBack() }
@@ -117,6 +125,55 @@ fun AccessibilitySettingsScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_accessibility_lockscreen_pin_entry),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_accessibility_lockscreen_pin_entry_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = pinInputOnLockscreenEnabled,
+                        enabled = DeviceSpecific.isPhysicalKeyboardDevice(),
+                        onCheckedChange = { enabled ->
+                            if (enabled) {
+                                if (LockscreenPinEntry.connected.value) {
+                                    pinInputOnLockscreenEnabled = enabled
+                                    SettingsManager.setLockscreenPinEntry(context, enabled)
+                                } else {
+                                    // Open accessibility settings to enable the service
+                                    val intent =
+                                        Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                    context.startActivity(intent)
+                                }
+                            } else {
+                                // allow disabling regardless of whether the accessibility service is enabled or not
+                                pinInputOnLockscreenEnabled = false
+                                SettingsManager.setLockscreenPinEntry(context, false)
+                            }
+                        }
+                    )
+                }
+            }
+
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
