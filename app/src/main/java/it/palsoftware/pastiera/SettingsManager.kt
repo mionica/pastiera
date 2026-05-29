@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.KeyEvent
@@ -463,7 +464,17 @@ object SettingsManager {
      * Returns the SharedPreferences instance for Pastiera.
      */
     fun getPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                val deviceContext = context.createDeviceProtectedStorageContext()
+                deviceContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to create device protected storage, using default", e)
+                context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            }
+        } else {
+            context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        }
     }
 
     fun getAppLanguageTag(context: Context): String? {
