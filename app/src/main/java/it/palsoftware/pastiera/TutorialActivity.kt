@@ -55,11 +55,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.palsoftware.pastiera.ui.theme.PastieraTheme
 import it.palsoftware.pastiera.BuildConfig
+/*
 import it.palsoftware.pastiera.update.checkForUpdate
+*/
 import it.palsoftware.pastiera.update.fetchReleaseNotesForVersion
 import it.palsoftware.pastiera.update.ReleaseNotesSummary
+/*
 import it.palsoftware.pastiera.update.showUpdateDialog
 import it.palsoftware.pastiera.update.shouldUseGithubUpdateChecks
+*/
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import it.palsoftware.pastiera.inputmethod.SoftwareKeyboardAutoDetector
 import it.palsoftware.pastiera.inputmethod.TypingSoundPlayer
@@ -72,16 +76,22 @@ private const val UNIHERTZ_HIDE_IME_CAPTION_BAR_KEY = "agui_hide_ime_caption_bar
 
 class TutorialActivity : LocalizedComponentActivity() {
     companion object {
+		/*
         const val EXTRA_UPDATE_TUTORIAL = "it.palsoftware.pastiera.UPDATE_TUTORIAL"
         const val EXTRA_PREVIEW_UPDATE_TUTORIAL = "it.palsoftware.pastiera.PREVIEW_UPDATE_TUTORIAL"
+		*/
         const val EXTRA_PREVIOUS_VERSION = "it.palsoftware.pastiera.PREVIOUS_VERSION"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+		/*
         val updateTutorial = intent.getBooleanExtra(EXTRA_UPDATE_TUTORIAL, false)
         val previewUpdateTutorial = intent.getBooleanExtra(EXTRA_PREVIEW_UPDATE_TUTORIAL, false)
+		*/
+        val updateTutorial = false
+        val previewUpdateTutorial = false
         val previousVersionOverride = intent.getStringExtra(EXTRA_PREVIOUS_VERSION)
         setContent {
             PastieraTheme {
@@ -307,6 +317,7 @@ fun TutorialScreen(
     val coroutineScope = rememberCoroutineScope()
     
     // Automatic update check at tutorial start (only once, respecting dismissed releases)
+	/*
     if (shouldUseGithubUpdateChecks(context)) {
         LaunchedEffect(Unit) {
             checkForUpdate(
@@ -321,6 +332,7 @@ fun TutorialScreen(
             }
         }
     }
+	*/
     
     Scaffold(
         modifier = Modifier.fillMaxSize()

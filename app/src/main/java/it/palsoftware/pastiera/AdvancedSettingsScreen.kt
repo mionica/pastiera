@@ -648,6 +648,7 @@ fun AdvancedSettingsScreen(
                             }
                         }
 
+                        /*
                         Surface(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -695,6 +696,7 @@ fun AdvancedSettingsScreen(
                                 )
                             }
                         }
+                        */
                     }
                 }
             }

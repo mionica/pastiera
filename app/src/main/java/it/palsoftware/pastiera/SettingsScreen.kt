@@ -43,9 +43,11 @@ import it.palsoftware.pastiera.R
 import android.widget.Toast
 import it.palsoftware.pastiera.BuildConfig
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
+/*
 import it.palsoftware.pastiera.update.checkForUpdate
 import it.palsoftware.pastiera.update.showUpdateDialog
 import it.palsoftware.pastiera.update.shouldUseGithubUpdateChecks
+*/
 
 /**
  * Sealed class per rappresentare lo stato della navigazione nelle settings.
@@ -110,6 +112,7 @@ fun SettingsScreen(
     }
     
     // Automatic update check on screen open (only once, respecting dismissed releases)
+	/*
     if (shouldUseGithubUpdateChecks(context)) {
         LaunchedEffect(Unit) {
             checkForUpdate(
@@ -124,6 +127,7 @@ fun SettingsScreen(
             }
         }
     }
+	*/
     
     // Handle system back button
     BackHandler { navigateBack() }
@@ -580,7 +584,8 @@ private fun SettingsMainScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if (shouldUseGithubUpdateChecks(context)) {
+                /*
+				if (shouldUseGithubUpdateChecks(context)) {
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -658,6 +663,7 @@ private fun SettingsMainScreen(
                         }
                     }
                 }
+				*/
 
                 // Build Info
                 Surface(
