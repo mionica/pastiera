@@ -52,9 +52,11 @@ import it.palsoftware.pastiera.R
 import android.widget.Toast
 import it.palsoftware.pastiera.BuildConfig
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
+/*
 import it.palsoftware.pastiera.update.checkForUpdateNotices
 import it.palsoftware.pastiera.update.showReleaseNotice
 import it.palsoftware.pastiera.update.shouldUseGithubUpdateChecks
+*/
 import kotlinx.coroutines.delay
 
 /**
@@ -170,6 +172,7 @@ fun SettingsScreen(
         }
     }
 
+    /*
     // Automatic update check on screen open (only once, respecting dismissed releases)
     if (currentDestination == SettingsDestination.Main && shouldUseGithubUpdateChecks(context)) {
         LaunchedEffect(Unit) {
@@ -184,6 +187,7 @@ fun SettingsScreen(
             }
         }
     }
+    */
 
 
     CompositionLocalProvider(
@@ -575,6 +579,7 @@ private fun SettingsMainScreen(
                 }
             )
 
+            /*
             if (shouldUseGithubUpdateChecks(context)) {
                 SettingsCategoryRow(
                     icon = ImageVector.vectorResource(R.drawable.plektra_open_monochrome_24),
@@ -636,6 +641,7 @@ private fun SettingsMainScreen(
                     }
                 )
             }
+            */
 
                     Spacer(modifier = Modifier.height(16.dp))
                 }
