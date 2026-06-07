@@ -54,10 +54,12 @@ import it.palsoftware.pastiera.inputmethod.NotificationHelper
 import it.palsoftware.pastiera.ui.CustomTopBar
 import it.palsoftware.pastiera.ui.theme.PastieraTheme
 import it.palsoftware.pastiera.BuildConfig
+/*
 import it.palsoftware.pastiera.update.checkForUpdate
 import it.palsoftware.pastiera.update.showUpdateDialog
 import it.palsoftware.pastiera.update.UpdateCheckWorker
 import it.palsoftware.pastiera.update.shouldUseGithubUpdateChecks
+*/
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Settings
@@ -196,6 +198,7 @@ class MainActivity : LocalizedComponentActivity() {
             return
         }
 
+        /*
         if (
             BuildConfig.RELEASE_CHANNEL != "nightly" &&
             SettingsManager.shouldShowWhatsNew(this, BuildConfig.VERSION_NAME)
@@ -212,6 +215,7 @@ class MainActivity : LocalizedComponentActivity() {
             // Schedule periodic background update checks (every 24 hours).
             UpdateCheckWorker.schedule(applicationContext)
         }
+        */
 
         enableEdgeToEdge()
         setContent {
@@ -465,6 +469,7 @@ fun KeyboardSetupScreen(
     }
 
     // Automatic update check on screen open (only once, respecting dismissed releases)
+    /*
     if (shouldUseGithubUpdateChecks(context)) {
         LaunchedEffect(Unit) {
             it.palsoftware.pastiera.update.checkForUpdateNotices(
@@ -478,6 +483,7 @@ fun KeyboardSetupScreen(
             }
         }
     }
+    */
 
     // Main screen
     val buildCurrentReport: () -> String = {
