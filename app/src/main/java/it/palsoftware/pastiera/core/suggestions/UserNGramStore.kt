@@ -10,6 +10,15 @@ interface UserNGramRepository {
     fun predict(locale: String, prefix: String, limit: Int): List<UserNGramStore.Prediction>
     fun delete(locale: String, prefix: String, nextWord: String): Int
     fun deleteNextWord(locale: String, nextWord: String): Int
+
+    // Trigram (two-word context) variants. The "prefix" here is a compound key of the two
+    // preceding normalized words (see NextWordPredictor.contextKey). Kept as a distinct table
+    // rather than overloading the bigram one so bigram fallback/backoff stays a simple query.
+    fun learnTrigram(locale: String, contextKey: String, nextWord: String, nowMs: Long = System.currentTimeMillis())
+    fun predictTrigram(locale: String, contextKey: String, limit: Int): List<UserNGramStore.Prediction>
+    fun deleteTrigram(locale: String, contextKey: String, nextWord: String): Int
+    fun deleteTrigramNextWord(locale: String, nextWord: String): Int
+
     fun clearAll()
 }
 
@@ -27,9 +36,15 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
     )
 
     override fun onCreate(db: SQLiteDatabase) {
+        createNGramTable(db, TABLE_BIGRAMS)
+        createNGramTable(db, TABLE_TRIGRAMS)
+        seedDefaultBigrams(db)
+    }
+
+    private fun createNGramTable(db: SQLiteDatabase, table: String) {
         db.execSQL(
             """
-            CREATE TABLE $TABLE_BIGRAMS (
+            CREATE TABLE IF NOT EXISTS $table (
                 $COL_LOCALE TEXT NOT NULL,
                 $COL_PREFIX TEXT NOT NULL,
                 $COL_NEXT_WORD TEXT NOT NULL,
@@ -40,10 +55,9 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
             """.trimIndent()
         )
         db.execSQL(
-            "CREATE INDEX ${TABLE_BIGRAMS}_lookup ON $TABLE_BIGRAMS " +
+            "CREATE INDEX IF NOT EXISTS ${table}_lookup ON $table " +
                 "($COL_LOCALE, $COL_PREFIX, $COL_COUNT DESC, $COL_LAST_USED DESC)"
         )
-        seedDefaultBigrams(db)
     }
 
     /**
@@ -80,15 +94,44 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
         if (oldVersion < 1) {
             db.execSQL("DROP TABLE IF EXISTS $TABLE_BIGRAMS")
             onCreate(db)
+            return
+        }
+        if (oldVersion < 2) {
+            // Added the trigram (two-word context) table. Bigram data is untouched.
+            createNGramTable(db, TABLE_TRIGRAMS)
         }
     }
 
-    override fun learn(locale: String, prefix: String, nextWord: String, nowMs: Long) {
+    override fun learn(locale: String, prefix: String, nextWord: String, nowMs: Long) =
+        learnInto(TABLE_BIGRAMS, locale, prefix, nextWord, nowMs)
+
+    override fun predict(locale: String, prefix: String, limit: Int): List<Prediction> =
+        predictFrom(TABLE_BIGRAMS, locale, prefix, limit)
+
+    override fun delete(locale: String, prefix: String, nextWord: String): Int =
+        deleteFrom(TABLE_BIGRAMS, locale, prefix, nextWord)
+
+    override fun deleteNextWord(locale: String, nextWord: String): Int =
+        deleteNextWordFrom(TABLE_BIGRAMS, locale, nextWord)
+
+    override fun learnTrigram(locale: String, contextKey: String, nextWord: String, nowMs: Long) =
+        learnInto(TABLE_TRIGRAMS, locale, contextKey, nextWord, nowMs)
+
+    override fun predictTrigram(locale: String, contextKey: String, limit: Int): List<Prediction> =
+        predictFrom(TABLE_TRIGRAMS, locale, contextKey, limit)
+
+    override fun deleteTrigram(locale: String, contextKey: String, nextWord: String): Int =
+        deleteFrom(TABLE_TRIGRAMS, locale, contextKey, nextWord)
+
+    override fun deleteTrigramNextWord(locale: String, nextWord: String): Int =
+        deleteNextWordFrom(TABLE_TRIGRAMS, locale, nextWord)
+
+    private fun learnInto(table: String, locale: String, prefix: String, nextWord: String, nowMs: Long) {
         val db = writableDatabase
         db.beginTransaction()
         try {
             db.insertWithOnConflict(
-                TABLE_BIGRAMS,
+                table,
                 null,
                 ContentValues().apply {
                     put(COL_LOCALE, locale)
@@ -101,7 +144,7 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
             )
             db.execSQL(
                 """
-                UPDATE $TABLE_BIGRAMS
+                UPDATE $table
                 SET $COL_COUNT = $COL_COUNT + 1,
                     $COL_LAST_USED = ?
                 WHERE $COL_LOCALE = ?
@@ -116,10 +159,10 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
         }
     }
 
-    override fun predict(locale: String, prefix: String, limit: Int): List<Prediction> {
+    private fun predictFrom(table: String, locale: String, prefix: String, limit: Int): List<Prediction> {
         if (limit <= 0) return emptyList()
         val cursor = readableDatabase.query(
-            TABLE_BIGRAMS,
+            table,
             arrayOf(COL_NEXT_WORD, COL_COUNT, COL_LAST_USED),
             "$COL_LOCALE = ? AND $COL_PREFIX = ?",
             arrayOf(locale, prefix),
@@ -146,17 +189,17 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
         }
     }
 
-    override fun delete(locale: String, prefix: String, nextWord: String): Int {
+    private fun deleteFrom(table: String, locale: String, prefix: String, nextWord: String): Int {
         return writableDatabase.delete(
-            TABLE_BIGRAMS,
+            table,
             "$COL_LOCALE = ? AND $COL_PREFIX = ? AND $COL_NEXT_WORD = ? COLLATE NOCASE",
             arrayOf(locale, prefix, nextWord)
         )
     }
 
-    override fun deleteNextWord(locale: String, nextWord: String): Int {
+    private fun deleteNextWordFrom(table: String, locale: String, nextWord: String): Int {
         return writableDatabase.delete(
-            TABLE_BIGRAMS,
+            table,
             "$COL_LOCALE = ? AND $COL_NEXT_WORD = ? COLLATE NOCASE",
             arrayOf(locale, nextWord)
         )
@@ -164,12 +207,14 @@ class UserNGramStore(context: Context) : SQLiteOpenHelper(
 
     override fun clearAll() {
         writableDatabase.delete(TABLE_BIGRAMS, null, null)
+        writableDatabase.delete(TABLE_TRIGRAMS, null, null)
     }
 
     companion object {
         private const val DATABASE_NAME = "user_ngrams.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
         private const val TABLE_BIGRAMS = "bigrams"
+        private const val TABLE_TRIGRAMS = "trigrams"
         private const val COL_LOCALE = "locale"
         private const val COL_PREFIX = "prefix"
         private const val COL_NEXT_WORD = "next_word"
