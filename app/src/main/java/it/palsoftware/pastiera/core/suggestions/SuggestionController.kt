@@ -362,7 +362,7 @@ class SuggestionController(
         if (!word.isNullOrBlank()) {
             tracker.setWord(word)
         } else if (previousCompletedWord == null) {
-            publishSentenceStartPredictionsOrStarter()
+            publishSentenceStartPredictions()
         }
     }
 
@@ -396,7 +396,7 @@ class SuggestionController(
                 } else {
                     previousCompletedWord = null
                     sentenceStartPending = true
-                    publishSentenceStartPredictionsOrStarter()
+                    publishSentenceStartPredictions()
                 }
             }
         }
@@ -487,11 +487,7 @@ class SuggestionController(
             }
         }
 
-        val next = fillWithStarterSuggestions(
-            current.filterNot { it.candidate.equals(trimmed, ignoreCase = true) },
-            settingsProvider(),
-            excludedCandidates = setOf(trimmed)
-        )
+        val next = current.filterNot { it.candidate.equals(trimmed, ignoreCase = true) }
         latestSuggestions.set(next)
         suggestionsListener?.invoke(next)
     }
@@ -602,116 +598,52 @@ class SuggestionController(
         }
     }
 
-    private fun publishNextWordPredictions(previousWord: String) {
+    /**
+     * Publishes the top next-word candidates for the given rolling [context] (oldest word
+     * first, up to the last two completed words). Trigram context (both words) is preferred
+     * over bigram (last word only) inside [NextWordPredictor.predict] itself; this just wires
+     * that context through.
+     *
+     * This only ever shows continuations the predictor genuinely learned for this context (or,
+     * with an empty context, genuinely learned sentence-starts via [publishSentenceStartPredictions]).
+     * There is no generic dictionary-frequency filler anywhere in this path: a common word with
+     * no real connection to the current context is a wrong-looking guess, not a helpful
+     * placeholder, so the suggestion bar simply goes blank when nothing has been learned yet.
+     */
+    private fun publishNextWordPredictions(context: List<String>) {
+        if (context.isEmpty()) {
+            publishSentenceStartPredictions()
+            return
+        }
         val settings = settingsProvider()
         val primary = nextWordPredictor.predict(
             currentLocale,
-            previousWord,
+            context,
             settings.maxSuggestions
         )
         val extras = activeExtraLocales().flatMap { locale ->
-            nextWordPredictor.predict(locale, previousWord, settings.maxSuggestions)
+            nextWordPredictor.predict(locale, context, settings.maxSuggestions)
         }
         val predictions = mergeSuggestionResults(primary, extras, settings.maxSuggestions)
-        val suggestions = fillWithStarterSuggestions(predictions, settings)
-        if (suggestions.isNotEmpty()) {
-            latestSuggestions.set(suggestions)
-            suggestionsListener?.invoke(suggestions)
-        } else {
-            publishStarterSuggestions()
-        }
+        latestSuggestions.set(predictions)
+        suggestionsListener?.invoke(predictions)
     }
 
-    private fun publishSentenceStartPredictionsOrStarter() {
+    /**
+     * Publishes genuinely-learned sentence-starting words for a truly empty field/cursor
+     * position (no completed-word context at all). Like [publishNextWordPredictions], this does
+     * not pad with generic dictionary-frequency words - if nothing has been learned as a
+     * sentence start yet, the bar goes blank rather than showing unrelated common words.
+     */
+    private fun publishSentenceStartPredictions() {
         val settings = settingsProvider()
         val primary = nextWordPredictor.predictSentenceStart(currentLocale, settings.maxSuggestions)
         val extras = activeExtraLocales().flatMap { locale ->
             nextWordPredictor.predictSentenceStart(locale, settings.maxSuggestions)
         }
         val predictions = mergeSuggestionResults(primary, extras, settings.maxSuggestions)
-        val suggestions = fillWithStarterSuggestions(predictions, settings)
-        if (suggestions.isNotEmpty()) {
-            latestSuggestions.set(suggestions)
-            suggestionsListener?.invoke(suggestions)
-        } else {
-            publishStarterSuggestions()
-        }
-    }
-
-    private fun publishStarterSuggestions() {
-        val settings = settingsProvider()
-        if (!settings.suggestionsEnabled || !dictionaryRepository.isReady) {
-            latestSuggestions.set(emptyList())
-            suggestionsListener?.invoke(emptyList())
-            return
-        }
-
-        val suggestions = starterSuggestions(settings)
-        latestSuggestions.set(suggestions)
-        suggestionsListener?.invoke(suggestions)
-    }
-
-    private fun starterSuggestions(settings: SuggestionSettings): List<SuggestionResult> {
-        val primary = starterSuggestionsFor(dictionaryRepository, PRIMARY_SUGGESTION_BOOST, settings.maxSuggestions)
-        val extras = activeExtraSuggestionEngines().flatMap { extra ->
-            if (!extra.repository.isReady) {
-                scheduleRepositoryLoad(extra.repository, refreshAfterLoad = true)
-                emptyList()
-            } else {
-                starterSuggestionsFor(extra.repository, 0.0, settings.maxSuggestions)
-            }
-        }
-        return mergeSuggestionResults(primary, extras, settings.maxSuggestions)
-    }
-
-    private fun fillWithStarterSuggestions(
-        predictions: List<SuggestionResult>,
-        settings: SuggestionSettings
-    ): List<SuggestionResult> {
-        if (predictions.size >= settings.maxSuggestions) return predictions.take(settings.maxSuggestions)
-
-        val seen = predictions
-            .mapTo(HashSet()) { it.candidate.lowercase(currentLocale) }
-        val fillers = starterSuggestions(settings)
-            .filter { seen.add(it.candidate.lowercase(currentLocale)) }
-        return (predictions + fillers).take(settings.maxSuggestions)
-    }
-
-    private fun fillWithStarterSuggestions(
-        predictions: List<SuggestionResult>,
-        settings: SuggestionSettings,
-        excludedCandidates: Set<String>
-    ): List<SuggestionResult> {
-        if (predictions.size >= settings.maxSuggestions) return predictions.take(settings.maxSuggestions)
-
-        val excluded = excludedCandidates.mapTo(HashSet()) { it.lowercase(currentLocale) }
-        val seen = predictions
-            .mapTo(HashSet()) { it.candidate.lowercase(currentLocale) }
-        val fillers = starterSuggestions(settings)
-            .filter { result ->
-                val key = result.candidate.lowercase(currentLocale)
-                key !in excluded && seen.add(key)
-            }
-        return (predictions + fillers).take(settings.maxSuggestions)
-    }
-
-    private fun starterSuggestionsFor(
-        repository: DictionaryRepository,
-        scoreBoost: Double,
-        limit: Int
-    ): List<SuggestionResult> {
-        return repository.topCommonEntries(limit * 3)
-            .map { entry ->
-                SuggestionResult(
-                    candidate = entry.word,
-                    distance = 0,
-                    score = repository.effectiveFrequency(entry) / 1_600.0 + scoreBoost +
-                        if (entry.source == SuggestionSource.USER) 5.0 else 0.0,
-                    source = entry.source,
-                    kind = SuggestionKind.STARTER_WORD
-                )
-            }
-            .take(limit)
+        latestSuggestions.set(predictions)
+        suggestionsListener?.invoke(predictions)
     }
 
     private fun mergeSuggestionResults(
@@ -774,7 +706,7 @@ class SuggestionController(
                             if (word.isNotBlank()) {
                                 updateSuggestionsForWord(word)
                             } else if (previousCompletedWord == null) {
-                                publishSentenceStartPredictionsOrStarter()
+                                publishSentenceStartPredictions()
                             }
                         }
                     }
@@ -930,7 +862,7 @@ class SuggestionController(
                 return
             }
             if (previousCompletedWord == null) {
-                publishSentenceStartPredictionsOrStarter()
+                publishSentenceStartPredictions()
                 return
             }
         }
@@ -939,7 +871,7 @@ class SuggestionController(
         if (word.isNotBlank()) {
             updateSuggestionsForWord(word)
         } else if (previousCompletedWord == null) {
-            publishSentenceStartPredictionsOrStarter()
+            publishSentenceStartPredictions()
         }
     }
 
