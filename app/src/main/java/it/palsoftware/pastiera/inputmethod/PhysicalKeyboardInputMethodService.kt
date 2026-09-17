@@ -117,9 +117,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
             KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_Z,
             KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
-            KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, KeyEvent.KEYCODE_COMMA,
-            KeyEvent.KEYCODE_PERIOD, KeyEvent.KEYCODE_SPACE, KeyEvent.KEYCODE_DEL,
-            KeyEvent.KEYCODE_ENTER
+            KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_GRAVE,
+            KeyEvent.KEYCODE_COMMA, KeyEvent.KEYCODE_PERIOD, KeyEvent.KEYCODE_SPACE,
+            KeyEvent.KEYCODE_DEL, KeyEvent.KEYCODE_ENTER
         )
     }
 
@@ -1646,7 +1646,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         isAlphabeticKey(keyCode) ||
                 keyCode == KeyEvent.KEYCODE_ENTER ||
                 keyCode == KeyEvent.KEYCODE_DEL ||
-                keyCode == KeyEvent.KEYCODE_SPACE
+                keyCode == KeyEvent.KEYCODE_SPACE ||
+                keyCode == KeyEvent.KEYCODE_0 ||
+                keyCode == KeyEvent.KEYCODE_GRAVE
 
     private fun updateModifierTapLatchSettings() {
         if (!::modifierStateController.isInitialized) {
@@ -4961,7 +4963,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
         if (!altActiveNow && !ctrlActiveNow && handleVietnameseTelexKey(keyCode, event, ic)) {
             return true
         }
-        
+
+        // Blackberry keyboards have a currency key
+        if (
+            hasEditableField &&
+            DeviceSpecific.hasBlackberryKeyboard() &&
+            keyCode == KeyEvent.KEYCODE_GRAVE &&
+            event?.repeatCount == 0 &&
+            !symLayoutController.isSymActive()
+        ) {
+            val currency = SettingsManager.getPhysicalKeyboardCurrencySymbol(this)
+            ic.commitText(currency, currency.length)
+            return true
+        }
+
         val routingDecision = inputEventRouter.routeEditableFieldKeyDown(
             keyCode = keyCode,
             event = event,
@@ -5302,7 +5317,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             symChordUsedSinceKeyDown = false
             return true
         }
-        
+
         if (symLayoutController.handleKeyUp(keyCode, shiftPressed)) {
             return true
         }

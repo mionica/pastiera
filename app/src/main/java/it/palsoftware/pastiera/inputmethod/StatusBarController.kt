@@ -1358,18 +1358,31 @@ class StatusBarController(
         emojiKeyButtons.clear()
         
         // Definizione delle righe della tastiera
-        val keyboardRows = listOf(
-            listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
-                   android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
-                   android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
-                   android.view.KeyEvent.KEYCODE_P),
-            listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
-                   android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
-                   android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L),
-            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
-                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
-                   android.view.KeyEvent.KEYCODE_M)
+        val keyboardRow0 = listOf(
+            android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
+            android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
+            android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
+            android.view.KeyEvent.KEYCODE_P
         )
+        val keyboardRow1 = listOf(
+            android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
+            android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
+            android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L
+        )
+        val keyboardRow2default = listOf(
+            android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
+            android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
+            android.view.KeyEvent.KEYCODE_M
+        )
+        val keyboardRow2bb = listOf(
+            android.view.KeyEvent.KEYCODE_0, android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X,
+            android.view.KeyEvent.KEYCODE_C, android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B,
+            android.view.KeyEvent.KEYCODE_N, android.view.KeyEvent.KEYCODE_M, android.view.KeyEvent.KEYCODE_GRAVE
+        )
+        val keyboardRowsDefault = listOf(keyboardRow0, keyboardRow1, keyboardRow2default)
+        val keyboardRowsBlackberry = listOf(keyboardRow0, keyboardRow1, keyboardRow2bb)
+        val isBlackberry = DeviceSpecific.hasBlackberryKeyboard()
+        val keyboardRows = if (isBlackberry) keyboardRowsBlackberry else keyboardRowsDefault
         
         val keyLabels = mapOf(
             android.view.KeyEvent.KEYCODE_Q to "Q", android.view.KeyEvent.KEYCODE_W to "W", android.view.KeyEvent.KEYCODE_E to "E",
@@ -1380,7 +1393,8 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", android.view.KeyEvent.KEYCODE_0 to "0", 
+            android.view.KeyEvent.KEYCODE_GRAVE to "$"
         )
         
         val keySpacing = TypedValue.applyDimension(
@@ -1418,6 +1432,35 @@ class StatusBarController(
                 }
             }
             
+            if (isBlackberry) {
+                // Ortholinear layout for Titan 2
+                when (rowIndex) {
+                    0 -> { // Row 1: Q W E R T Y U I O P (10 keys)
+                        for ((index, keyCode) in row.withIndex()) {
+                            addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, index == row.size - 1)
+                        }
+                    }
+                    1 -> { // Row 2: A S D F G H J K L (9 keys) + [Globe/Editor]
+                        for ((index, keyCode) in row.withIndex()) {
+                            addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+                        }
+                        // Globe Button (where enter would be)
+                        // have the long-press trigger the Editor, since we only have room for one button
+                        val selectionButton = createKeyboardSelectionButton(keyHeight, fixedKeyWidth, page)
+                        rowLayout.addView(selectionButton)
+                        rowLayout.addView(View(context), LinearLayout.LayoutParams(keySpacing, keyHeight))
+                    }
+                    2 -> { // Row 3: 0 Z X C V B N M $ (9 keys)
+                        for ((index, keyCode) in row.withIndex()) {
+                            addKeyToRow(rowLayout, keyCode, symMappings, fixedKeyWidth, keyHeight, keySpacing, page, inputConnection, false)
+                        }
+                        rowLayout.addView(View(context), LinearLayout.LayoutParams(fixedKeyWidth, keyHeight))
+                    }
+                }
+                container.addView(rowLayout)
+                continue
+            }
+
             if (isTitan2Layout) {
                 // Ortholinear layout for Titan 2
                 when (rowIndex) {
@@ -2291,7 +2334,7 @@ class StatusBarController(
     }
 
     private fun openSymCustomization(page: Int, keyCode: Int?, openPicker: Boolean) {
-		val prefs = SettingsManager.getPreferences(context)
+        val prefs = SettingsManager.getPreferences(context)
         val currentSymPage = prefs.getInt("current_sym_page", 0)
         if (currentSymPage > 0) {
             SettingsManager.setPendingRestoreSymPage(context, currentSymPage)
@@ -2498,7 +2541,7 @@ class StatusBarController(
         }
     }
 
-    private fun createKeyboardSelectionButton(height: Int, width: Int): View {
+    private fun createKeyboardSelectionButton(height: Int, width: Int, page: Int? = null): View {
         val theme = activeThemeColors()
         val button = FrameLayout(context).apply {
             layoutParams = LinearLayout.LayoutParams(width, height)
@@ -2520,6 +2563,11 @@ class StatusBarController(
             val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
             imm?.showInputMethodPicker()
         }
+        if (page != null)
+            button.setOnLongClickListener {
+                openSymCustomization(page = page, keyCode = null, openPicker = false)
+                true
+            }
         return button
     }
 
@@ -2651,7 +2699,8 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", android.view.KeyEvent.KEYCODE_0 to "0", 
+            android.view.KeyEvent.KEYCODE_GRAVE to "$"
         )
         val label = keyLabels[keyCode] ?: ""
         val content = symMappings[keyCode] ?: ""
@@ -2706,18 +2755,31 @@ class StatusBarController(
         }
         
         // Definizione delle righe della tastiera (stessa struttura della tastiera reale)
-        val keyboardRows = listOf(
-            listOf(android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E, 
-                   android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y, 
-                   android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O, 
-                   android.view.KeyEvent.KEYCODE_P),
-            listOf(android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D, 
-                   android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H, 
-                   android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L),
-            listOf(android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C, 
-                   android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N, 
-                   android.view.KeyEvent.KEYCODE_M)
+        val keyboardRow0 = listOf(
+            android.view.KeyEvent.KEYCODE_Q, android.view.KeyEvent.KEYCODE_W, android.view.KeyEvent.KEYCODE_E,
+            android.view.KeyEvent.KEYCODE_R, android.view.KeyEvent.KEYCODE_T, android.view.KeyEvent.KEYCODE_Y,
+            android.view.KeyEvent.KEYCODE_U, android.view.KeyEvent.KEYCODE_I, android.view.KeyEvent.KEYCODE_O,
+            android.view.KeyEvent.KEYCODE_P
         )
+        val keyboardRow1 = listOf(
+            android.view.KeyEvent.KEYCODE_A, android.view.KeyEvent.KEYCODE_S, android.view.KeyEvent.KEYCODE_D,
+            android.view.KeyEvent.KEYCODE_F, android.view.KeyEvent.KEYCODE_G, android.view.KeyEvent.KEYCODE_H,
+            android.view.KeyEvent.KEYCODE_J, android.view.KeyEvent.KEYCODE_K, android.view.KeyEvent.KEYCODE_L
+        )
+        val keyboardRow2default = listOf(
+            android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X, android.view.KeyEvent.KEYCODE_C,
+            android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B, android.view.KeyEvent.KEYCODE_N,
+            android.view.KeyEvent.KEYCODE_M
+        )
+        val keyboardRow2bb = listOf(
+            android.view.KeyEvent.KEYCODE_0, android.view.KeyEvent.KEYCODE_Z, android.view.KeyEvent.KEYCODE_X,
+            android.view.KeyEvent.KEYCODE_C, android.view.KeyEvent.KEYCODE_V, android.view.KeyEvent.KEYCODE_B,
+            android.view.KeyEvent.KEYCODE_N, android.view.KeyEvent.KEYCODE_M, android.view.KeyEvent.KEYCODE_GRAVE
+        )
+        val keyboardRowsDefault = listOf(keyboardRow0, keyboardRow1, keyboardRow2default)
+        val keyboardRowsBlackberry = listOf(keyboardRow0, keyboardRow1, keyboardRow2bb)
+        val isBlackberry = DeviceSpecific.hasBlackberryKeyboard()
+        val keyboardRows = if (isBlackberry) keyboardRowsBlackberry else keyboardRowsDefault
         
         val keyLabels = mapOf(
             android.view.KeyEvent.KEYCODE_Q to "Q", android.view.KeyEvent.KEYCODE_W to "W", android.view.KeyEvent.KEYCODE_E to "E",
@@ -2728,7 +2790,8 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", android.view.KeyEvent.KEYCODE_0 to "0", 
+            android.view.KeyEvent.KEYCODE_GRAVE to "$"
         )
         
         val keySpacing = TypedValue.applyDimension(
@@ -2905,7 +2968,8 @@ class StatusBarController(
             android.view.KeyEvent.KEYCODE_H to "H", android.view.KeyEvent.KEYCODE_J to "J", android.view.KeyEvent.KEYCODE_K to "K",
             android.view.KeyEvent.KEYCODE_L to "L", android.view.KeyEvent.KEYCODE_Z to "Z", android.view.KeyEvent.KEYCODE_X to "X",
             android.view.KeyEvent.KEYCODE_C to "C", android.view.KeyEvent.KEYCODE_V to "V", android.view.KeyEvent.KEYCODE_B to "B",
-            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M"
+            android.view.KeyEvent.KEYCODE_N to "N", android.view.KeyEvent.KEYCODE_M to "M", android.view.KeyEvent.KEYCODE_0 to "0", 
+            android.view.KeyEvent.KEYCODE_GRAVE to "$"
         )
         val label = keyLabels[keyCode] ?: ""
         val emoji = symMappings[keyCode] ?: ""

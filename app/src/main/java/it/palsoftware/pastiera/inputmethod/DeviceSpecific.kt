@@ -637,6 +637,10 @@ object DeviceSpecific {
         return currentDeviceProfile().physicalLayoutName
     }
 
+    fun hasBlackberryKeyboard(): Boolean {
+        return currentDeviceProfile().family == KeyboardFamily.BLACKBERRY
+    }
+
     fun isTitan2Device(): Boolean {
         return when (currentDeviceProfile().model) {
             KeyboardModel.TITAN_2,
