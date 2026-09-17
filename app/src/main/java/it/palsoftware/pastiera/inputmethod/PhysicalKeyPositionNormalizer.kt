@@ -10,6 +10,7 @@ import android.view.KeyEvent
  */
 internal object PhysicalKeyPositionNormalizer {
     fun canonicalAlphabeticKeyCode(scanCode: Int): Int? = when (scanCode) {
+        11 -> KeyEvent.KEYCODE_0
         16 -> KeyEvent.KEYCODE_Q
         17 -> KeyEvent.KEYCODE_W
         18 -> KeyEvent.KEYCODE_E
@@ -29,6 +30,7 @@ internal object PhysicalKeyPositionNormalizer {
         36 -> KeyEvent.KEYCODE_J
         37 -> KeyEvent.KEYCODE_K
         38 -> KeyEvent.KEYCODE_L
+        41 -> KeyEvent.KEYCODE_GRAVE
         44 -> KeyEvent.KEYCODE_Z
         45 -> KeyEvent.KEYCODE_X
         46 -> KeyEvent.KEYCODE_C

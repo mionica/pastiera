@@ -177,6 +177,8 @@ class MainActivity : LocalizedComponentActivity() {
             KeyEvent.KEYCODE_B -> "KEYCODE_B"
             KeyEvent.KEYCODE_N -> "KEYCODE_N"
             KeyEvent.KEYCODE_M -> "KEYCODE_M"
+            KeyEvent.KEYCODE_0 -> "KEYCODE_0"
+            KeyEvent.KEYCODE_GRAVE -> "KEYCODE_$"
             KeyEvent.KEYCODE_SPACE -> "KEYCODE_SPACE"
             KeyEvent.KEYCODE_ENTER -> "KEYCODE_ENTER"
             KeyEvent.KEYCODE_DEL -> "KEYCODE_DEL"

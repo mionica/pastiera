@@ -212,6 +212,8 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> 'B'
             KeyEvent.KEYCODE_N -> 'N'
             KeyEvent.KEYCODE_M -> 'M'
+            KeyEvent.KEYCODE_0 -> '0'
+            KeyEvent.KEYCODE_GRAVE -> '$'
             else -> null
         }
     }
@@ -291,6 +293,8 @@ private fun LauncherShortcutAssignmentBottomSheet(
             KeyEvent.KEYCODE_B -> "B"
             KeyEvent.KEYCODE_N -> "N"
             KeyEvent.KEYCODE_M -> "M"
+            KeyEvent.KEYCODE_0 -> "0"
+            KeyEvent.KEYCODE_GRAVE -> "$"
             KeyEvent.KEYCODE_DEL -> "⌫"
             KeyEvent.KEYCODE_SPACE -> "␣"
             KeyEvent.KEYCODE_ENTER -> "⏎"

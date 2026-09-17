@@ -868,6 +868,8 @@ private fun getKeyLabel(keyCode: Int): String {
         KeyEvent.KEYCODE_B -> "B"
         KeyEvent.KEYCODE_N -> "N"
         KeyEvent.KEYCODE_M -> "M"
+        KeyEvent.KEYCODE_0 -> "0"
+        KeyEvent.KEYCODE_GRAVE -> "$"
         else -> stringResource(R.string.nav_mode_key_unknown)
     }
 }
@@ -962,7 +964,7 @@ private fun loadAllKeyMappings(context: Context, useDefaults: Boolean = false): 
         KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
         KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_Z,
         KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
-        KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M
+        KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_GRAVE
     )
 
     val loadedMappings = try {
@@ -993,7 +995,7 @@ private fun loadLayoutHints(context: Context): Map<Int, String> {
         KeyEvent.KEYCODE_D, KeyEvent.KEYCODE_F, KeyEvent.KEYCODE_G, KeyEvent.KEYCODE_H,
         KeyEvent.KEYCODE_J, KeyEvent.KEYCODE_K, KeyEvent.KEYCODE_L, KeyEvent.KEYCODE_Z,
         KeyEvent.KEYCODE_X, KeyEvent.KEYCODE_C, KeyEvent.KEYCODE_V, KeyEvent.KEYCODE_B,
-        KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M
+        KeyEvent.KEYCODE_N, KeyEvent.KEYCODE_M, KeyEvent.KEYCODE_0, KeyEvent.KEYCODE_GRAVE
     )
 
     return allAlphabeticKeys.mapNotNull { keyCode ->
@@ -1037,6 +1039,8 @@ private fun keyCodeToLetter(keyCode: Int): String? {
         KeyEvent.KEYCODE_B -> "B"
         KeyEvent.KEYCODE_N -> "N"
         KeyEvent.KEYCODE_M -> "M"
+        KeyEvent.KEYCODE_0 -> "0"
+        KeyEvent.KEYCODE_GRAVE -> "$"
         else -> null
     }
 }

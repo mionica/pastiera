@@ -64,14 +64,14 @@ internal object SoftwareKeyboardSymLabels {
         'w' -> KeyEvent.KEYCODE_W
         'e' -> KeyEvent.KEYCODE_E
         'r' -> KeyEvent.KEYCODE_R
-        't' -> KeyEvent.KEYCODE_T
+        't', 'ț' -> KeyEvent.KEYCODE_T
         'y' -> KeyEvent.KEYCODE_Y
         'u', 'ü', 'ù' -> KeyEvent.KEYCODE_U
-        'i' -> KeyEvent.KEYCODE_I
+        'i', 'î' -> KeyEvent.KEYCODE_I
         'o', 'ö' -> KeyEvent.KEYCODE_O
         'p' -> KeyEvent.KEYCODE_P
-        'a', 'ä' -> KeyEvent.KEYCODE_A
-        's' -> KeyEvent.KEYCODE_S
+        'a', 'ä', 'ă', 'â' -> KeyEvent.KEYCODE_A
+        's', 'ș' -> KeyEvent.KEYCODE_S
         'd' -> KeyEvent.KEYCODE_D
         'f' -> KeyEvent.KEYCODE_F
         'g' -> KeyEvent.KEYCODE_G
@@ -86,6 +86,8 @@ internal object SoftwareKeyboardSymLabels {
         'b' -> KeyEvent.KEYCODE_B
         'n' -> KeyEvent.KEYCODE_N
         'm' -> KeyEvent.KEYCODE_M
+        '0' -> KeyEvent.KEYCODE_0
+        '$' -> KeyEvent.KEYCODE_GRAVE
         ',' -> KeyEvent.KEYCODE_COMMA
         '.' -> KeyEvent.KEYCODE_PERIOD
         else -> null

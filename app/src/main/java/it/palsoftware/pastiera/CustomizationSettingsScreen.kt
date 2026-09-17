@@ -2044,6 +2044,8 @@ private fun keyLabel(keyCode: Int): String {
         KeyEvent.KEYCODE_X -> "X"
         KeyEvent.KEYCODE_Y -> "Y"
         KeyEvent.KEYCODE_Z -> "Z"
+        KeyEvent.KEYCODE_0 -> "0"
+        KeyEvent.KEYCODE_GRAVE -> "$"
         else -> keyCode.toString()
     }
 }
