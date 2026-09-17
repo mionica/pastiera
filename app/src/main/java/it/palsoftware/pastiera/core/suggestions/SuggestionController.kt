@@ -149,7 +149,7 @@ class SuggestionController(
         schedulePrimaryDictionaryLoad(refreshAfterLoad = true)
         
         // Reset tracker and clear suggestions
-        previousCompletedWord = null
+        resetWordContext()
         sentenceStartPending = true
         tracker.reset()
         suggestionsListener?.invoke(emptyList())
@@ -174,6 +174,10 @@ class SuggestionController(
     private val cursorDebounceMs = 120L
     private var pendingAddUserWord: String? = null
     private var previousCompletedWord: String? = null
+    // The word completed immediately before previousCompletedWord. Together the two give up to
+    // a two-word rolling context for trigram-aware next-word prediction; reset alongside
+    // previousCompletedWord at every sentence boundary/context change (see resetWordContext()).
+    private var secondPreviousCompletedWord: String? = null
     private var pendingInitialContextConnection: InputConnection? = null
     @Volatile private var pendingPrimaryRefreshAfterLoad: Boolean = false
     @Volatile private var pendingExtraRefreshAfterLoad: Boolean = false
@@ -185,6 +189,22 @@ class SuggestionController(
         suggestionJob?.cancel()
         suggestionJob = null
     }
+
+    /** Clears the rolling word context (used on sentence boundaries / cursor jumps / resets). */
+    private fun resetWordContext() {
+        previousCompletedWord = null
+        secondPreviousCompletedWord = null
+    }
+
+    /** Shifts the rolling context forward by one completed word. */
+    private fun advanceWordContext(newWord: String) {
+        secondPreviousCompletedWord = previousCompletedWord
+        previousCompletedWord = newWord
+    }
+
+    /** Up to the last two completed words, oldest first - the context fed to next-word prediction. */
+    private fun recentContextWords(): List<String> =
+        listOfNotNull(secondPreviousCompletedWord, previousCompletedWord)
 
     private fun updateSuggestionsForWord(word: String) {
         val settings = settingsProvider()
@@ -207,6 +227,7 @@ class SuggestionController(
         val localeSnapshot = currentLocale
         val layoutSnapshot = keyboardLayoutProvider()
         val primaryRepository = dictionaryRepository
+        val extraLocalesSnapshot = activeExtraLocales()
         val extraRepositories = activeExtraSuggestionEngines().mapNotNull { extra ->
             if (!extra.repository.isReady) {
                 scheduleRepositoryLoad(extra.repository, refreshAfterLoad = true)
@@ -215,6 +236,10 @@ class SuggestionController(
                 extra.locale to extra.repository
             }
         }
+        // Snapshot the rolling context now: by the time the coroutine below finishes, the user
+        // may have kept typing and previousCompletedWord/secondPreviousCompletedWord could have
+        // moved on.
+        val contextSnapshot = recentContextWords()
 
         suggestionJob = suggestionScope.launch {
             val primary = if (primaryRepository.isReady) {
@@ -243,7 +268,35 @@ class SuggestionController(
                 )
             }
 
-            val next = mergeSuggestionResults(primary, extraSuggestions, settings.maxSuggestions, localeSnapshot)
+            val dictionarySuggestions =
+                mergeSuggestionResults(primary, extraSuggestions, settings.maxSuggestions, localeSnapshot)
+
+            // Ask the next-word predictor for candidates given the preceding 1-2 completed
+            // words that also happen to start with what's typed so far. This is what lets a
+            // single letter or two resolve straight to the contextually-likely word (e.g. after
+            // "I want to " typing "b" surfaces "buy" ahead of a generic "bar"/"be") instead of
+            // suggestions only reflecting raw dictionary frequency while a word is in progress.
+            val contextMatches = if (contextSnapshot.isNotEmpty()) {
+                val primaryContext = nextWordPredictor.predictMatchingPrefix(
+                    localeSnapshot,
+                    contextSnapshot,
+                    wordSnapshot,
+                    settings.maxSuggestions
+                )
+                val extraContext = extraLocalesSnapshot.flatMap { locale ->
+                    nextWordPredictor.predictMatchingPrefix(locale, contextSnapshot, wordSnapshot, settings.maxSuggestions)
+                }
+                mergeSuggestionResults(primaryContext, extraContext, settings.maxSuggestions, localeSnapshot)
+            } else {
+                emptyList()
+            }
+
+            val next = blendContextMatchesWithCurrentWord(
+                contextMatches,
+                dictionarySuggestions,
+                settings.maxSuggestions,
+                localeSnapshot
+            )
             val pendingCandidate = addWordCandidateFor(wordSnapshot, primaryRepository)
 
             cursorHandler.post {
@@ -255,6 +308,23 @@ class SuggestionController(
                 suggestionsListener?.invoke(next)
             }
         }
+    }
+
+    /**
+     * Puts context-predicted candidates (already filtered to match the typed prefix) first,
+     * then fills any remaining slots with ordinary dictionary completions - deduplicated so a
+     * word offered contextually isn't repeated as a plain completion.
+     */
+    private fun blendContextMatchesWithCurrentWord(
+        contextMatches: List<SuggestionResult>,
+        dictionarySuggestions: List<SuggestionResult>,
+        limit: Int,
+        locale: Locale
+    ): List<SuggestionResult> {
+        if (contextMatches.isEmpty()) return dictionarySuggestions.take(limit)
+        val seen = contextMatches.mapTo(HashSet()) { it.candidate.lowercase(locale) }
+        val fillers = dictionarySuggestions.filter { seen.add(it.candidate.lowercase(locale)) }
+        return (contextMatches + fillers).take(limit)
     }
 
     private fun addWordCandidateFor(word: String?, repository: DictionaryRepository = dictionaryRepository): String? {
@@ -372,7 +442,7 @@ class SuggestionController(
         cursorRunnable?.let { cursorHandler.removeCallbacks(it) }
         if (inputConnection == null) {
             tracker.reset()
-            previousCompletedWord = null
+            resetWordContext()
             sentenceStartPending = true
             suggestionsListener?.invoke(emptyList())
             return
@@ -380,7 +450,7 @@ class SuggestionController(
         cursorRunnable = Runnable {
             if (!dictionaryRepository.isReady) {
                 tracker.reset()
-                previousCompletedWord = null
+                resetWordContext()
                 suggestionsListener?.invoke(emptyList())
                 return@Runnable
             }
@@ -392,9 +462,9 @@ class SuggestionController(
                 val previous = previousCompletedWord
                 val lastChar = lastCharBeforeCursor(inputConnection)
                 if (previous != null && isSoftPredictionBoundary(lastChar)) {
-                    publishNextWordPredictions(previous)
+                    publishNextWordPredictions(recentContextWords())
                 } else {
-                    previousCompletedWord = null
+                    resetWordContext()
                     sentenceStartPending = true
                     publishSentenceStartPredictions()
                 }
@@ -407,7 +477,7 @@ class SuggestionController(
         if (!isEnabled()) return
         tracker.onContextChanged()
         pendingAddUserWord = null
-        previousCompletedWord = null
+        resetWordContext()
         sentenceStartPending = true
         suggestionsListener?.invoke(emptyList())
     }
@@ -415,7 +485,7 @@ class SuggestionController(
     fun onNavModeToggle() {
         if (!isEnabled()) return
         tracker.onContextChanged()
-        previousCompletedWord = null
+        resetWordContext()
         sentenceStartPending = true
     }
 
@@ -498,9 +568,9 @@ class SuggestionController(
             if (hardDeleteEverywhere) {
                 nextWordPredictor.forgetNextWordEverywhere(locale, candidate)
             } else {
-                val previous = previousCompletedWord
-                if (previous != null) {
-                    nextWordPredictor.forget(locale, previous, candidate)
+                val context = recentContextWords()
+                if (context.isNotEmpty()) {
+                    nextWordPredictor.forget(locale, context, candidate)
                 } else {
                     nextWordPredictor.forgetSentenceStart(locale, candidate)
                 }
@@ -541,7 +611,7 @@ class SuggestionController(
 
     internal fun clearLearnedNextWordsForTests() {
         nextWordPredictor.clearAll()
-        previousCompletedWord = null
+        resetWordContext()
     }
 
     internal fun flushNextWordLearningForTests() {
@@ -558,7 +628,7 @@ class SuggestionController(
     private fun handleCompletedWordBoundary(completedWord: String?, boundaryChar: Char?) {
         val settings = settingsProvider()
         if (!settings.suggestionsEnabled) {
-            previousCompletedWord = null
+            resetWordContext()
             latestSuggestions.set(emptyList())
             suggestionsListener?.invoke(emptyList())
             return
@@ -569,28 +639,29 @@ class SuggestionController(
             if (sentenceStartPending) {
                 nextWordPredictor.learnSentenceStart(currentLocale, cleanWord)
             }
-            previousCompletedWord?.let { previous ->
-                nextWordPredictor.learn(currentLocale, previous, cleanWord)
+            val contextBeforeThisWord = recentContextWords()
+            if (contextBeforeThisWord.isNotEmpty()) {
+                nextWordPredictor.learn(currentLocale, contextBeforeThisWord, cleanWord)
             }
         }
 
         when {
             cleanWord != null && isSoftPredictionBoundary(boundaryChar) -> {
-                previousCompletedWord = cleanWord
+                advanceWordContext(cleanWord)
                 sentenceStartPending = false
-                publishNextWordPredictions(cleanWord)
+                publishNextWordPredictions(recentContextWords())
             }
             cleanWord == null && isSoftPredictionBoundary(boundaryChar) -> {
-                val previous = previousCompletedWord
-                if (previous != null) {
-                    publishNextWordPredictions(previous)
+                val context = recentContextWords()
+                if (context.isNotEmpty()) {
+                    publishNextWordPredictions(context)
                 } else {
                     latestSuggestions.set(emptyList())
                     suggestionsListener?.invoke(emptyList())
                 }
             }
             else -> {
-                previousCompletedWord = null
+                resetWordContext()
                 sentenceStartPending = true
                 latestSuggestions.set(emptyList())
                 suggestionsListener?.invoke(emptyList())
