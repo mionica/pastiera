@@ -2,6 +2,7 @@ package it.palsoftware.pastiera
 
 import android.content.Context
 import android.net.Uri
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import java.text.Normalizer
 
 /**
@@ -421,8 +422,14 @@ object SettingLinkRegistry {
         ),
         entry(
             SettingLinkIds.TEXT_INPUT_ALT_CTRL_SPEECH_SHORTCUT,
-            R.string.alt_ctrl_speech_shortcut_title,
-            R.string.alt_ctrl_speech_shortcut_description,
+            if (! DeviceSpecific.hasBlackberryKeyboard())
+                R.string.alt_ctrl_speech_shortcut_title
+            else
+                R.string.alt_zero_speech_shortcut_title,
+            if (! DeviceSpecific.hasBlackberryKeyboard())
+                R.string.alt_ctrl_speech_shortcut_description
+            else
+                R.string.alt_zero_speech_shortcut_description,
             destination = SettingsDestination.TextInput
         ),
         entry(

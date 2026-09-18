@@ -33,7 +33,9 @@
     <string name="swipe_incremental_threshold_description">Відстань для переміщення курсора на одну позицію. Менші числа прискорюють курсор.</string>
     <string name="auto_show_keyboard_title">Автопоказ клавіатури</string>
     <string name="alt_ctrl_speech_shortcut_title">Розпізнавання мовлення Alt+Ctrl</string>
+    <string name="alt_zero_speech_shortcut_title">Розпізнавання мовлення Alt+0</string>
     <string name="alt_ctrl_speech_shortcut_description">Увімкнути комбінацію Alt+Ctrl для запуску розпізнавання мовлення</string>
+    <string name="alt_zero_speech_shortcut_description">Увімкнути комбінацію Alt+0 для запуску розпізнавання мовлення</string>
     <string name="static_variation_bar_mode_title">Статична панель варіацій</string>
     <string name="static_variation_bar_mode_description">Завжди показувати фіксований набір утиліт замість контекстних варіацій.</string>
     <string name="swipe_to_move_cursor">Свайп для переміщення курсора</string>

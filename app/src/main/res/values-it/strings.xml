@@ -64,7 +64,9 @@
 
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Riconoscimento vocale Alt+Ctrl</string>
+    <string name="alt_zero_speech_shortcut_title">Riconoscimento vocale Alt+0</string>
     <string name="alt_ctrl_speech_shortcut_description">Abilita la scorciatoia da tastiera Alt+Ctrl per avviare il riconoscimento vocale</string>
+    <string name="alt_zero_speech_shortcut_description">Abilita la scorciatoia da tastiera Alt+0 per avviare il riconoscimento vocale</string>
 
     <!-- Static Variation Bar Mode -->
     <string name="static_variation_preset_title">Preset variazione statica</string>

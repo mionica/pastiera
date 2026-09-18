@@ -24,7 +24,9 @@
     <string name="swipe_to_move_cursor">Սվայփ՝ կուրսորը տեղափոխելու համար</string>
     <string name="auto_show_keyboard_title">Ավտոմատ ցույց տալ ստեղնաշարը</string>
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl խոսքի ճանաչում</string>
+    <string name="alt_zero_speech_shortcut_title">Alt+0 խոսքի ճանաչում</string>
     <string name="alt_ctrl_speech_shortcut_description">Միացնել Alt+Ctrl դյուրանցումը՝ խոսքի ճանաչումը սկսելու համար</string>
+    <string name="alt_zero_speech_shortcut_description">Միացնել Alt+0 դյուրանցումը՝ խոսքի ճանաչումը սկսելու համար</string>
     <string name="info_title">Տեղեկատվություն</string>
     <string name="info_description">Կարգավորումները ավտոմատ պահվում և կիրառվում են անմիջապես։</string>
     <string name="keyboard_subtitle">Ֆիզիկական ստեղնաշար երկար սեղմման աջակցությամբ</string>

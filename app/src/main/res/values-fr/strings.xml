@@ -180,7 +180,9 @@
     <string name="notification_nav_mode_activated_title">Mode Nav Activé</string>
     <string name="notification_nav_mode_activated_text">Mode nav activé</string>
     <string name="alt_ctrl_speech_shortcut_title">Reconnaissance vocale Alt+Ctrl</string>
+    <string name="alt_zero_speech_shortcut_title">Reconnaissance vocale Alt+0</string>
     <string name="alt_ctrl_speech_shortcut_description">Activer le raccourci clavier Alt+Ctrl pour lancer la reconnaissance vocale</string>
+    <string name="alt_zero_speech_shortcut_description">Activer le raccourci clavier Alt+0 pour lancer la reconnaissance vocale</string>
     <string name="speech_recognition_prompt">Parlez maintenant…</string>
     <string name="auto_correct_search_placeholder">Rechercher des corrections…</string>
     <string name="auto_correct_search_description">Rechercher</string>

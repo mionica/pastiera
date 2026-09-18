@@ -4558,6 +4558,24 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
             return true
         }
 
+        // Blackberry keyboards trigger voice input on Alt-0
+        // but only do this if the speech shortcut is enabled
+        if (
+            hasEditableField &&
+            DeviceSpecific.hasBlackberryKeyboard() &&
+            keyCode == KeyEvent.KEYCODE_0 &&
+            event?.repeatCount == 0 &&
+            altActiveForDedicatedKeys
+        ) {
+            // if the shortcut is enabled, trigger speech recognition
+            if (SettingsManager.getAltCtrlSpeechShortcutEnabled(this))
+                startSpeechRecognition()
+            // otherwise, disable Alt so we'd get a normal 0
+            else
+                currentInputConnection?.commitText("0", 1)
+            return true
+        }
+
         if (
             hasEditableField &&
             (symTogglePendingOnKeyUp || event?.isSymPressed == true) &&
@@ -5030,7 +5048,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService(), ClicksAccessibi
                 callSuperWithKey = { defaultKeyCode, defaultEvent ->
                     super.onKeyDown(defaultKeyCode, defaultEvent)
                 },
-                startSpeechRecognition = { startSpeechRecognition() },
+                // speech recognition is triggered by Alt-0 on Blackberry keyboards (already handled)
+                // so only leave that callback for non-blackberry devices
+                startSpeechRecognition = { if (! DeviceSpecific.hasBlackberryKeyboard()) startSpeechRecognition() },
                 getMapping = { code -> LayoutMappingRepository.getMapping(code) },
                 handleMultiTapCommit = { code, mapping, uppercase, inputConnection, allowLongPress ->
                     handleMultiTapCommit(code, mapping, uppercase, inputConnection, allowLongPress)
