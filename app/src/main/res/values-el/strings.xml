@@ -1669,6 +1669,11 @@ QWERTZ σε φυσικό QWERTY
     <string name="settings_link_copied_toast">Ο σύνδεσμος αντιγράφηκε</string>
     <string name="settings_link_unavailable_toast">Αυτή η ρύθμιση δεν είναι διαθέσιμη</string>
 
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Ανοιχτή ακρόαση ενεργοποιημένη</string>
+    <string name="speaker_toggle_off">Ανοιχτή ακρόαση απενεργοποιημένη</string>
+    <string name="speaker_toggle_not_in_call">Δεν βρίσκομαι σε κλήση</string>
+
     <!-- Invisible search keywords per settings entry; never rendered, only
          consumed by the settings search. -->
     <string name="kw_main_keyboards_devices">πληκτρολόγια, συσκευές, hardware, bluetooth, φυσικό πληκτρολόγιο, keyboards, devices, physical keyboard, clicks</string>

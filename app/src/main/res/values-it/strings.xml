@@ -998,6 +998,11 @@ Ogni tasto può essere configurato come Keycode, Azione, Native Ctrl o Nessuno. 
     <string name="keyboard_theme_wizard_leds">Colori LED</string>
     <string name="keyboard_theme_wizard_leds_description">Scegli i colori degli indicatori dei modificatori inattivi, attivi e bloccati.</string>
 
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Altoparlante ATTIVO</string>
+    <string name="speaker_toggle_off">Altoparlante DISATTIVO</string>
+    <string name="speaker_toggle_not_in_call">Non in chiamata</string>
+
     <!-- Parole chiave di ricerca invisibili per voce di impostazione; mai
          renderizzate, usate solo dalla ricerca delle impostazioni. -->
     <string name="kw_main_keyboards_devices">tastiere, dispositivi, hardware, bluetooth, tastiera fisica, clicks</string>

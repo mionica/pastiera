@@ -1677,6 +1677,11 @@ Each key can be configured as Keycode, Action, Native Ctrl, or None. Use overrid
     <string name="settings_link_copied_toast">Link copied</string>
     <string name="settings_link_unavailable_toast">This setting is not available</string>
 
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Speaker On</string>
+    <string name="speaker_toggle_off">Speaker off</string>
+    <string name="speaker_toggle_not_in_call">Not in a call</string>
+
     <!-- Invisible search keywords per settings entry; never rendered, only
          consumed by the settings search. -->
     <string name="kw_main_keyboards_devices">keyboards, devices, hardware, bluetooth, physical keyboard, clicks</string>

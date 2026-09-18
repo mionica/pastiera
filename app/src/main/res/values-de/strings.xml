@@ -1367,6 +1367,11 @@ Jede Taste kann als Keycode, Aktion, Native Ctrl oder Keine konfiguriert werden.
     <string name="keyboard_theme_wizard_leds">LED-Farben</string>
     <string name="keyboard_theme_wizard_leds_description">Wähle die Farben für inaktive, aktive und gesperrte Modifier-Anzeigen.</string>
 
+    <!-- Speaker Toggle -->
+    <string name="speaker_toggle_on">Lautsprecher EIN</string>
+    <string name="speaker_toggle_off">Lautsprecher AUS</string>
+    <string name="speaker_toggle_not_in_call">Nicht im Anruf</string>
+
     <!-- Unsichtbare Such-Keywords pro Einstellungseintrag; werden nie angezeigt,
          sondern nur von der Einstellungssuche genutzt. -->
     <string name="kw_main_keyboards_devices">Tastaturen, Geräte, Hardware, Bluetooth, physische Tastatur, Clicks</string>

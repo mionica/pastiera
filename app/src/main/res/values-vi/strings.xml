@@ -856,6 +856,9 @@ Mỗi phím có thể cấu hình là Keycode, Action, Native Ctrl hoặc None. 
     <string name="dynamic_variation_resize_to_content_description">Khi bật, các mục động lấp đầy hàng còn trống dựa trên số mục đang hiển thị. Khi tắt, chúng giữ kích thước ô từ thanh trượt và căn trái.</string>
     <string name="keyboard_theme_tab_colors">Màu sắc</string>
     <string name="keyboard_theme_tab_keys">Phím</string>
+    <string name="speaker_toggle_on">Loa đang bật</string>
+    <string name="speaker_toggle_off">Loa đã tắt</string>
+    <string name="speaker_toggle_not_in_call">Không phải trong cuộc gọi</string>
 
     <string name="settings_search_hint">Tìm trong cài đặt</string>
     <string name="settings_search_no_results">Không có cài đặt phù hợp</string>

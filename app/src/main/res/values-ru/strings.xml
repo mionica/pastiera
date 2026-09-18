@@ -856,6 +856,9 @@ Nav Mode использует физическое положение клави
     <string name="dynamic_variation_resize_to_content_description">Если включено, динамические элементы заполняют доступную строку в зависимости от их количества. Если выключено, они сохраняют размер слота из ползунка и остаются выровненными слева.</string>
     <string name="keyboard_theme_tab_colors">Цвета</string>
     <string name="keyboard_theme_tab_keys">Клавиши</string>
+    <string name="speaker_toggle_on">Громкоговоритель включен</string>
+    <string name="speaker_toggle_off">Громкоговоритель выключен</string>
+    <string name="speaker_toggle_not_in_call">Не в ходе звонка</string>
 
     <string name="settings_search_hint">Поиск по настройкам</string>
     <string name="settings_search_no_results">Нет подходящих настроек</string>
