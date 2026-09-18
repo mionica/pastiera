@@ -641,6 +641,10 @@ object DeviceSpecific {
         return currentDeviceProfile().family == KeyboardFamily.BLACKBERRY
     }
 
+    fun hasUnihertzKeyboard(): Boolean {
+        return currentDeviceProfile().family == KeyboardFamily.UNIHERTZ
+    }
+
     fun isTitan2Device(): Boolean {
         return when (currentDeviceProfile().model) {
             KeyboardModel.TITAN_2,
