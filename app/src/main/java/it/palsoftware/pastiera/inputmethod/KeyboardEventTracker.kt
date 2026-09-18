@@ -196,7 +196,13 @@ object KeyboardEventTracker {
             KeyEvent.KEYCODE_PAGE_DOWN -> "PAGE_DOWN"
             KeyEvent.KEYCODE_ESCAPE -> "ESCAPE"
             KeyEvent.KEYCODE_FORWARD_DEL -> "FORWARD_DEL"
-            63 -> "KEYCODE_SYM"
+            KeyEvent.KEYCODE_ALT_LEFT -> "KEYCODE_ALT"
+            KeyEvent.KEYCODE_ALT_RIGHT -> "KEYCODE_ALT"
+            KeyEvent.KEYCODE_SHIFT_LEFT -> "KEYCODE_SHIFT"
+            KeyEvent.KEYCODE_SHIFT_RIGHT -> "KEYCODE_SHIFT"
+            KeyEvent.KEYCODE_CTRL_LEFT -> "KEYCODE_CTRL"
+            KeyEvent.KEYCODE_CTRL_RIGHT -> "KEYCODE_CTRL"
+            KeyEvent.KEYCODE_SYM -> "KEYCODE_SYM"
             else -> "KEYCODE_$keyCode"
         }
     }
