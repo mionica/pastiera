@@ -107,7 +107,9 @@
 
     <!-- Alt+Ctrl Speech Recognition Shortcut Section -->
     <string name="alt_ctrl_speech_shortcut_title">Alt+Ctrl για φωνητική εισαγωγή</string>
+    <string name="alt_zero_speech_shortcut_title">Alt+0 για φωνητική εισαγωγή</string>
     <string name="alt_ctrl_speech_shortcut_description">Ξεκινά φωνητική εισαγωγή με Alt+Ctrl.</string>
+    <string name="alt_zero_speech_shortcut_description">Ξεκινά φωνητική εισαγωγή με Alt+0.</string>
 
     <!-- Static Variation Bar Mode -->
     <string name="static_variation_bar_mode_title">Στατική γραμμή παραλλαγών</string>

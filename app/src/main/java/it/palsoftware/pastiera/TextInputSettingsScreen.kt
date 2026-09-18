@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.core.Punctuation
+import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 
 /**
  * Text Input settings screen.
@@ -499,8 +500,14 @@ fun TextInputSettingsScreen(
                 }
             )
             SettingsSwitchRow(
-                title = stringResource(R.string.alt_ctrl_speech_shortcut_title),
-                description = stringResource(R.string.alt_ctrl_speech_shortcut_description),
+                title = if (DeviceSpecific.hasBlackberryKeyboard())
+                          stringResource(R.string.alt_zero_speech_shortcut_title)
+                        else
+                          stringResource(R.string.alt_ctrl_speech_shortcut_title),
+                description = if (DeviceSpecific.hasBlackberryKeyboard())
+                                stringResource(R.string.alt_zero_speech_shortcut_description)
+                              else
+                                stringResource(R.string.alt_ctrl_speech_shortcut_description),
                 checked = altCtrlSpeechShortcut,
                 linkId = SettingLinkIds.TEXT_INPUT_ALT_CTRL_SPEECH_SHORTCUT,
                 onCheckedChange = { enabled ->

@@ -40,7 +40,9 @@
     <string name="swipe_incremental_threshold_description">Khoảng cách cần để di chuyển con trỏ một vị trí. Giá trị thấp làm con trỏ di chuyển nhanh hơn.</string>
     <string name="auto_show_keyboard_title">Tự động hiển thị bàn phím</string>
     <string name="alt_ctrl_speech_shortcut_title">Nhận dạng giọng nói Alt+Ctrl</string>
+    <string name="alt_zero_speech_shortcut_title">Nhận dạng giọng nói Alt+0</string>
     <string name="alt_ctrl_speech_shortcut_description">Bật phím tắt Alt+Ctrl để bắt đầu nhận dạng giọng nói</string>
+    <string name="alt_zero_speech_shortcut_description">Bật phím tắt Alt+0 để bắt đầu nhận dạng giọng nói</string>
     <string name="static_variation_bar_mode_title">Thanh biến thể tĩnh</string>
     <string name="static_variation_bar_mode_description">Luôn hiển thị một nhóm phím tiện ích cố định ở hàng biến thể thay vì biến thể theo ngữ cảnh.</string>
     <string name="static_variation_base_layer_title">Mẫu hàng trên thay thế</string>
