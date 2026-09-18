@@ -247,56 +247,64 @@ private fun HardwareKeyboardListScreen(
 
             HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_behavior_title))
 
-            HardwareKeyboardSwitchRow(
-                title = stringResource(R.string.titan2_layout_title),
-                linkId = "hardware.titan2_layout",
-                description = stringResource(R.string.titan2_layout_description),
-                checked = titan2LayoutEnabled,
-                onCheckedChange = { enabled ->
-                    titan2LayoutEnabled = enabled
-                    SettingsManager.setTitan2LayoutEnabled(context, enabled)
-                }
-            )
+            if (DeviceSpecific.hasUnihertzKeyboard()) {
+                HardwareKeyboardSwitchRow(
+                    title = stringResource(R.string.titan2_layout_title),
+                    linkId = "hardware.titan2_layout",
+                    description = stringResource(R.string.titan2_layout_description),
+                    checked = titan2LayoutEnabled,
+                    onCheckedChange = { enabled ->
+                        titan2LayoutEnabled = enabled
+                        SettingsManager.setTitan2LayoutEnabled(context, enabled)
+                    }
+                )
+            }
 
-            HardwareKeyboardSectionTitle(stringResource(R.string.keyboard_currency_symbol_title))
-            Text(
-                text = stringResource(R.string.keyboard_currency_symbol_description),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .settingRow("hardware.currency").padding(horizontal = 12.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                SettingsManager.physicalKeyboardCurrencySymbols().forEach { symbol ->
-                    Surface(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                currencySymbol = symbol
-                                SettingsManager.setPhysicalKeyboardCurrencySymbol(context, symbol)
-                            },
-                        color = if (currencySymbol == symbol) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surface
-                        },
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Text(
-                            text = symbol,
-                            style = MaterialTheme.typography.titleMedium,
+            if (DeviceSpecific.hasBlackberryKeyboard()) {
+                HardwareKeyboardSectionTitle(stringResource(R.string.keyboard_currency_symbol_title))
+                Text(
+                    text = stringResource(R.string.keyboard_currency_symbol_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .settingRow("hardware.currency")
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    SettingsManager.physicalKeyboardCurrencySymbols().forEach { symbol ->
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable {
+                                    currencySymbol = symbol
+                                    SettingsManager.setPhysicalKeyboardCurrencySymbol(
+                                        context,
+                                        symbol
+                                    )
+                                },
                             color = if (currencySymbol == symbol) {
-                                MaterialTheme.colorScheme.onPrimaryContainer
+                                MaterialTheme.colorScheme.primaryContainer
                             } else {
-                                MaterialTheme.colorScheme.onSurface
+                                MaterialTheme.colorScheme.surface
                             },
-                            modifier = Modifier.padding(vertical = 12.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
+                            shape = MaterialTheme.shapes.small
+                        ) {
+                            Text(
+                                text = symbol,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = if (currencySymbol == symbol) {
+                                    MaterialTheme.colorScheme.onPrimaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface
+                                },
+                                modifier = Modifier.padding(vertical = 12.dp),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
                     }
                 }
             }
