@@ -477,7 +477,7 @@ class StatusBarController(
     }
 
     private fun modifierLedLayout() = ModifierLedLayouts.resolve(
-        physicalProfileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(context),
+        physicalProfileOverride = "auto",
         titan2EliteAutoDetected = DeviceSpecific.isTitan2EliteDevice()
     )
 

@@ -9,10 +9,6 @@ import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 
 object DeviceSymProfileResolver {
     fun resolve(context: Context): String {
-        val manualOverride = SettingsManager.getPhysicalKeyboardProfileOverride(context)
-        if (manualOverride != "auto") {
-            return manualOverride
-        }
         DeviceSpecific.detectedInputProfiles()
             .firstOrNull { it.kind == DeviceSpecific.InputDeviceKind.ACCESSORY }
             ?.let { return it.profileId }

@@ -37,8 +37,7 @@ object DebugCaptureStore {
         val packageName: String?,
         val inputType: Int?,
         val subtypeLocale: String?,
-        val resolvedLayout: String?,
-        val physicalProfileOverride: String?
+        val resolvedLayout: String?
     )
 
     data class RawTrackpadEvent(
@@ -176,16 +175,14 @@ object DebugCaptureStore {
         packageName: String?,
         inputType: Int?,
         subtypeLocale: String?,
-        resolvedLayout: String?,
-        physicalProfileOverride: String?
+        resolvedLayout: String?
     ) {
         imeContextSnapshot = ImeContextSnapshot(
             timestampMs = System.currentTimeMillis(),
             packageName = packageName,
             inputType = inputType,
             subtypeLocale = subtypeLocale,
-            resolvedLayout = resolvedLayout,
-            physicalProfileOverride = physicalProfileOverride
+            resolvedLayout = resolvedLayout
         )
     }
 

@@ -93,8 +93,7 @@ class MainActivity : LocalizedComponentActivity() {
     private fun remapHardwareEvent(keyCode: Int, event: KeyEvent?): Pair<Int, KeyEvent?> {
         val remapped = DeviceSpecific.remapHardwareKeyEvent(
             keyCode,
-            event,
-            SettingsManager.getPhysicalKeyboardProfileOverride(this)
+            event
         )
         return remapped.keyCode to remapped.event
     }
@@ -1146,7 +1145,6 @@ private fun buildKeyboardDebugReport(
         }
         appendLine("physical_keyboard_name=${DeviceSpecific.physicalKeyboardName()}")
         appendLine("keyboard_family=${DeviceSpecific.keyboardName()}")
-        appendLine("profile_override=${SettingsManager.getPhysicalKeyboardProfileOverride(context)}")
         appendLine("resolved_physical_profile=$resolvedPhysicalProfile")
         appendLine()
         appendLine("[input_devices]")
@@ -1178,7 +1176,6 @@ private fun buildKeyboardDebugReport(
         appendLine("input_type=${imeContext?.inputType?.toString() ?: "n/a"}")
         appendLine("subtype_locale=${imeContext?.subtypeLocale ?: "n/a"}")
         appendLine("resolved_layout=${imeContext?.resolvedLayout ?: "n/a"}")
-        appendLine("profile_override_snapshot=${imeContext?.physicalProfileOverride ?: "n/a"}")
         appendLine("resolved_physical_profile_snapshot=$resolvedPhysicalProfile")
         appendLine()
         appendLine("[settings_snapshot]")

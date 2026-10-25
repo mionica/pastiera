@@ -89,7 +89,7 @@ private fun HardwareKeyboardListScreen(
 ) {
     val context = LocalContext.current
     var selectedProfile by remember {
-        mutableStateOf(SettingsManager.getPhysicalKeyboardProfileOverride(context))
+        mutableStateOf(null)
     }
     var profileMenuExpanded by remember { mutableStateOf(false) }
     var currencySymbol by remember {
@@ -171,50 +171,8 @@ private fun HardwareKeyboardListScreen(
 
             HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_curated_profiles_title))
 
-            val selectedProfileLabel = hardwareKeyboardProfiles
-                .firstOrNull { it.first == selectedProfile }
-                ?.let { stringResource(it.second) }
-                ?: stringResource(R.string.keyboard_profile_option_auto)
-            ExposedDropdownMenuBox(
-                expanded = profileMenuExpanded,
-                onExpandedChange = { profileMenuExpanded = it },
-                modifier = Modifier.settingRow("hardware.profile").padding(horizontal = 16.dp, vertical = 4.dp)
-            ) {
-                OutlinedTextField(
-                    value = selectedProfileLabel,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.hardware_keyboard_profile_select_label)) },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = profileMenuExpanded)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                )
-                ExposedDropdownMenu(
-                    expanded = profileMenuExpanded,
-                    onDismissRequest = { profileMenuExpanded = false }
-                ) {
-                    hardwareKeyboardProfiles.forEach { (profile, labelRes) ->
-                        DropdownMenuItem(
-                            text = { Text(stringResource(labelRes)) },
-                            onClick = {
-                                selectedProfile = profile
-                                SettingsManager.setPhysicalKeyboardProfileOverride(context, profile)
-                                profileMenuExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
             Text(
-                text = if (selectedProfile == "auto") {
-                    stringResource(R.string.keyboard_profile_override_auto_description, detectedProfile)
-                } else {
-                    stringResource(R.string.keyboard_profile_override_manual_description)
-                },
+                text = stringResource(R.string.keyboard_profile_override_auto_description, detectedProfile),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)

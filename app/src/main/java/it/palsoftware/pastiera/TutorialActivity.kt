@@ -976,10 +976,9 @@ private fun resolveSoftwareKeyboardAutoDetection(
     context: Context,
     configuredMode: SettingsManager.SoftwareKeyboardMode
 ): SoftwareKeyboardAutoDetection {
-    val profileOverride = SettingsManager.getPhysicalKeyboardProfileOverride(context)
     val physicalProfile = DeviceSpecific.physicalKeyboardName()
     val keyboardFamily = DeviceSpecific.keyboardName()
-    val isPhysicalKeyboardProfile = DeviceSpecific.isPhysicalKeyboardDevice(profileOverride)
+    val isPhysicalKeyboardProfile = DeviceSpecific.isPhysicalKeyboardDevice()
     val autoMode = SoftwareKeyboardAutoDetector.resolve(context)
     val effectiveMode = if (configuredMode == SettingsManager.SoftwareKeyboardMode.AUTO) {
         autoMode
@@ -1667,7 +1666,6 @@ private fun launcherShortcutLabel(shortcut: SettingsManager.LauncherShortcut?): 
 
 internal fun applyDevsChoiceSettings(context: Context) {
     SettingsManager.setAppLanguageTag(context, null)
-    SettingsManager.setPhysicalKeyboardProfileOverride(context, "auto")
     SettingsManager.setSoftwareKeyboardMode(context, SettingsManager.SoftwareKeyboardMode.AUTO)
     SettingsManager.setLongPressModifier(context, "variations")
     SettingsManager.setLongPressThreshold(context, 200L)

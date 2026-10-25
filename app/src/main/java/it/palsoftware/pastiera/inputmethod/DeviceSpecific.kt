@@ -93,10 +93,9 @@ object DeviceSpecific {
 
     fun remapHardwareKeyEvent(
         keyCode: Int,
-        event: KeyEvent?,
-        physicalProfileOverride: String? = null
+        event: KeyEvent?
     ): RemappedHardwareEvent {
-        val model = resolveKeyboardModel(event, physicalProfileOverride)
+        val model = resolveKeyboardModel(event)
         val positionNormalized = normalizePhysicalKeyPosition(model, keyCode, event)
         return when (model) {
             KeyboardModel.Q25 -> remapQ25KeyEvent(
@@ -127,10 +126,9 @@ object DeviceSpecific {
     // Backward-compatible API used by existing callers.
     fun remapKeyEvent(
         keyCode: Int,
-        event: KeyEvent?,
-        physicalProfileOverride: String? = null
+        event: KeyEvent?
     ): Pair<Int, KeyEvent?>? {
-        val remapped = remapHardwareKeyEvent(keyCode, event, physicalProfileOverride)
+        val remapped = remapHardwareKeyEvent(keyCode, event)
         if (remapped.keyCode == keyCode && remapped.event === event) {
             return null
         }
@@ -340,8 +338,8 @@ object DeviceSpecific {
 
     private fun currentDeviceProfile(): DeviceProfile = resolveDeviceProfile()
 
-    private fun keyboardModelForProfile(profileId: String?): KeyboardModel {
-        return when (normalizePhysicalProfileOverride(profileId)) {
+    private fun keyboardModelForProfile(): KeyboardModel {
+        return when (normalizePhysicalProfileOverride()) {
             "key2" -> KeyboardModel.KEY2
             "q25" -> KeyboardModel.Q25
             "titan2elite_qwerty" -> KeyboardModel.TITAN_2_ELITE_QWERTY
@@ -353,28 +351,23 @@ object DeviceSpecific {
     }
 
     private fun resolveKeyboardModel(
-        event: KeyEvent?,
-        physicalProfileOverride: String?
+        event: KeyEvent?
     ): KeyboardModel {
-        return keyboardModelForProfile(
-            resolveInputProfile(event, physicalProfileOverride).profileId
-        )
+        return keyboardModelForProfile()
     }
 
     fun resolveInputProfile(
-        event: KeyEvent?,
-        physicalProfileOverride: String? = null
+        event: KeyEvent?
     ): ResolvedInputProfile {
         val identity = event
             ?.takeIf { it.deviceId >= 0 }
             ?.let { InputDevice.getDevice(it.deviceId) }
             ?.let(::keyboardInputIdentity)
-        return resolveInputProfile(identity, physicalProfileOverride)
+        return resolveInputProfile(identity)
     }
 
     internal fun resolveInputProfile(
-        identity: KeyboardInputIdentity?,
-        physicalProfileOverride: String? = null
+        identity: KeyboardInputIdentity?
     ): ResolvedInputProfile {
         val kind = when {
             identity == null -> InputDeviceKind.UNKNOWN
@@ -382,7 +375,7 @@ object DeviceSpecific {
             else -> InputDeviceKind.BUILT_IN
         }
 
-        val manualProfile = normalizePhysicalProfileOverride(physicalProfileOverride)
+        val manualProfile = normalizePhysicalProfileOverride()
         if (manualProfile != null) {
             return ResolvedInputProfile(
                 profileId = manualProfile,
@@ -449,13 +442,8 @@ object DeviceSpecific {
             identity.keyboardType != InputDevice.KEYBOARD_TYPE_NONE
     }
 
-    private fun normalizePhysicalProfileOverride(physicalProfileOverride: String?): String? {
-        val normalized = physicalProfileOverride?.trim()?.lowercase().orEmpty()
-        return when (normalized) {
-            "", "auto" -> null
-            "key2", "q25", "titan", "titan2", "titan2elite_qwerty", "mp01" -> normalized
-            else -> null
-        }
+    private fun normalizePhysicalProfileOverride(): String? {
+        return null
     }
 
     internal fun setBuildFingerprintForTests(
@@ -613,12 +601,12 @@ object DeviceSpecific {
     fun isTitan2EliteDevice(): Boolean =
         currentDeviceProfile().model == KeyboardModel.TITAN_2_ELITE_QWERTY
 
-    fun isMinimalPhoneDevice(physicalProfileOverride: String? = null): Boolean {
-        return keyboardModelForProfile(physicalProfileOverride) == KeyboardModel.MINIMAL_PHONE
+    fun isMinimalPhoneDevice(): Boolean {
+        return keyboardModelForProfile() == KeyboardModel.MINIMAL_PHONE
     }
 
-    fun isPhysicalKeyboardDevice(physicalProfileOverride: String? = null): Boolean {
-        return when (keyboardModelForProfile(physicalProfileOverride)) {
+    fun isPhysicalKeyboardDevice(): Boolean {
+        return when (keyboardModelForProfile()) {
             KeyboardModel.Q25,
             KeyboardModel.KEY2,
             KeyboardModel.TITAN_2_ELITE_QWERTY,
