@@ -1,9 +1,7 @@
 package it.palsoftware.pastiera
 
 import android.hardware.input.InputManager
-import android.view.InputDevice
 import android.view.KeyEvent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.HorizontalDivider
@@ -180,14 +177,6 @@ private fun KeyboardsDevicesMainScreen(
                 },
                 value = if (isVirtual) stringResource(R.string.keyboard_source_on_screen) else stringResource(R.string.keyboard_source_physical)
             )
-            NavigationRow(
-                icon = Icons.Filled.Keyboard,
-                title = shortcut?.let { stringResource(R.string.keyboard_switching_override_shortcut, it) }
-                    ?: stringResource(R.string.keyboard_switching_shortcut_unassigned),
-                description = stringResource(R.string.keyboard_switching_override_description),
-                linkId = SettingLinkIds.KEYBOARDS_DEVICES_KEYBOARD_SWITCHING_SHORTCUT,
-                onClick = { onNavModeSettingsClick(shortcutKeyCode) }
-            )
             SwitchRow(
                 title = stringResource(R.string.software_keyboard_mode_toggle_toasts_title),
                 description = stringResource(R.string.software_keyboard_mode_toggle_toasts_description),
@@ -213,21 +202,6 @@ private fun KeyboardsDevicesMainScreen(
                 description = if (builtInDetected) stringResource(R.string.keyboard_source_device_bound_detected) else stringResource(R.string.keyboard_source_device_bound),
                 linkId = SettingLinkIds.KEYBOARDS_DEVICES_BUILT_IN_KEYBOARDS,
                 onClick = onBuiltIn
-            )
-            NavigationRow(
-                icon = Icons.Filled.Bluetooth,
-                title = stringResource(R.string.keyboard_accessories_title),
-                description = stringResource(R.string.keyboard_accessory_clicks_disconnected),
-                linkId = SettingLinkIds.KEYBOARDS_DEVICES_KEYBOARD_ACCESSORIES,
-                onClick = onPowerKeyboard
-            )
-
-            SectionDivider(stringResource(R.string.hardware_keyboard_custom_profiles_title))
-            Text(
-                text = stringResource(R.string.keyboard_custom_profiles_binding_description),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
             )
         }
     }

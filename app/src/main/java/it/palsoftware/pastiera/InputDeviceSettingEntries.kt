@@ -29,7 +29,6 @@ internal fun inputDeviceSettingEntries(): List<SettingEntry> = listOf(
     SettingEntry("hardware.titan2_layout", R.string.titan2_layout_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
     SettingEntry("hardware.profile", R.string.hardware_keyboard_profile_select_label, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
     SettingEntry("hardware.currency", R.string.keyboard_currency_symbol_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
-    SettingEntry("hardware.alt_editor", R.string.alt_key_editor_title, route = SettingRoute(SettingsDestination.KeyboardsDevices, keyboardsDevicesDestination = KeyboardsDevicesDestination.BuiltIn)),
     SettingEntry("sym.auto_close", R.string.sym_auto_close_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.auto_close_touch", R.string.sym_auto_close_touch_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),
     SettingEntry("sym.emoji_height", R.string.emoji_picker_expanded_height_title, route = SettingRoute(SettingsDestination.Modifiers, symCustomization = true)),

@@ -178,22 +178,6 @@ private fun HardwareKeyboardListScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
-            HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_custom_profiles_title))
-            Text(
-                text = stringResource(R.string.hardware_keyboard_custom_profiles_empty),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-            )
-            HardwareKeyboardNavigationRow(
-                title = stringResource(R.string.alt_key_editor_title),
-                linkId = "hardware.alt_editor",
-                description = stringResource(R.string.alt_key_editor_summary),
-                icon = Icons.Filled.Edit,
-                status = FeatureStatus.Construction,
-                onClick = onDeviceSymLayerEditor
-            )
-
             HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_behavior_title))
 
             if (DeviceSpecific.hasUnihertzKeyboard()) {
