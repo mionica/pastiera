@@ -1,7 +1,6 @@
 package it.palsoftware.pastiera.inputmethod
 
 import android.view.KeyEvent
-import it.palsoftware.pastiera.ClicksPowerKeyboardState
 
 /**
  * Resolves firmware output back to one or more possible physical source keys.
@@ -23,8 +22,7 @@ class PhysicalKeyResolver {
     fun resolve(
         keyCode: Int,
         event: KeyEvent?,
-        profile: PhysicalKeyAdjacencyProfile?,
-        clicksState: ClicksPowerKeyboardState? = null
+        profile: PhysicalKeyAdjacencyProfile?
     ): Resolution {
         val isModifier = isModifierKey(keyCode)
         if (profile == null || event == null) {
@@ -36,13 +34,6 @@ class PhysicalKeyResolver {
         candidates += profile.resolveNormalizedFirmwareOutput(keyCode, event.metaState)
 
         val signature = OutputSignature(keyCode, broadModifiers(event.metaState))
-        if (profile.profileId == ClicksPowerKeyboardLayout.profileId) {
-            clicksState?.numberRemaps?.forEachIndexed { index, remap ->
-                if (remap != null && outputSignatureForGattRemap(remap) == signature) {
-                    NUMBER_KEYS.getOrNull(index)?.let(candidates::add)
-                }
-            }
-        }
 
         return Resolution(candidates, profile, isModifier)
     }
@@ -53,18 +44,6 @@ class PhysicalKeyResolver {
                 KeyEvent.META_META_ON or KeyEvent.META_SYM_ON
 
         private data class OutputSignature(val keyCode: Int, val modifiers: Int)
-
-        private val NUMBER_KEYS = listOf(
-            ClicksPowerKeyboardLayout.DIGIT_1,
-            ClicksPowerKeyboardLayout.DIGIT_2,
-            ClicksPowerKeyboardLayout.DIGIT_3,
-            ClicksPowerKeyboardLayout.DIGIT_4,
-            ClicksPowerKeyboardLayout.DIGIT_5,
-            ClicksPowerKeyboardLayout.DIGIT_6,
-            ClicksPowerKeyboardLayout.DIGIT_7,
-            ClicksPowerKeyboardLayout.DIGIT_8,
-            ClicksPowerKeyboardLayout.DIGIT_9
-        )
 
         fun isModifierKey(keyCode: Int): Boolean =
             KeyEvent.isModifierKey(keyCode) ||

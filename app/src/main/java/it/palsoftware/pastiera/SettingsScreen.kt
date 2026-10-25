@@ -74,7 +74,6 @@ enum class SettingsDestination {
     About,
     CustomInputStyles,
     AppLanguage,
-    DeviceSymLayerEditor,
     Modifiers
 }
 
@@ -314,9 +313,6 @@ fun SettingsScreen(
             }
             SettingsDestination.AppLanguage -> {
                 AppLanguageSettingsScreen(modifier = modifier, onBack = { navigateBack() })
-            }
-            SettingsDestination.DeviceSymLayerEditor -> {
-                DeviceSymLayerEditorStubScreen(modifier = modifier, onBack = { navigateBack() })
             }
             SettingsDestination.Modifiers -> {
                 ModifierSettingsScreen(

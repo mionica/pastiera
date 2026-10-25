@@ -86,9 +86,6 @@ fun ModifierSettingsScreen(
         AltModifierBinding.DeviceSymProfile("titan2") to stringResource(R.string.keyboard_profile_option_titan2),
         AltModifierBinding.DeviceSymProfile("titan2elite_qwerty") to stringResource(R.string.keyboard_profile_option_titan2elite_qwerty),
         AltModifierBinding.DeviceSymProfile("mp01") to stringResource(R.string.keyboard_profile_option_mp01),
-        AltModifierBinding.DeviceSymProfile("clicks_razr") to stringResource(R.string.keyboard_profile_option_clicks_razr),
-        AltModifierBinding.DeviceSymProfile("clicks_pixel") to stringResource(R.string.keyboard_profile_option_clicks_pixel),
-        AltModifierBinding.DeviceSymProfile("clicks_power") to stringResource(R.string.clicks_power_keyboard_title)
     )
 
     Scaffold(

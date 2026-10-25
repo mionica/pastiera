@@ -263,10 +263,6 @@ internal object BackupPreferenceContract {
             "bounce_keys_enter_enabled" to PreferenceValueType.BOOLEAN,
             "bounce_keys_backspace_enabled" to PreferenceValueType.BOOLEAN,
             "overlapping_keys_enabled" to PreferenceValueType.BOOLEAN,
-            "clicks_overlapping_keys_enabled" to PreferenceValueType.BOOLEAN,
-            "clicks_overlapping_keys_mode" to PreferenceValueType.STRING,
-            "clicks_number_row_input_mode" to PreferenceValueType.STRING,
-            "clicks_number_row_repeat_enabled" to PreferenceValueType.BOOLEAN,
             "clear_alt_on_space" to PreferenceValueType.BOOLEAN,
             "alt_ctrl_speech_shortcut" to PreferenceValueType.BOOLEAN,
             "layout_aware_ctrl_shortcuts" to PreferenceValueType.BOOLEAN,
@@ -388,22 +384,6 @@ internal object BackupPreferenceContract {
             "alt_shift_layout_switch" to PreferenceValueType.BOOLEAN,
             "ctrl_space_layout_switch" to PreferenceValueType.BOOLEAN,
             "physical_keyboard_currency_symbol" to PreferenceValueType.STRING,
-            "clicks_close_input_on_disconnect" to PreferenceValueType.BOOLEAN,
-            "clicks_show_keyboard_only_with_text_focus" to PreferenceValueType.BOOLEAN,
-            "clicks_button_mode" to PreferenceValueType.STRING,
-            "clicks_meta_button_mode" to PreferenceValueType.STRING,
-            "clicks_alt_button_mode" to PreferenceValueType.STRING,
-            "clicks_microphone_button_mode" to PreferenceValueType.STRING,
-            "clicks_red_button_binding_choice" to PreferenceValueType.STRING,
-            "clicks_red_button_binding_output" to PreferenceValueType.STRING,
-            "clicks_keyboard_button_binding_choice" to PreferenceValueType.STRING,
-            "clicks_keyboard_button_binding_output" to PreferenceValueType.STRING,
-            "clicks_microphone_button_binding_choice" to PreferenceValueType.STRING,
-            "clicks_microphone_button_binding_output" to PreferenceValueType.STRING,
-            "clicks_power_keyboard_snapshots_v1" to PreferenceValueType.STRING,
-            "clicks_charging_automation" to PreferenceValueType.BOOLEAN,
-            "clicks_charging_start_percent" to PreferenceValueType.INT,
-            "clicks_charging_stop_percent" to PreferenceValueType.INT,
             "toast_on_layout_switch" to PreferenceValueType.BOOLEAN,
             "software_keyboard_mode_toggle_toasts" to PreferenceValueType.BOOLEAN,
             "alt_enter_layout_switch" to PreferenceValueType.BOOLEAN,
@@ -414,10 +394,6 @@ internal object BackupPreferenceContract {
         dynamicKeys = listOf(
             PreferenceFileSchema.DynamicKey(
                 prefix = "auto_correct_custom_",
-                type = PreferenceValueType.STRING
-            ),
-            PreferenceFileSchema.DynamicKey(
-                prefix = "clicks_power_soc_calibration_",
                 type = PreferenceValueType.STRING
             )
         )
@@ -451,9 +427,7 @@ internal object BackupPreferenceContract {
         "variations_updated" to "runtime refresh marker",
         "pastierina_mode_active" to "runtime-derived state",
         "software_keyboard_mode_runtime_override" to "runtime-derived state",
-        "typing_sound_updated_at" to "runtime refresh marker",
-        "clicks_bluetooth_permission_explained" to "permission UI state",
-        "clicks_manual_charging_until" to "transient runtime state"
+        "typing_sound_updated_at" to "runtime refresh marker"
     )
 
     fun expectedExportType(prefName: String, key: String): PreferenceValueType? {

@@ -1036,7 +1036,6 @@ object SettingLinkRegistry {
     val keyboardsDevicesSubtitles: Map<KeyboardsDevicesDestination, Int> = mapOf(
         KeyboardsDevicesDestination.OnScreen to R.string.on_screen_keyboard_title,
         KeyboardsDevicesDestination.BuiltIn to R.string.built_in_keyboards_title,
-        KeyboardsDevicesDestination.PowerKeyboard to R.string.keyboard_accessories_title
     )
 
     val customizationSubtitles: Map<String, Int> = mapOf(

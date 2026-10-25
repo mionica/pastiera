@@ -23,10 +23,6 @@ object SoftwareKeyboardAutoDetector {
         systemInputViewDecision = null
     }
 
-    fun beginClosingInputForClicksDisconnect() {
-        suppressVirtualPresentationUntilInputHidden = true
-    }
-
     fun onInputWindowHidden() {
         suppressVirtualPresentationUntilInputHidden = false
     }

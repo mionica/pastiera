@@ -50,9 +50,6 @@ object DeviceSpecific {
         TITAN_SLIM,
         TITAN_ORIGINAL,
         MINIMAL_PHONE,
-        CLICKS_RAZR,
-        CLICKS_PIXEL,
-        CLICKS_POWER,
         UNKNOWN
     }
 
@@ -116,7 +113,7 @@ object DeviceSpecific {
         event: KeyEvent?
     ): RemappedHardwareEvent {
         val usesCanonicalAlphabeticPositions =
-            model == KeyboardModel.KEY2 || model == KeyboardModel.CLICKS_POWER
+            model == KeyboardModel.KEY2
         if (!usesCanonicalAlphabeticPositions) {
             return RemappedHardwareEvent(keyCode, event)
         }
@@ -351,9 +348,6 @@ object DeviceSpecific {
             "titan" -> KeyboardModel.TITAN_ORIGINAL
             "titan2" -> KeyboardModel.TITAN_2
             "mp01" -> KeyboardModel.MINIMAL_PHONE
-            "clicks_razr" -> KeyboardModel.CLICKS_RAZR
-            "clicks_pixel" -> KeyboardModel.CLICKS_PIXEL
-            "clicks_power" -> KeyboardModel.CLICKS_POWER
             else -> currentDeviceProfile().model
         }
     }
@@ -378,17 +372,6 @@ object DeviceSpecific {
         return resolveInputProfile(identity, physicalProfileOverride)
     }
 
-    fun resolveInputProfile(
-        device: InputDevice,
-        physicalProfileOverride: String? = null
-    ): ResolvedInputProfile {
-        return resolveInputProfile(keyboardInputIdentity(device), physicalProfileOverride)
-    }
-
-    fun isClicksPowerKeyboard(device: InputDevice): Boolean {
-        return isClicksPowerKeyboard(keyboardInputIdentity(device))
-    }
-
     internal fun resolveInputProfile(
         identity: KeyboardInputIdentity?,
         physicalProfileOverride: String? = null
@@ -397,14 +380,6 @@ object DeviceSpecific {
             identity == null -> InputDeviceKind.UNKNOWN
             identity.isExternal -> InputDeviceKind.ACCESSORY
             else -> InputDeviceKind.BUILT_IN
-        }
-
-        if (identity != null && isClicksPowerKeyboard(identity)) {
-            return ResolvedInputProfile(
-                profileId = "clicks_power",
-                kind = InputDeviceKind.ACCESSORY,
-                autoDetected = true
-            )
         }
 
         val manualProfile = normalizePhysicalProfileOverride(physicalProfileOverride)
@@ -436,9 +411,6 @@ object DeviceSpecific {
         InputDevice.getDeviceIds().forEach { deviceId ->
             val device = InputDevice.getDevice(deviceId) ?: return@forEach
             val identity = keyboardInputIdentity(device)
-            if (!identity.isVirtual && isKeyboardLike(identity) && isClicksPowerKeyboard(identity)) {
-                profiles += resolveInputProfile(identity)
-            }
         }
         return profiles.distinctBy { it.kind to it.profileId }
     }
@@ -477,20 +449,11 @@ object DeviceSpecific {
             identity.keyboardType != InputDevice.KEYBOARD_TYPE_NONE
     }
 
-    private fun isClicksPowerKeyboard(identity: KeyboardInputIdentity): Boolean {
-        return identity.isExternal &&
-            !identity.isVirtual &&
-            isKeyboardLike(identity) &&
-            identity.vendorId == 2007 &&
-            identity.name.trim().startsWith("Power Keyboard-", ignoreCase = true)
-    }
-
     private fun normalizePhysicalProfileOverride(physicalProfileOverride: String?): String? {
         val normalized = physicalProfileOverride?.trim()?.lowercase().orEmpty()
         return when (normalized) {
             "", "auto" -> null
-            "key2", "q25", "titan", "titan2", "titan2elite_qwerty", "mp01",
-            "clicks_razr", "clicks_pixel", "clicks_power" -> normalized
+            "key2", "q25", "titan", "titan2", "titan2elite_qwerty", "mp01" -> normalized
             else -> null
         }
     }
@@ -594,9 +557,6 @@ object DeviceSpecific {
                 KeyboardModel.TITAN_SLIM -> "titan-slim"
                 KeyboardModel.TITAN_ORIGINAL -> "titan"
                 KeyboardModel.MINIMAL_PHONE -> "minimal-phone"
-                KeyboardModel.CLICKS_RAZR,
-                KeyboardModel.CLICKS_PIXEL,
-                KeyboardModel.CLICKS_POWER,
                 KeyboardModel.UNKNOWN -> null
             },
             displayName = when (model) {
@@ -608,9 +568,6 @@ object DeviceSpecific {
                 KeyboardModel.TITAN_SLIM -> "Titan Slim"
                 KeyboardModel.TITAN_ORIGINAL -> "Titan"
                 KeyboardModel.MINIMAL_PHONE -> "Minimal Phone"
-                KeyboardModel.CLICKS_RAZR,
-                KeyboardModel.CLICKS_PIXEL,
-                KeyboardModel.CLICKS_POWER,
                 KeyboardModel.UNKNOWN -> fallbackName
             },
             brand = fingerprint.brand,
@@ -669,10 +626,7 @@ object DeviceSpecific {
             KeyboardModel.TITAN_POCKET,
             KeyboardModel.TITAN_SLIM,
             KeyboardModel.TITAN_ORIGINAL,
-            KeyboardModel.MINIMAL_PHONE,
-            KeyboardModel.CLICKS_RAZR,
-            KeyboardModel.CLICKS_PIXEL,
-            KeyboardModel.CLICKS_POWER -> true
+            KeyboardModel.MINIMAL_PHONE -> true
             KeyboardModel.UNKNOWN -> false
         }
     }

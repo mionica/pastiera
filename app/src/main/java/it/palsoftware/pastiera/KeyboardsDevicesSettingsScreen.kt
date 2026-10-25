@@ -46,7 +46,7 @@ import it.palsoftware.pastiera.data.mappings.KeyMappingLoader
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 import it.palsoftware.pastiera.inputmethod.SoftwareKeyboardAutoDetector
 
-enum class KeyboardsDevicesDestination { Main, OnScreen, BuiltIn, PowerKeyboard }
+enum class KeyboardsDevicesDestination { Main, OnScreen, BuiltIn }
 
 @Composable
 fun KeyboardsDevicesSettingsScreen(
@@ -63,7 +63,7 @@ fun KeyboardsDevicesSettingsScreen(
             onBack = onBack,
             onOnScreen = { onDestinationChange(KeyboardsDevicesDestination.OnScreen) },
             onBuiltIn = { onDestinationChange(KeyboardsDevicesDestination.BuiltIn) },
-            onPowerKeyboard = { onDestinationChange(KeyboardsDevicesDestination.PowerKeyboard) },
+            onPowerKeyboard = {  },
             onNavModeSettingsClick = onNavModeSettingsClick
         )
         KeyboardsDevicesDestination.OnScreen -> VirtualKeyboardBehaviorSettingsScreen(
@@ -72,10 +72,6 @@ fun KeyboardsDevicesSettingsScreen(
             onOpenKeyboardTheme = onOpenKeyboardTheme
         )
         KeyboardsDevicesDestination.BuiltIn -> HardwareKeyboardSettingsScreen(
-            modifier = modifier,
-            onBack = { onDestinationChange(KeyboardsDevicesDestination.Main) }
-        )
-        KeyboardsDevicesDestination.PowerKeyboard -> ClicksPowerKeyboardSettingsScreen(
             modifier = modifier,
             onBack = { onDestinationChange(KeyboardsDevicesDestination.Main) }
         )
@@ -132,11 +128,6 @@ private fun KeyboardsDevicesMainScreen(
     val autoEnabled = configuredMode == SettingsManager.SoftwareKeyboardMode.AUTO
     val isVirtual = effectiveMode == SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
     val runtimeOverride = SettingsManager.getSoftwareKeyboardModeRuntimeOverride(context)
-    val clicksDevice = remember(inputDeviceRevision) {
-        InputDevice.getDeviceIds().asSequence()
-            .mapNotNull(InputDevice::getDevice)
-            .firstOrNull(DeviceSpecific::isClicksPowerKeyboard)
-    }
     val builtInDetected = remember(inputDeviceRevision) {
         DeviceSpecific.detectedInputProfiles().any {
             it.kind == DeviceSpecific.InputDeviceKind.BUILT_IN
@@ -185,7 +176,6 @@ private fun KeyboardsDevicesMainScreen(
                         stringResource(R.string.keyboard_switching_status_override_hardware)
                     isVirtual && !DeviceSpecific.hasConnectedHardwareKeyboard() -> stringResource(R.string.keyboard_switching_status_no_physical)
                     isVirtual -> stringResource(R.string.keyboard_switching_status_virtual)
-                    clicksDevice != null -> stringResource(R.string.keyboard_switching_status_clicks)
                     else -> stringResource(R.string.keyboard_switching_status_built_in)
                 },
                 value = if (isVirtual) stringResource(R.string.keyboard_source_on_screen) else stringResource(R.string.keyboard_source_physical)
@@ -227,12 +217,7 @@ private fun KeyboardsDevicesMainScreen(
             NavigationRow(
                 icon = Icons.Filled.Bluetooth,
                 title = stringResource(R.string.keyboard_accessories_title),
-                description = if (clicksDevice != null) {
-                    val slot = clicksDevice.name.substringAfterLast('-', missingDelimiterValue = "?")
-                    stringResource(R.string.keyboard_accessory_clicks_connected, slot)
-                } else {
-                    stringResource(R.string.keyboard_accessory_clicks_disconnected)
-                },
+                description = stringResource(R.string.keyboard_accessory_clicks_disconnected),
                 linkId = SettingLinkIds.KEYBOARDS_DEVICES_KEYBOARD_ACCESSORIES,
                 onClick = onPowerKeyboard
             )

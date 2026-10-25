@@ -16,7 +16,6 @@ class PastieraApplication : Application() {
         SettingsManager.initializeAltShiftLayoutSwitchDefault(this)
         SettingsManager.enforceTitan2EliteRoundedCornersOnce(this)
         AppPackageChangeMonitor.register(this)
-        ClicksPowerKeyboardController.initialize(this)
         publishSoftwareKeyboardModeShortcut()
         Handler(Looper.getMainLooper()).post {
             AdditionalSubtypeUtils.registerAdditionalSubtypes(this)

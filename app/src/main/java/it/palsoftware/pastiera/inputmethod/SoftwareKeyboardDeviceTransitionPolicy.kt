@@ -12,14 +12,11 @@ internal object SoftwareKeyboardDeviceTransitionPolicy {
     fun plan(
         configuredMode: SettingsManager.SoftwareKeyboardMode,
         previousAutoMode: SettingsManager.SoftwareKeyboardMode?,
-        autoMode: SettingsManager.SoftwareKeyboardMode,
-        clicksConnectionChanged: Boolean,
-        clicksDisconnected: Boolean,
-        closeInputOnClicksDisconnect: Boolean
+        autoMode: SettingsManager.SoftwareKeyboardMode
     ): Transition? {
         val baseDeviceModeChanged = autoMode != previousAutoMode
-        val clearTemporaryOverride = baseDeviceModeChanged || clicksConnectionChanged
-        if (!clearTemporaryOverride && !clicksDisconnected) return null
+        val clearTemporaryOverride = baseDeviceModeChanged
+        if (!clearTemporaryOverride) return null
 
         val baseMode = if (configuredMode == SettingsManager.SoftwareKeyboardMode.AUTO) {
             autoMode
@@ -29,7 +26,7 @@ internal object SoftwareKeyboardDeviceTransitionPolicy {
         return Transition(
             mode = baseMode,
             clearTemporaryOverride = clearTemporaryOverride,
-            closeInput = clicksDisconnected && closeInputOnClicksDisconnect
+            closeInput = false
         )
     }
 }

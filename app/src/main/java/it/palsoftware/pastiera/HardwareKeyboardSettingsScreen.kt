@@ -53,10 +53,7 @@ private val hardwareKeyboardProfiles = listOf(
     "titan" to R.string.keyboard_profile_option_titan,
     "titan2" to R.string.keyboard_profile_option_titan2,
     "titan2elite_qwerty" to R.string.keyboard_profile_option_titan2elite_qwerty,
-    "mp01" to R.string.keyboard_profile_option_mp01,
-    "clicks_razr" to R.string.keyboard_profile_option_clicks_razr,
-    "clicks_pixel" to R.string.keyboard_profile_option_clicks_pixel,
-    "clicks_power" to R.string.keyboard_profile_option_clicks_power_converted
+    "mp01" to R.string.keyboard_profile_option_mp01
 )
 
 @Composable
@@ -71,17 +68,11 @@ fun HardwareKeyboardSettingsScreen(
         if (settingHighlight != null) destination = HardwareKeyboardDestination.Main
     }
 
-    when (destination) {
-        HardwareKeyboardDestination.Main -> HardwareKeyboardListScreen(
-            modifier = modifier,
-            onBack = onBack,
-            onDeviceSymLayerEditor = { destination = HardwareKeyboardDestination.DeviceSymLayerEditor }
-        )
-        HardwareKeyboardDestination.DeviceSymLayerEditor -> DeviceSymLayerEditorStubScreen(
-            modifier = modifier,
-            onBack = { destination = HardwareKeyboardDestination.Main }
-        )
-    }
+    HardwareKeyboardListScreen(
+        modifier = modifier,
+        onBack = onBack,
+        onDeviceSymLayerEditor = { destination = HardwareKeyboardDestination.DeviceSymLayerEditor }
+    )
 }
 
 private enum class HardwareKeyboardDestination {

@@ -36,17 +36,17 @@ data class ReleaseNotesSummary(
                 highlights = when (language) {
                     "de" -> listOf(
                         "Die neu gestalteten Einstellungen sind durchsuchbar, direkt verlinkbar und zuverlässiger navigierbar.",
-                        "Pastiera passt sich sauberer an das gerundete Display des Titan 2 Elite an. Clicks-Tastaturen erhalten eigene Steuerungen und zuverlässigere Eingabe.",
+                        "Pastiera passt sich sauberer an das gerundete Display des Titan 2 Elite an.",
                         "Die Bildschirmtastatur bietet eigene Themes, Presets, Software-Modifier, Zahlenreihe und bessere Barrierefreiheit."
                     )
                     "it" -> listOf(
                         "Le impostazioni ridisegnate sono ricercabili, collegabili direttamente e più affidabili da navigare.",
-                        "Pastiera si adatta meglio al display arrotondato del Titan 2 Elite. Le tastiere Clicks ricevono controlli dedicati e un input più affidabile.",
+                        "Pastiera si adatta meglio al display arrotondato del Titan 2 Elite.",
                         "La tastiera su schermo offre temi, preset, modificatori software, riga numerica e accessibilità migliorata."
                     )
                     else -> listOf(
                         "Redesigned Settings are searchable, directly linkable, and more reliable to navigate.",
-                        "Pastiera fits the Titan 2 Elite’s rounded display more cleanly. Clicks keyboards gain dedicated controls and more reliable input.",
+                        "Pastiera fits the Titan 2 Elite’s rounded display more cleanly.",
                         "The on-screen keyboard adds custom themes, presets, software modifiers, a number row, and better accessibility."
                     )
                 },
