@@ -145,7 +145,6 @@ object SettingsManager {
     private const val KEY_BACKSPACE_AT_START_DELETE = "backspace_at_start_delete" // Backspace at line start performs forward delete
     private const val KEY_PASTIERINA_MODE_OVERRIDE = "pastierina_mode_override" // pastierina | full_status_bar
     private const val KEY_PASTIERINA_MODE_ACTIVE = "pastierina_mode_active" // Current effective state
-    private const val KEY_SOFTWARE_KEYBOARD_MODE = "software_keyboard_mode" // auto | force_hardware | force_virtual
     const val KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE = "software_keyboard_mode_runtime_override"
     private const val KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE = "software_keyboard_layout_style" // compact | extended_iso | full_ansi | full_iso
     private const val KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED = "software_keyboard_number_row_enabled"
@@ -420,29 +419,9 @@ object SettingsManager {
         FULL_STATUS_BAR("full_status_bar")
     }
 
-    enum class SoftwareKeyboardMode(val storageValue: String) {
-        AUTO("auto"),
-        FORCE_HARDWARE("force_hardware"),
-        FORCE_VIRTUAL("force_virtual")
-    }
-
-    enum class SoftwareKeyboardLayoutStyle(val storageValue: String) {
-        COMPACT("compact"),
-        EXTENDED_ISO("extended_iso"),
-        FULL_ANSI("full_ansi"),
-        FULL_ISO("full_iso")
-    }
-
-    enum class SoftwareKeyboardModifierKey(val storageValue: String) {
-        CTRL("ctrl"),
-        ALT("alt")
-    }
-
     enum class KeyboardThemeTarget {
-        HARDWARE,
-        SOFTWARE
+        HARDWARE
     }
-
     data class KeyboardThemeSettings(
         val background: Int,
         val divider: Int,
@@ -570,150 +549,6 @@ object SettingsManager {
             .apply()
     }
 
-    fun getSoftwareKeyboardMode(context: Context): SoftwareKeyboardMode {
-        val value = getPreferences(context).getString(
-            KEY_SOFTWARE_KEYBOARD_MODE,
-            SoftwareKeyboardMode.AUTO.storageValue
-        )
-        return SoftwareKeyboardMode.values().firstOrNull { it.storageValue == value }
-            ?: SoftwareKeyboardMode.AUTO
-    }
-
-    fun setSoftwareKeyboardMode(context: Context, mode: SoftwareKeyboardMode) {
-        getPreferences(context).edit()
-            .putString(KEY_SOFTWARE_KEYBOARD_MODE, mode.storageValue)
-            .remove(KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardModeRuntimeOverride(context: Context): SoftwareKeyboardMode? {
-        val value = getPreferences(context).getString(
-            KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE,
-            null
-        ) ?: return null
-        return SoftwareKeyboardMode.values()
-            .firstOrNull { it.storageValue == value && it != SoftwareKeyboardMode.AUTO }
-    }
-
-    fun setSoftwareKeyboardModeRuntimeOverride(
-        context: Context,
-        mode: SoftwareKeyboardMode?
-    ) {
-        val editor = getPreferences(context).edit()
-        if (mode == null || mode == SoftwareKeyboardMode.AUTO) {
-            editor.remove(KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE)
-        } else {
-            editor.putString(KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE, mode.storageValue)
-        }
-        editor.apply()
-    }
-
-    fun getSoftwareKeyboardModeToggleToastsEnabled(context: Context): Boolean {
-        return getPreferences(context).getBoolean(
-            KEY_SOFTWARE_KEYBOARD_MODE_TOGGLE_TOASTS,
-            DEFAULT_SOFTWARE_KEYBOARD_MODE_TOGGLE_TOASTS
-        )
-    }
-
-    fun setSoftwareKeyboardModeToggleToastsEnabled(context: Context, enabled: Boolean) {
-        getPreferences(context).edit()
-            .putBoolean(KEY_SOFTWARE_KEYBOARD_MODE_TOGGLE_TOASTS, enabled)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardLayoutStyle(context: Context): SoftwareKeyboardLayoutStyle {
-        val value = getPreferences(context).getString(
-            KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE,
-            SoftwareKeyboardLayoutStyle.COMPACT.storageValue
-        )
-        return SoftwareKeyboardLayoutStyle.values().firstOrNull { it.storageValue == value }
-            ?: SoftwareKeyboardLayoutStyle.COMPACT
-    }
-
-    fun setSoftwareKeyboardLayoutStyle(context: Context, style: SoftwareKeyboardLayoutStyle) {
-        getPreferences(context).edit()
-            .putString(KEY_SOFTWARE_KEYBOARD_LAYOUT_STYLE, style.storageValue)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardNumberRowEnabled(context: Context): Boolean =
-        getPreferences(context).getBoolean(KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED, true)
-
-    fun setSoftwareKeyboardNumberRowEnabled(context: Context, enabled: Boolean) {
-        getPreferences(context).edit()
-            .putBoolean(KEY_SOFTWARE_KEYBOARD_NUMBER_ROW_ENABLED, enabled)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardNearestKeyTouchEnabled(context: Context): Boolean =
-        getPreferences(context).getBoolean(KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED, true)
-
-    fun setSoftwareKeyboardNearestKeyTouchEnabled(context: Context, enabled: Boolean) {
-        getPreferences(context).edit()
-            .putBoolean(KEY_SOFTWARE_KEYBOARD_NEAREST_KEY_TOUCH_ENABLED, enabled)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardLongPressLayerPopupEnabled(context: Context): Boolean =
-        getPreferences(context).getBoolean(
-            KEY_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_ENABLED,
-            DEFAULT_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_ENABLED
-        )
-
-    fun setSoftwareKeyboardLongPressLayerPopupEnabled(context: Context, enabled: Boolean) {
-        getPreferences(context).edit()
-            .putBoolean(KEY_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_ENABLED, enabled)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardLongPressLayerPopupBelowKey(context: Context): Boolean =
-        getPreferences(context).getBoolean(
-            KEY_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_BELOW_KEY,
-            DEFAULT_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_BELOW_KEY
-        )
-
-    fun setSoftwareKeyboardLongPressLayerPopupBelowKey(context: Context, enabled: Boolean) {
-        getPreferences(context).edit()
-            .putBoolean(KEY_SOFTWARE_KEYBOARD_LONG_PRESS_LAYER_POPUP_BELOW_KEY, enabled)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardLeftModifierKey(context: Context): SoftwareKeyboardModifierKey =
-        getSoftwareKeyboardModifierKey(
-            context = context,
-            key = KEY_SOFTWARE_KEYBOARD_LEFT_MODIFIER_KEY,
-            defaultValue = SoftwareKeyboardModifierKey.CTRL
-        )
-
-    fun setSoftwareKeyboardLeftModifierKey(context: Context, modifierKey: SoftwareKeyboardModifierKey) {
-        getPreferences(context).edit()
-            .putString(KEY_SOFTWARE_KEYBOARD_LEFT_MODIFIER_KEY, modifierKey.storageValue)
-            .apply()
-    }
-
-    fun getSoftwareKeyboardRightModifierKey(context: Context): SoftwareKeyboardModifierKey =
-        getSoftwareKeyboardModifierKey(
-            context = context,
-            key = KEY_SOFTWARE_KEYBOARD_RIGHT_MODIFIER_KEY,
-            defaultValue = SoftwareKeyboardModifierKey.ALT
-        )
-
-    fun setSoftwareKeyboardRightModifierKey(context: Context, modifierKey: SoftwareKeyboardModifierKey) {
-        getPreferences(context).edit()
-            .putString(KEY_SOFTWARE_KEYBOARD_RIGHT_MODIFIER_KEY, modifierKey.storageValue)
-            .apply()
-    }
-
-    private fun getSoftwareKeyboardModifierKey(
-        context: Context,
-        key: String,
-        defaultValue: SoftwareKeyboardModifierKey
-    ): SoftwareKeyboardModifierKey {
-        val value = getPreferences(context).getString(key, defaultValue.storageValue)
-        return SoftwareKeyboardModifierKey.values().firstOrNull { it.storageValue == value }
-            ?: defaultValue
-    }
-
     fun defaultKeyboardTheme(): KeyboardThemeSettings =
         KeyboardThemeSettings(
             background = 0xFFF2F2F2.toInt(),
@@ -733,22 +568,9 @@ object SettingsManager {
         )
 
     private fun defaultKeyboardTheme(target: KeyboardThemeTarget): KeyboardThemeSettings =
-        when (target) {
-            KeyboardThemeTarget.HARDWARE -> defaultKeyboardTheme()
-            KeyboardThemeTarget.SOFTWARE -> defaultKeyboardTheme().copy(
-                keyCornerRadiusRatio = SOFTWARE_THEME_DEFAULT_KEY_CORNER_RADIUS,
-                chromeCornerRadiusRatio = SOFTWARE_THEME_DEFAULT_CHROME_CORNER_RADIUS,
-                keyHeightScale = SOFTWARE_THEME_DEFAULT_KEY_HEIGHT,
-                numberRowHeightScale = SOFTWARE_THEME_DEFAULT_NUMBER_ROW_HEIGHT,
-                rowGapScale = SOFTWARE_THEME_DEFAULT_ROW_GAP,
-                ortholinear = true,
-                showLeds = false,
-                suggestionsHeightScale = SOFTWARE_THEME_DEFAULT_SUGGESTIONS_HEIGHT,
-                variationsHeightScale = SOFTWARE_THEME_DEFAULT_VARIATIONS_HEIGHT
-            )
-        }
+        defaultKeyboardTheme()
 
-    private fun defaultSystemKeyboardTheme(target: KeyboardThemeTarget, dark: Boolean): KeyboardThemeSettings {
+    private fun defaultSystemKeyboardTheme(dark: Boolean): KeyboardThemeSettings {
         val base = if (dark) {
             KeyboardThemeSettings(
                 background = 0xFF000000.toInt(),
@@ -788,54 +610,26 @@ object SettingsManager {
                 chromeCornerRadiusRatio = 0.10f
             )
         }
-        return when (target) {
-            KeyboardThemeTarget.HARDWARE -> base
-            KeyboardThemeTarget.SOFTWARE -> base.copy(
-                keyCornerRadiusRatio = SOFTWARE_THEME_DEFAULT_KEY_CORNER_RADIUS,
-                chromeCornerRadiusRatio = SOFTWARE_THEME_DEFAULT_CHROME_CORNER_RADIUS,
-                keyHeightScale = SOFTWARE_THEME_DEFAULT_KEY_HEIGHT,
-                numberRowHeightScale = SOFTWARE_THEME_DEFAULT_NUMBER_ROW_HEIGHT,
-                rowGapScale = SOFTWARE_THEME_DEFAULT_ROW_GAP,
-                ortholinear = true,
-                showLeds = false,
-                suggestionsHeightScale = SOFTWARE_THEME_DEFAULT_SUGGESTIONS_HEIGHT,
-                variationsHeightScale = SOFTWARE_THEME_DEFAULT_VARIATIONS_HEIGHT
-            )
-        }
+        return base
     }
 
-    fun keyboardThemeKeyForTarget(target: KeyboardThemeTarget): String =
-        when (target) {
-            KeyboardThemeTarget.HARDWARE -> KEY_KEYBOARD_THEME_HARDWARE
-            KeyboardThemeTarget.SOFTWARE -> KEY_KEYBOARD_THEME_SOFTWARE
-        }
+    fun keyboardThemeKeyForTarget(): String =
+        KEY_KEYBOARD_THEME_HARDWARE
 
-    private fun keyboardThemeAssignmentModeKeyForTarget(target: KeyboardThemeTarget): String =
-        when (target) {
-            KeyboardThemeTarget.HARDWARE -> KEY_KEYBOARD_THEME_ASSIGNMENT_MODE_HARDWARE
-            KeyboardThemeTarget.SOFTWARE -> KEY_KEYBOARD_THEME_ASSIGNMENT_MODE_SOFTWARE
-        }
+    private fun keyboardThemeAssignmentModeKeyForTarget(): String =
+        KEY_KEYBOARD_THEME_ASSIGNMENT_MODE_HARDWARE
 
-    private fun keyboardThemeLightKeyForTarget(target: KeyboardThemeTarget): String =
-        when (target) {
-            KeyboardThemeTarget.HARDWARE -> KEY_KEYBOARD_THEME_LIGHT_HARDWARE
-            KeyboardThemeTarget.SOFTWARE -> KEY_KEYBOARD_THEME_LIGHT_SOFTWARE
-        }
+    private fun keyboardThemeLightKeyForTarget(): String =
+        KEY_KEYBOARD_THEME_LIGHT_HARDWARE
 
-    private fun keyboardThemeDarkKeyForTarget(target: KeyboardThemeTarget): String =
-        when (target) {
-            KeyboardThemeTarget.HARDWARE -> KEY_KEYBOARD_THEME_DARK_HARDWARE
-            KeyboardThemeTarget.SOFTWARE -> KEY_KEYBOARD_THEME_DARK_SOFTWARE
-        }
+    private fun keyboardThemeDarkKeyForTarget(): String =
+        KEY_KEYBOARD_THEME_DARK_HARDWARE
 
-    private fun keyboardThemeLayoutOverridesKeyForTarget(target: KeyboardThemeTarget): String =
-        when (target) {
-            KeyboardThemeTarget.HARDWARE -> KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_HARDWARE
-            KeyboardThemeTarget.SOFTWARE -> KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_SOFTWARE
-        }
+    private fun keyboardThemeLayoutOverridesKeyForTarget(): String =
+        KEY_KEYBOARD_THEME_LAYOUT_OVERRIDES_HARDWARE
 
     fun isKeyboardThemePreferenceKey(key: String?): Boolean {
-        return key == KEY_KEYBOARD_THEME_HARDWARE || key == KEY_KEYBOARD_THEME_SOFTWARE
+        return key == KEY_KEYBOARD_THEME_HARDWARE
     }
 
     fun isModifierIndicatorPreferenceKey(key: String?): Boolean {
@@ -859,9 +653,9 @@ object SettingsManager {
             .apply()
     }
 
-    fun getKeyboardTheme(context: Context, target: KeyboardThemeTarget): KeyboardThemeSettings {
-        val defaults = defaultKeyboardTheme(target)
-        val stored = getPreferences(context).getString(keyboardThemeKeyForTarget(target), null)
+    fun getKeyboardTheme(context: Context): KeyboardThemeSettings {
+        val defaults = defaultKeyboardTheme()
+        val stored = getPreferences(context).getString(keyboardThemeKeyForTarget(), null)
             ?: return defaults
         return try {
             val json = JSONObject(stored)
@@ -903,9 +697,9 @@ object SettingsManager {
         }
     }
 
-    fun getKeyboardThemeAssignmentMode(context: Context, target: KeyboardThemeTarget): String {
+    fun getKeyboardThemeAssignmentMode(context: Context): String {
         val stored = getPreferences(context).getString(
-            keyboardThemeAssignmentModeKeyForTarget(target),
+            keyboardThemeAssignmentModeKeyForTarget(),
             KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED
         )
         return if (stored == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
@@ -915,24 +709,23 @@ object SettingsManager {
         }
     }
 
-    fun setKeyboardThemeAssignmentMode(context: Context, target: KeyboardThemeTarget, mode: String) {
+    fun setKeyboardThemeAssignmentMode(context: Context, mode: String) {
         val normalized = if (mode == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
             KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM
         } else {
             KEYBOARD_THEME_ASSIGNMENT_MODE_FIXED
         }
         getPreferences(context).edit()
-            .putString(keyboardThemeAssignmentModeKeyForTarget(target), normalized)
+            .putString(keyboardThemeAssignmentModeKeyForTarget(), normalized)
             .apply()
     }
 
     fun getKeyboardThemeSystemSlot(
         context: Context,
-        target: KeyboardThemeTarget,
         dark: Boolean
     ): KeyboardThemeSettings {
-        val defaults = defaultSystemKeyboardTheme(target, dark)
-        val key = if (dark) keyboardThemeDarkKeyForTarget(target) else keyboardThemeLightKeyForTarget(target)
+        val defaults = defaultSystemKeyboardTheme(dark)
+        val key = if (dark) keyboardThemeDarkKeyForTarget() else keyboardThemeLightKeyForTarget()
         val stored = getPreferences(context).getString(key, null) ?: return defaults
         return try {
             keyboardThemeFromJson(JSONObject(stored), defaults)
@@ -944,11 +737,10 @@ object SettingsManager {
 
     fun setKeyboardThemeSystemSlot(
         context: Context,
-        target: KeyboardThemeTarget,
         dark: Boolean,
         theme: KeyboardThemeSettings
     ) {
-        val key = if (dark) keyboardThemeDarkKeyForTarget(target) else keyboardThemeLightKeyForTarget(target)
+        val key = if (dark) keyboardThemeDarkKeyForTarget() else keyboardThemeLightKeyForTarget()
         getPreferences(context).edit()
             .putString(key, keyboardThemeToJson(theme).toString())
             .apply()
@@ -959,29 +751,27 @@ object SettingsManager {
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 
-    fun getEffectiveKeyboardTheme(context: Context, target: KeyboardThemeTarget): KeyboardThemeSettings {
-        return getEffectiveKeyboardTheme(context, target, locale = null, layout = null)
+    fun getEffectiveKeyboardTheme(context: Context): KeyboardThemeSettings {
+        return getEffectiveKeyboardTheme(context, locale = null, layout = null)
     }
 
     fun getEffectiveKeyboardTheme(
         context: Context,
-        target: KeyboardThemeTarget,
         locale: String?,
         layout: String?
     ): KeyboardThemeSettings {
-        findKeyboardThemeLayoutOverride(context, target, locale, layout)?.let { return it.theme }
-        return if (getKeyboardThemeAssignmentMode(context, target) == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
-            getKeyboardThemeSystemSlot(context, target, dark = isSystemDarkTheme(context))
+        findKeyboardThemeLayoutOverride(context, locale, layout)?.let { return it.theme }
+        return if (getKeyboardThemeAssignmentMode(context) == KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM) {
+            getKeyboardThemeSystemSlot(context, dark = isSystemDarkTheme(context))
         } else {
-            getKeyboardTheme(context, target)
+            getKeyboardTheme(context)
         }
     }
 
     fun getKeyboardThemeLayoutOverrides(
-        context: Context,
-        target: KeyboardThemeTarget
+        context: Context
     ): List<KeyboardThemeLayoutOverride> {
-        val stored = getPreferences(context).getString(keyboardThemeLayoutOverridesKeyForTarget(target), null)
+        val stored = getPreferences(context).getString(keyboardThemeLayoutOverridesKeyForTarget(), null)
             ?: return emptyList()
         return try {
             val array = JSONArray(stored)
@@ -996,7 +786,7 @@ object SettingsManager {
                         KeyboardThemeLayoutOverride(
                             locale = locale?.let(::normalizeKeyboardThemeOverrideLocale),
                             layout = layout,
-                            theme = keyboardThemeFromJson(themeObject, defaultKeyboardTheme(target))
+                            theme = keyboardThemeFromJson(themeObject, defaultKeyboardTheme())
                         )
                     )
                 }
@@ -1009,7 +799,6 @@ object SettingsManager {
 
     fun setKeyboardThemeLayoutOverrides(
         context: Context,
-        target: KeyboardThemeTarget,
         overrides: List<KeyboardThemeLayoutOverride>
     ) {
         val array = JSONArray()
@@ -1030,13 +819,12 @@ object SettingsManager {
             .forEach { array.put(it) }
 
         getPreferences(context).edit()
-            .putString(keyboardThemeLayoutOverridesKeyForTarget(target), array.toString())
+            .putString(keyboardThemeLayoutOverridesKeyForTarget(), array.toString())
             .apply()
     }
 
     fun upsertKeyboardThemeLayoutOverride(
         context: Context,
-        target: KeyboardThemeTarget,
         locale: String?,
         layout: String?,
         theme: KeyboardThemeSettings
@@ -1044,36 +832,34 @@ object SettingsManager {
         val normalizedLocale = locale?.let(::normalizeKeyboardThemeOverrideLocale)?.takeIf { it.isNotBlank() }
         val normalizedLayout = layout?.trim()?.takeIf { it.isNotBlank() }
         if (normalizedLocale == null && normalizedLayout == null) return
-        val updated = getKeyboardThemeLayoutOverrides(context, target)
+        val updated = getKeyboardThemeLayoutOverrides(context)
             .filterNot { it.locale == normalizedLocale && it.layout == normalizedLayout }
             .toMutableList()
         updated += KeyboardThemeLayoutOverride(normalizedLocale, normalizedLayout, theme)
-        setKeyboardThemeLayoutOverrides(context, target, updated)
+        setKeyboardThemeLayoutOverrides(context, updated)
     }
 
     fun removeKeyboardThemeLayoutOverride(
         context: Context,
-        target: KeyboardThemeTarget,
         locale: String?,
         layout: String?
     ) {
         val normalizedLocale = locale?.let(::normalizeKeyboardThemeOverrideLocale)?.takeIf { it.isNotBlank() }
         val normalizedLayout = layout?.trim()?.takeIf { it.isNotBlank() }
-        val updated = getKeyboardThemeLayoutOverrides(context, target)
+        val updated = getKeyboardThemeLayoutOverrides(context)
             .filterNot { it.locale == normalizedLocale && it.layout == normalizedLayout }
-        setKeyboardThemeLayoutOverrides(context, target, updated)
+        setKeyboardThemeLayoutOverrides(context, updated)
     }
 
     private fun findKeyboardThemeLayoutOverride(
         context: Context,
-        target: KeyboardThemeTarget,
         locale: String?,
         layout: String?
     ): KeyboardThemeLayoutOverride? {
         val normalizedLocale = locale?.let(::normalizeKeyboardThemeOverrideLocale)?.takeIf { it.isNotBlank() }
         val normalizedLanguage = normalizedLocale?.substringBefore('-')
         val normalizedLayout = layout?.trim()?.takeIf { it.isNotBlank() }
-        return getKeyboardThemeLayoutOverrides(context, target)
+        return getKeyboardThemeLayoutOverrides(context)
             .mapNotNull { override ->
                 val score = keyboardThemeOverrideMatchScore(
                     override = override,
@@ -1114,12 +900,11 @@ object SettingsManager {
 
     fun setKeyboardTheme(
         context: Context,
-        target: KeyboardThemeTarget,
         theme: KeyboardThemeSettings
     ) {
         val json = keyboardThemeToJson(theme)
         getPreferences(context).edit()
-            .putString(keyboardThemeKeyForTarget(target), json.toString())
+            .putString(keyboardThemeKeyForTarget(), json.toString())
             .apply()
     }
 
@@ -1400,15 +1185,6 @@ object SettingsManager {
             KEYBOARD_THEME_POPUP_STYLE_CLASSIC -> KEYBOARD_THEME_POPUP_STYLE_CLASSIC
             else -> KEYBOARD_THEME_POPUP_STYLE_FLOATING
         }
-
-    fun resolveEffectiveSoftwareKeyboardMode(context: Context): SoftwareKeyboardMode {
-        getSoftwareKeyboardModeRuntimeOverride(context)?.let { return it }
-        val configured = getSoftwareKeyboardMode(context)
-        if (configured != SoftwareKeyboardMode.AUTO) {
-            return configured
-        }
-        return it.palsoftware.pastiera.inputmethod.SoftwareKeyboardAutoDetector.resolve(context)
-    }
 
     fun isTitan2LayoutEnabled(context: Context): Boolean {
         val prefs = getPreferences(context)

@@ -12,9 +12,6 @@ import android.view.KeyEvent
 import android.view.inputmethod.InputConnection
 import android.widget.Toast
 import it.palsoftware.pastiera.MainActivity
-import it.palsoftware.pastiera.R
-import it.palsoftware.pastiera.SettingsManager
-import it.palsoftware.pastiera.SoftwareKeyboardModeActions
 import it.palsoftware.pastiera.core.NavModeController
 import it.palsoftware.pastiera.inputmethod.QuickLauncherActivity
 import rikka.shizuku.Shizuku
@@ -103,7 +100,6 @@ class CommandExecutor(
                     fail("Could not open Pastiera")
                 }
             }
-            PastieraCommandSource.ACTION_TOGGLE_SOFTWARE_KEYBOARD_MODE -> toggleSoftwareKeyboardMode()
             DeviceControlCommandSource.ACTION_HOME_SCREEN -> goHome()
             DeviceControlCommandSource.ACTION_MEDIA_PLAY_PAUSE -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
             DeviceControlCommandSource.ACTION_MEDIA_PREVIOUS -> dispatchMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
@@ -129,22 +125,6 @@ class CommandExecutor(
             Log.e(TAG, "Failed to go home", error)
             fail("Could not go home")
         }
-    }
-
-    private fun toggleSoftwareKeyboardMode(): CommandExecutionResult {
-        val next = SoftwareKeyboardModeActions.toggleTemporaryMode(context)
-        if (showToast && SettingsManager.getSoftwareKeyboardModeToggleToastsEnabled(context)) {
-            val message = when (next) {
-                SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL ->
-                    context.getString(R.string.software_keyboard_mode_toggle_now_virtual)
-                SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE ->
-                    context.getString(R.string.software_keyboard_mode_toggle_now_hardware)
-                SettingsManager.SoftwareKeyboardMode.AUTO ->
-                    context.getString(R.string.software_keyboard_mode_auto_short)
-            }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
-        return CommandExecutionResult.Success
     }
 
     private fun dispatchMediaKey(keyCode: Int): CommandExecutionResult {

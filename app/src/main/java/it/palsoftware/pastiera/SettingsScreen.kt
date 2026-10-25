@@ -244,12 +244,6 @@ fun SettingsScreen(
                     onNavModeSettingsClick = { keyCode ->
                         navigateToNavMode(keyCode)
                     },
-                    onOpenKeyboardTheme = {
-                        openCustomization(
-                            SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-                            SettingsActivity.KEYBOARD_THEME_TARGET_SOFTWARE
-                        )
-                    },
                     destination = entry.keyboardsDevicesDestination,
                     onDestinationChange = { destination ->
                         if (destination == KeyboardsDevicesDestination.Main) navigateBack()

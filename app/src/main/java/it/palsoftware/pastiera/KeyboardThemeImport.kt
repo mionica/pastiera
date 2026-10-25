@@ -54,7 +54,6 @@ internal fun importedKeyboardThemeDraft(
 
 internal fun saveImportedKeyboardTheme(
     context: Context,
-    target: SettingsManager.KeyboardThemeTarget,
     name: String,
     importedTheme: SettingsManager.KeyboardThemeSettings
 ): Boolean {
@@ -62,6 +61,6 @@ internal fun saveImportedKeyboardTheme(
     if (normalizedName.isEmpty() || keyboardThemeNameExists(context, normalizedName)) return false
 
     SettingsManager.saveKeyboardTheme(context, normalizedName, importedTheme)
-    SettingsManager.setKeyboardTheme(context, target, importedTheme)
+    SettingsManager.setKeyboardTheme(context, importedTheme)
     return true
 }

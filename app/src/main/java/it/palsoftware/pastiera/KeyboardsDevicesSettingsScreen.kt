@@ -41,16 +41,14 @@ import androidx.compose.ui.unit.dp
 import it.palsoftware.pastiera.commands.PastieraCommandSource
 import it.palsoftware.pastiera.data.mappings.KeyMappingLoader
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
-import it.palsoftware.pastiera.inputmethod.SoftwareKeyboardAutoDetector
 
-enum class KeyboardsDevicesDestination { Main, OnScreen, BuiltIn }
+enum class KeyboardsDevicesDestination { Main, BuiltIn }
 
 @Composable
 fun KeyboardsDevicesSettingsScreen(
     modifier: Modifier = Modifier,
     onBack: () -> Unit,
     onNavModeSettingsClick: (Int?) -> Unit,
-    onOpenKeyboardTheme: () -> Unit,
     destination: KeyboardsDevicesDestination,
     onDestinationChange: (KeyboardsDevicesDestination) -> Unit
 ) {
@@ -58,15 +56,9 @@ fun KeyboardsDevicesSettingsScreen(
         KeyboardsDevicesDestination.Main -> KeyboardsDevicesMainScreen(
             modifier = modifier,
             onBack = onBack,
-            onOnScreen = { onDestinationChange(KeyboardsDevicesDestination.OnScreen) },
             onBuiltIn = { onDestinationChange(KeyboardsDevicesDestination.BuiltIn) },
             onPowerKeyboard = {  },
             onNavModeSettingsClick = onNavModeSettingsClick
-        )
-        KeyboardsDevicesDestination.OnScreen -> VirtualKeyboardBehaviorSettingsScreen(
-            modifier = modifier,
-            onBack = { onDestinationChange(KeyboardsDevicesDestination.Main) },
-            onOpenKeyboardTheme = onOpenKeyboardTheme
         )
         KeyboardsDevicesDestination.BuiltIn -> HardwareKeyboardSettingsScreen(
             modifier = modifier,
@@ -79,39 +71,18 @@ fun KeyboardsDevicesSettingsScreen(
 private fun KeyboardsDevicesMainScreen(
     modifier: Modifier,
     onBack: () -> Unit,
-    onOnScreen: () -> Unit,
     onBuiltIn: () -> Unit,
     onPowerKeyboard: () -> Unit,
     onNavModeSettingsClick: (Int?) -> Unit
 ) {
     val context = LocalContext.current
-    var configuredMode by remember { mutableStateOf(SettingsManager.getSoftwareKeyboardMode(context)) }
-    var effectiveMode by remember { mutableStateOf(SettingsManager.resolveEffectiveSoftwareKeyboardMode(context)) }
-    var showToggleToasts by remember { mutableStateOf(SettingsManager.getSoftwareKeyboardModeToggleToastsEnabled(context)) }
     var inputDeviceRevision by remember { mutableStateOf(0) }
-
-    DisposableEffect(context) {
-        val prefs = SettingsManager.getPreferences(context)
-        val listener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == "software_keyboard_mode" || key == "software_keyboard_mode_runtime_override") {
-                configuredMode = SettingsManager.getSoftwareKeyboardMode(context)
-                effectiveMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(context)
-            }
-            if (key == "software_keyboard_mode_toggle_toasts") {
-                showToggleToasts = SettingsManager.getSoftwareKeyboardModeToggleToastsEnabled(context)
-            }
-        }
-        prefs.registerOnSharedPreferenceChangeListener(listener)
-        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
-    }
 
     DisposableEffect(context) {
         val inputManager = context.getSystemService(InputManager::class.java)
         val listener = object : InputManager.InputDeviceListener {
             private fun refreshKeyboardState() {
-                SoftwareKeyboardAutoDetector.onInputDevicesChanged()
                 inputDeviceRevision += 1
-                effectiveMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(context)
             }
 
             override fun onInputDeviceAdded(deviceId: Int) = refreshKeyboardState()
@@ -122,9 +93,7 @@ private fun KeyboardsDevicesMainScreen(
         onDispose { inputManager.unregisterInputDeviceListener(listener) }
     }
 
-    val autoEnabled = configuredMode == SettingsManager.SoftwareKeyboardMode.AUTO
-    val isVirtual = effectiveMode == SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
-    val runtimeOverride = SettingsManager.getSoftwareKeyboardModeRuntimeOverride(context)
+    val autoEnabled = true
     val builtInDetected = remember(inputDeviceRevision) {
         DeviceSpecific.detectedInputProfiles().any {
             it.kind == DeviceSpecific.InputDeviceKind.BUILT_IN
@@ -148,54 +117,13 @@ private fun KeyboardsDevicesMainScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             SectionDivider(stringResource(R.string.keyboard_switching_section_title))
-            SwitchRow(
-                title = stringResource(R.string.keyboard_switching_auto_title),
-                description = stringResource(R.string.keyboard_switching_auto_description),
-                checked = autoEnabled,
-                linkId = SettingLinkIds.KEYBOARDS_DEVICES_KEYBOARD_SWITCHING_AUTO,
-                onCheckedChange = { enabled ->
-                    val newMode = if (enabled) {
-                        SettingsManager.SoftwareKeyboardMode.AUTO
-                    } else {
-                        effectiveMode
-                    }
-                    SettingsManager.setSoftwareKeyboardMode(context, newMode)
-                    configuredMode = newMode
-                    effectiveMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(context)
-                }
-            )
             InfoRow(
                 title = stringResource(R.string.keyboard_switching_current_title),
-                description = when {
-                    runtimeOverride != null && isVirtual ->
-                        stringResource(R.string.keyboard_switching_status_override_virtual)
-                    runtimeOverride != null ->
-                        stringResource(R.string.keyboard_switching_status_override_hardware)
-                    isVirtual && !DeviceSpecific.hasConnectedHardwareKeyboard() -> stringResource(R.string.keyboard_switching_status_no_physical)
-                    isVirtual -> stringResource(R.string.keyboard_switching_status_virtual)
-                    else -> stringResource(R.string.keyboard_switching_status_built_in)
-                },
-                value = if (isVirtual) stringResource(R.string.keyboard_source_on_screen) else stringResource(R.string.keyboard_source_physical)
-            )
-            SwitchRow(
-                title = stringResource(R.string.software_keyboard_mode_toggle_toasts_title),
-                description = stringResource(R.string.software_keyboard_mode_toggle_toasts_description),
-                checked = showToggleToasts,
-                linkId = SettingLinkIds.KEYBOARDS_DEVICES_TOGGLE_TOASTS,
-                onCheckedChange = {
-                    showToggleToasts = it
-                    SettingsManager.setSoftwareKeyboardModeToggleToastsEnabled(context, it)
-                }
+                description = stringResource(R.string.keyboard_switching_status_built_in),
+                value = stringResource(R.string.keyboard_source_physical)
             )
 
             SectionDivider(stringResource(R.string.keyboard_sources_section_title))
-            NavigationRow(
-                icon = Icons.Filled.Keyboard,
-                title = stringResource(R.string.on_screen_keyboard_title),
-                description = if (isVirtual) stringResource(R.string.keyboard_source_active) else stringResource(R.string.keyboard_source_standby),
-                linkId = SettingLinkIds.KEYBOARDS_DEVICES_ON_SCREEN_KEYBOARD,
-                onClick = onOnScreen
-            )
             NavigationRow(
                 icon = Icons.Filled.PhoneAndroid,
                 title = stringResource(R.string.built_in_keyboards_title),

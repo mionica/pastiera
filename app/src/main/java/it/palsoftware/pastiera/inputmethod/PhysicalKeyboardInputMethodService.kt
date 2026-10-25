@@ -8,11 +8,9 @@ import android.content.SharedPreferences
 import android.content.res.Configuration
 import it.palsoftware.pastiera.AppBroadcastActions
 import it.palsoftware.pastiera.SettingsManager
-import it.palsoftware.pastiera.SoftwareKeyboardModeActions
 import android.inputmethodservice.InputMethodService
 import android.hardware.input.InputManager
 import android.os.Build
-import android.os.Bundle
 import android.os.SystemClock
 import android.media.AudioManager
 import android.util.Log
@@ -25,7 +23,6 @@ import android.view.inputmethod.ExtractedTextRequest
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.CursorAnchorInfo
 import it.palsoftware.pastiera.clipboard.ClipboardDao
-import it.palsoftware.pastiera.inputmethod.KeyboardEventTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -33,10 +30,8 @@ import kotlinx.coroutines.launch
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.Toast
 import it.palsoftware.pastiera.BuildConfig
 import it.palsoftware.pastiera.R
-import it.palsoftware.pastiera.inputmethod.NotificationHelper
 import it.palsoftware.pastiera.core.AutoCorrectionManager
 import it.palsoftware.pastiera.core.DeferredPunctuationSpaceTracker
 import it.palsoftware.pastiera.core.InputContextState
@@ -49,16 +44,11 @@ import it.palsoftware.pastiera.core.suggestions.SuggestionKind
 import it.palsoftware.pastiera.core.suggestions.SuggestionResult
 import it.palsoftware.pastiera.core.suggestions.SuggestionSettings
 import it.palsoftware.pastiera.data.layout.LayoutMappingRepository
-import it.palsoftware.pastiera.data.layout.LayoutFileStore
 import it.palsoftware.pastiera.data.layout.LayoutMapping
 import it.palsoftware.pastiera.data.mappings.KeyMappingLoader
 import it.palsoftware.pastiera.data.mappings.AltModifierMappingResolver
 import it.palsoftware.pastiera.data.variation.VariationRepository
-import it.palsoftware.pastiera.inputmethod.SpeechRecognitionActivity
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils
-import it.palsoftware.pastiera.inputmethod.aospkeyboard.AospKeyboardView
-import it.palsoftware.pastiera.inputmethod.aospkeyboard.SoftwareKeyboardLayoutTemplates
-import it.palsoftware.pastiera.inputmethod.aospkeyboard.SoftwareKeyboardSymLabels
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils.localeString
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils.setAdditionalInputMethodSubtypesCompat
 import it.palsoftware.pastiera.inputmethod.telex.VietnameseTelexProcessor
@@ -162,7 +152,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     private var suppressNextLayoutReload: Boolean = false
     private var activeKeyboardLayoutName: String = "qwerty"
     private var consumeAltEnterUntilKeyUp: Boolean = false
-    private var dispatchingSoftwareKeyboardKey: Boolean = false
 
     // Aggiungi per Power Shortcuts
     private var powerShortcutToast: android.widget.Toast? = null
@@ -275,7 +264,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     private var lastRenderedSymMappings: Map<Int, String>? = null
     private var lastRenderedStatusInputConnection: android.view.inputmethod.InputConnection? = null
     private var lastRenderedPastierinaModeActive: Boolean? = null
-    private var lastRenderedSoftwareKeyboardMode: SettingsManager.SoftwareKeyboardMode? = null
     private var lastRenderedModifierIndicators: Set<String>? = null
     private var requestedInputViewShown: Boolean = true
     private var suppressedAutoCapContextKey: String? = null
@@ -318,24 +306,20 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     private var replayingProtectedNumberKey = false
     private val uiHandler = Handler(Looper.getMainLooper())
     private var inputManager: InputManager? = null
-    private var lastObservedAutoSoftwareKeyboardMode: SettingsManager.SoftwareKeyboardMode? = null
     private var pendingInputDeviceModeRefresh: Runnable? = null
     private var pendingKeyboardSurfaceTransition: Runnable? = null
     private val inputDeviceListener = object : InputManager.InputDeviceListener {
         override fun onInputDeviceAdded(deviceId: Int) {
-            SoftwareKeyboardAutoDetector.onInputDevicesChanged()
             scheduleInputDeviceModeRefresh()
         }
 
         override fun onInputDeviceRemoved(deviceId: Int) {
             accidentalKeyPressFilter.resetDevice(deviceId)
-            SoftwareKeyboardAutoDetector.onInputDevicesChanged()
             scheduleInputDeviceModeRefresh()
         }
 
         override fun onInputDeviceChanged(deviceId: Int) {
             accidentalKeyPressFilter.resetDevice(deviceId)
-            SoftwareKeyboardAutoDetector.onInputDevicesChanged()
             val device = InputDevice.getDevice(deviceId)
         }
     }
@@ -345,7 +329,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
     private val clipboardCleanupIntervalMs = 60_000L
     private val clipboardCleanupRunnable = object : Runnable {
         override fun run() {
-            val retention = SettingsManager.getClipboardRetentionTime(this@PhysicalKeyboardInputMethodService)
             clipboardHistoryManager.prepareClipboardHistory()
             val count = clipboardHistoryManager.getHistorySize()
             uiHandler.post {
@@ -394,8 +377,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
 
     @Suppress("DEPRECATION")
     private fun updateSystemStatusModifierIcon(
-        snapshot: StatusBarController.StatusSnapshot,
-        effectiveSoftwareKeyboardMode: SettingsManager.SoftwareKeyboardMode
+        snapshot: StatusBarController.StatusSnapshot
     ) {
         if (snapshot.navModeActive) {
             if (lastSystemStatusIconResId != R.drawable.ic_nav_mode_status) {
@@ -406,8 +388,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         }
 
         val iconResId = if (
-            SettingsManager.getModifierIndicatorShowsMenuBar(this) &&
-            effectiveSoftwareKeyboardMode != SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
+            SettingsManager.getModifierIndicatorShowsMenuBar(this)
         ) {
             systemStatusModifierIconResId(snapshot)
         } else {
@@ -492,36 +473,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         pendingInputDeviceModeRefresh?.let { uiHandler.removeCallbacks(it) }
         val refresh = Runnable {
             pendingInputDeviceModeRefresh = null
-            refreshSoftwareKeyboardModeForConnectedDevices()
         }
         pendingInputDeviceModeRefresh = refresh
         uiHandler.postDelayed(refresh, 120L)
     }
 
-    private fun refreshSoftwareKeyboardModeForConnectedDevices() {
-        alternateCharacterManager.reloadModifierAndDeviceSymMappings()
-        updateStatusBarText()
-        val autoMode = SoftwareKeyboardAutoDetector.resolve(this)
-        val previousAutoMode = lastObservedAutoSoftwareKeyboardMode
-        lastObservedAutoSoftwareKeyboardMode = autoMode
-        val configuredMode = SettingsManager.getSoftwareKeyboardMode(this)
-        val transition = SoftwareKeyboardDeviceTransitionPolicy.plan(
-            configuredMode = configuredMode,
-            previousAutoMode = previousAutoMode,
-            autoMode = autoMode,
-        ) ?: return
-        if (transition.clearTemporaryOverride) {
-            SoftwareKeyboardModeActions.clearTemporaryMode(this)
-        }
-        scheduleKeyboardSurfaceTransition(
-            mode = transition.mode,
-            closeInput = transition.closeInput,
-            delayMs = KEYBOARD_DEVICE_SURFACE_TRANSITION_DELAY_MS
-        )
-    }
-
     private fun scheduleKeyboardSurfaceTransition(
-        mode: SettingsManager.SoftwareKeyboardMode,
         closeInput: Boolean = false,
         requireActiveTextField: Boolean = false,
         delayMs: Long = KEYBOARD_SURFACE_TRANSITION_DELAY_MS
@@ -536,7 +493,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                 return@Runnable
             }
             keyboardVisibilityController.onKeyboardSurfaceChanged(
-                ensureInputViewShown = mode == SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL,
+                ensureInputViewShown = false,
                 requireActiveTextField = requireActiveTextField
             )
         }
@@ -544,21 +501,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         // A status-bar tap must finish dispatching before its own IME surface is replaced.
         // Two UI frames avoid InputDispatcher waiting for the disappearing touch target.
         uiHandler.postDelayed(transition, delayMs)
-    }
-
-    private fun toggleSoftwareKeyboardModeFromStatusBar() {
-        val next = SoftwareKeyboardModeActions.toggleTemporaryMode(this)
-        if (SettingsManager.getSoftwareKeyboardModeToggleToastsEnabled(this)) {
-            val message = when (next) {
-                SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL ->
-                    getString(R.string.software_keyboard_mode_toggle_now_virtual)
-                SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE ->
-                    getString(R.string.software_keyboard_mode_toggle_now_hardware)
-                SettingsManager.SoftwareKeyboardMode.AUTO ->
-                    getString(R.string.software_keyboard_mode_auto_short)
-            }
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun scheduleStatusBarTextUpdate(delayMs: Long = CURSOR_UPDATE_DELAY) {
@@ -584,7 +526,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         lastRenderedSymMappings = null
         lastRenderedStatusInputConnection = null
         lastRenderedPastierinaModeActive = null
-        lastRenderedSoftwareKeyboardMode = null
         lastRenderedModifierIndicators = null
     }
 
@@ -1869,11 +1810,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             symLayoutController.openSymbolsPage()
             updateStatusBarText()
         }
-        candidatesBarController.onSoftwareKeyboardSymToggleRequested = {
-            ensureImeSurfaceVisible()
-            symLayoutController.toggleSymPage()
-            updateStatusBarText()
-        }
         candidatesBarController.onSymCloseRequested = {
             if (symLayoutController.closeSymPage()) {
                 updateStatusBarText()
@@ -1893,56 +1829,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             variationInteractedDuringHold = true
             sendCtrlShortcut(KeyEvent.KEYCODE_Y)
         }
-        candidatesBarController.onSoftwareKeyboardKeyPressed = { keyCode ->
-            typingSoundPlayer.play(keyCode)
-        }
-        candidatesBarController.onSoftwareKeyboardModifierKeyDown = { keyCode ->
-            handleSoftwareKeyboardModifierKeyDown(keyCode)
-        }
-        candidatesBarController.onSoftwareKeyboardModifierKeyUp = { keyCode ->
-            handleSoftwareKeyboardModifierKeyUp(keyCode)
-        }
-        candidatesBarController.onSoftwareKeyboardKeyStroke = { keyCode, _ ->
-            handleSoftwareKeyboardKeyStroke(keyCode)
-        }
-        candidatesBarController.onSoftwareKeyboardShiftTapped = {
-            val wasShiftOneShot = modifierStateController.shiftOneShot
-            val downResult = modifierStateController.handleShiftKeyDown(KeyEvent.KEYCODE_SHIFT_LEFT)
-            if (wasShiftOneShot && !modifierStateController.shiftOneShot) {
-                suppressAutoCapRenderingAtCursorIfNeeded()
-            }
-            val upResult = modifierStateController.handleShiftKeyUp(KeyEvent.KEYCODE_SHIFT_LEFT)
-            if (
-                downResult.shouldUpdateStatusBar ||
-                downResult.shouldRefreshStatusBar ||
-                upResult.shouldUpdateStatusBar ||
-                upResult.shouldRefreshStatusBar
-            ) {
-                updateStatusBarText()
-            }
-        }
-        candidatesBarController.onSoftwareKeyboardNonShiftInteraction = {
-            modifierStateController.registerNonModifierKey()
-        }
-        candidatesBarController.onSoftwareKeyboardTextInput = { text, inputConnection, snapshot ->
-            val ic = inputConnection ?: currentInputConnection
-            val consumedShiftOneShot = text.length == 1 &&
-                    text[0].isLetter() &&
-                    modifierStateController.consumeShiftOneShot()
-            val handled = handleSoftwareKeyboardTextInput(text, ic, snapshot)
-            if (consumedShiftOneShot) {
-                updateStatusBarText()
-            }
-            handled
-        }
-        candidatesBarController.onSoftwareKeyboardBoundaryTextInput = { text, inputConnection ->
-            handleBoundaryTextBeforeCommit(text, inputConnection)
-        }
         candidatesBarController.onMinimalUiToggleRequested = {
             keyboardVisibilityController.togglePastierinaMode()
-        }
-        candidatesBarController.onSoftwareKeyboardModeToggleRequested = {
-            toggleSoftwareKeyboardModeFromStatusBar()
         }
         val postClipboardBadgeUpdate: () -> Unit = {
             val count = clipboardHistoryManager.getHistorySize()
@@ -2050,7 +1938,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             }
         )
         inputManager = getSystemService(InputManager::class.java)
-        lastObservedAutoSoftwareKeyboardMode = SoftwareKeyboardAutoDetector.resolve(this)
         inputManager?.registerInputDeviceListener(inputDeviceListener, uiHandler)
         launcherShortcutController = LauncherShortcutController(this)
         // Configura callbacks per gestire nav mode durante power shortcuts
@@ -2242,28 +2129,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                     candidatesBarController.refreshWindowInsets()
                 }
             } else if (
-                key == "experimental_candidates_view_enabled" ||
-                key == "software_keyboard_mode" ||
-                key == SettingsManager.KEY_SOFTWARE_KEYBOARD_MODE_RUNTIME_OVERRIDE
+                key == "experimental_candidates_view_enabled"
             ) {
                 invalidateRenderedStatusSnapshot()
-                val effectiveMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this)
-                scheduleKeyboardSurfaceTransition(
-                    mode = effectiveMode
-                )
-            } else if (
-                key == "software_keyboard_layout_style" ||
-                key == "software_keyboard_number_row_enabled" ||
-                key == "software_keyboard_left_modifier_key" ||
-                key == "software_keyboard_right_modifier_key"
-            ) {
-                Handler(Looper.getMainLooper()).post {
-                    updateStatusBarText()
-                }
-            } else if (key == "software_keyboard_nearest_key_touch_enabled") {
-                Handler(Looper.getMainLooper()).post {
-                    updateStatusBarText()
-                }
+                scheduleKeyboardSurfaceTransition()
             } else if (SettingsManager.isKeyboardThemePreferenceKey(key)) {
                 Handler(Looper.getMainLooper()).post {
                     updateStatusBarText()
@@ -2418,63 +2287,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         }
     }
 
-    private fun handleSoftwareKeyboardTextInput(
-        text: String,
-        inputConnection: InputConnection?,
-        snapshot: StatusBarController.StatusSnapshot
-    ): Boolean {
-        val ic = inputConnection ?: return false
-
-        if (text == " ") {
-            if (::textExpansionController.isInitialized &&
-                textExpansionController.handleKeyDown(KeyEvent.KEYCODE_SPACE)
-            ) {
-                return true
-            }
-            DeferredPunctuationSpaceTracker.prepareForTextCommit(this, ic, text)
-            return SoftwareKeyboardTextInputHandler.handleSpaceInput(
-                textInputController = textInputController,
-                inputConnection = ic,
-                shouldDisableDoubleSpaceToPeriod = snapshot.shouldDisableDoubleSpaceToPeriod,
-                shouldDisableAutoCapitalize = snapshot.shouldDisableAutoCapitalize,
-                shouldDisableSuggestions = snapshot.shouldDisableSuggestions,
-                onDoubleSpaceHandled = { suggestionController.onContextReset() },
-                onNormalBoundary = {
-                    suggestionController.onBoundaryKey(KeyEvent.KEYCODE_SPACE, null, ic).committed
-                },
-                onCommitSpace = {
-                    markSelectionUpdateSkipAfterCommit()
-                    ic.commitText(" ", 1)
-                },
-                onStatusBarUpdate = { updateStatusBarText() }
-            )
-        }
-
-        if (
-            handleBoundaryTextBeforeCommit(
-                text = text,
-                inputConnection = ic,
-                shouldDisableSuggestions = snapshot.shouldDisableSuggestions,
-                shouldDisableAutoCorrect = snapshot.shouldDisableAutoCorrect
-            )
-        ) {
-            if (::textExpansionController.isInitialized) textExpansionController.scheduleRefresh()
-            return true
-        }
-
-        markSelectionUpdateSkipAfterCommit()
-        if (DeferredPunctuationSpaceTracker.prepareForTextCommit(this, ic, text)) {
-            suggestionController.onContextReset()
-        }
-        ic.commitText(text, 1)
-        if (!snapshot.shouldDisableSuggestions) {
-            suggestionController.onCharacterCommitted(text, ic)
-        }
-        updateStatusBarText()
-        if (::textExpansionController.isInitialized) textExpansionController.scheduleRefresh()
-        return true
-    }
-
     private fun handleBoundaryTextBeforeCommit(
         text: String,
         inputConnection: InputConnection?,
@@ -2500,178 +2312,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             autoCorrectionManager = autoCorrectionManager,
             updateStatusBar = { updateStatusBarText() }
         )
-    }
-
-    private fun handleSoftwareKeyboardModifierKeyDown(keyCode: Int): Boolean {
-        return when (keyCode) {
-            KeyEvent.KEYCODE_CTRL_LEFT, KeyEvent.KEYCODE_CTRL_RIGHT -> {
-                modifierStateBeforeHold = modifierStateController.captureLogicalState()
-                variationInteractedDuringHold = false
-                otherKeyInteractedDuringHold = false
-                modifierDownTimes[keyCode] = SystemClock.uptimeMillis()
-                val result = modifierStateController.handleCtrlKeyDown(
-                    keyCode,
-                    isInputViewActive,
-                    onNavModeDeactivated = {
-                        navModeController.cancelNotification()
-                    }
-                )
-                if (result.shouldUpdateStatusBar || result.shouldRefreshStatusBar) {
-                    updateStatusBarText()
-                }
-                true
-            }
-            KeyEvent.KEYCODE_ALT_LEFT, KeyEvent.KEYCODE_ALT_RIGHT -> {
-                modifierStateBeforeHold = modifierStateController.captureLogicalState()
-                variationInteractedDuringHold = false
-                otherKeyInteractedDuringHold = false
-                modifierDownTimes[keyCode] = SystemClock.uptimeMillis()
-                if (symLayoutController.isSymActive()) {
-                    symLayoutController.closeSymPage()
-                }
-                val result = modifierStateController.handleAltKeyDown(keyCode)
-                if (result.shouldUpdateStatusBar || result.shouldRefreshStatusBar) {
-                    updateStatusBarText()
-                }
-                true
-            }
-            KEYCODE_SYM -> {
-                modifierDownTimes[keyCode] = SystemClock.uptimeMillis()
-                dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_DOWN)
-            }
-            else -> false
-        }
-    }
-
-    private fun handleSoftwareKeyboardModifierKeyUp(keyCode: Int): Boolean {
-        return when (keyCode) {
-            KeyEvent.KEYCODE_CTRL_LEFT, KeyEvent.KEYCODE_CTRL_RIGHT -> {
-                val downTime = modifierDownTimes[keyCode] ?: 0L
-                val now = SystemClock.uptimeMillis()
-                val holdDuration = if (downTime > 0L) now - downTime else 0L
-                val wasTap = holdDuration < 300L && !otherKeyInteractedDuringHold && !variationInteractedDuringHold
-                val shortcutUsedDuringHold = otherKeyInteractedDuringHold
-
-                val result = modifierStateController.handleCtrlKeyUp(keyCode)
-                if (shortcutUsedDuringHold && ctrlOneShot && !ctrlLatchActive) {
-                    modifierStateController.ctrlOneShot = false
-                }
-                if (result.shouldUpdateStatusBar || wasTap || shortcutUsedDuringHold) {
-                    updateStatusBarText()
-                }
-                modifierDownTimes.remove(keyCode)
-                variationInteractedDuringHold = false
-                otherKeyInteractedDuringHold = false
-                modifierStateBeforeHold = null
-                true
-            }
-            KeyEvent.KEYCODE_ALT_LEFT, KeyEvent.KEYCODE_ALT_RIGHT -> {
-                val result = modifierStateController.handleAltKeyUp(keyCode)
-                if (result.shouldUpdateStatusBar || result.shouldRefreshStatusBar) {
-                    updateStatusBarText()
-                }
-                modifierDownTimes.remove(keyCode)
-                variationInteractedDuringHold = false
-                otherKeyInteractedDuringHold = false
-                modifierStateBeforeHold = null
-                true
-            }
-            KEYCODE_SYM -> {
-                val downTime = modifierDownTimes[keyCode] ?: 0L
-                val now = SystemClock.uptimeMillis()
-                val holdDuration = if (downTime > 0L) now - downTime else 0L
-                if (holdDuration >= 300L && symLayoutController.currentSymPage() == 0) {
-                    symChordUsedSinceKeyDown = true
-                }
-                modifierDownTimes.remove(keyCode)
-                // Keep AOSP-rendered text SYM pages synchronous: the held-SYM preview and the
-                // activated SYM page use the same view, so posting KEY_UP would draw one frame
-                // of the base keyboard between them. Overlay pages replace the touched view and
-                // must still be posted to avoid mutating the hierarchy during touch dispatch.
-                if (symLayoutController.peekNextSymPage() in 3..4) {
-                    uiHandler.post {
-                        dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_UP)
-                    }
-                } else {
-                    dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_UP)
-                }
-                true
-            }
-            else -> false
-        }
-    }
-
-    private fun handleSoftwareKeyboardKeyStroke(keyCode: Int): Boolean {
-        val consumeCtrlOneShotAfterStroke = ctrlOneShot && !ctrlLatchActive && !ctrlLatchFromNavMode
-        val softwareModifierActive =
-            symTogglePendingOnKeyUp ||
-                    symLayoutController.currentSymPage() in 1..4 ||
-                    altPressed ||
-                    altPhysicallyPressed ||
-                    altLatchActive ||
-                    altOneShot ||
-                    ctrlPressed ||
-                    ctrlPhysicallyPressed ||
-                    ctrlLatchActive ||
-                    ctrlOneShot ||
-                    ctrlLatchFromNavMode
-        if (!softwareModifierActive) {
-            return false
-        }
-        val (downHandled, upHandled) = try {
-            dispatchingSoftwareKeyboardKey = true
-            dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_DOWN) to
-                    dispatchSoftwareKeyboardSyntheticKey(keyCode, KeyEvent.ACTION_UP)
-        } finally {
-            dispatchingSoftwareKeyboardKey = false
-        }
-        if ((downHandled || upHandled) && SettingsManager.isQuickLauncherShortcut(this, keyCode)) {
-            candidatesBarController.cancelSoftwareKeyboardTouchState()
-        }
-        if (consumeCtrlOneShotAfterStroke && (downHandled || upHandled)) {
-            modifierStateController.ctrlOneShot = false
-            updateStatusBarText()
-        }
-        return downHandled || upHandled
-    }
-
-    private fun dispatchSoftwareKeyboardSyntheticKey(keyCode: Int, action: Int): Boolean {
-        val now = SystemClock.uptimeMillis()
-        val metaState = buildSoftwareKeyboardMetaState(keyCode)
-        val event = KeyEvent(
-            now,
-            now,
-            action,
-            keyCode,
-            0,
-            metaState
-        )
-        return if (action == KeyEvent.ACTION_DOWN) {
-            onKeyDown(keyCode, event)
-        } else {
-            onKeyUp(keyCode, event)
-        }
-    }
-
-    private fun buildSoftwareKeyboardMetaState(keyCode: Int): Int {
-        var metaState = 0
-        val ctrlActive = keyCode == KeyEvent.KEYCODE_CTRL_LEFT ||
-                keyCode == KeyEvent.KEYCODE_CTRL_RIGHT ||
-                ctrlPressed ||
-                ctrlPhysicallyPressed ||
-                ctrlLatchActive ||
-                ctrlOneShot ||
-                ctrlLatchFromNavMode
-        if (ctrlActive) {
-            metaState = metaState or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
-        }
-        if (shiftPressed || shiftPhysicallyPressed || shiftOneShot || capsLockEnabled) {
-            metaState = metaState or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
-        }
-        if (altPressed || altPhysicallyPressed || altOneShot || altLatchActive) {
-            metaState = metaState or KeyEvent.META_ALT_ON or KeyEvent.META_ALT_LEFT_ON
-        }
-        return metaState
     }
 
     private fun buildTrackpadGestureDetector(): TrackpadGestureDetector {
@@ -2978,7 +2618,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         var updateBarsMs = 0L
 
         val pastierinaModeActive = candidatesBarController.isPastierinaModeActive()
-        val effectiveSoftwareKeyboardMode = SettingsManager.resolveEffectiveSoftwareKeyboardMode(this)
         val variationStart = ImePerfLogger.mark()
         val variationSnapshot = if (pastierinaModeActive) {
             VariationStateController.Snapshot(isActive = false, lastInsertedChar = null, variations = emptyList())
@@ -2999,7 +2638,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         val suggestionsStart = ImePerfLogger.mark()
         val baseSuggestions = if (suggestionsEnabled) visibleSuggestionStrings() else emptyList()
         suggestionsMs = ImePerfLogger.elapsedMs(suggestionsStart)
-        val softwareSymPreviewProjection = buildSoftwareSymPreviewProjection(modifierSnapshot)
         val snapshot = StatusBarController.StatusSnapshot(
             capsLockEnabled = modifierSnapshot.capsLockEnabled,
             shiftPhysicallyPressed = modifierSnapshot.shiftPhysicallyPressed,
@@ -3028,8 +2666,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             shiftLayerLatched = shiftLayerLatched,
             altModifierLayerLatched = altModifierLayerLatched,
             activeKeyboardLayoutName = activeKeyboardLayoutName,
-            softwareSymPreviewLabels = softwareSymPreviewProjection.contentByKeyCode,
-            softwareSymPreviewTextLabels = softwareSymPreviewProjection.contentByBaseText,
             softwareCtrlPreviewLabels = buildSoftwareCtrlPreviewLabels(modifierSnapshot),
             softwareCtrlPreviewIconRes = buildSoftwareCtrlPreviewIconRes(modifierSnapshot),
             softwareCtrlPreviewActive = shouldShowSoftwareCtrlPreview(modifierSnapshot),
@@ -3038,7 +2674,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             // Legacy flag for backward compatibility
             shouldDisableSmartFeatures = shouldDisableSmartFeatures
         )
-        updateSystemStatusModifierIcon(snapshot, effectiveSoftwareKeyboardMode)
+        updateSystemStatusModifierIcon(snapshot)
         val modifierIndicators = SettingsManager.getModifierIndicators(this)
         // Passa anche la mappa emoji quando SYM è attivo (solo pagina 1)
         val emojiMapText = symLayoutController.emojiMapText()
@@ -3053,7 +2689,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                     symMappings == lastRenderedSymMappings &&
                     inputConnection === lastRenderedStatusInputConnection &&
                     pastierinaModeActive == lastRenderedPastierinaModeActive &&
-                    effectiveSoftwareKeyboardMode == lastRenderedSoftwareKeyboardMode &&
                     modifierIndicators == lastRenderedModifierIndicators
         if (!unchangedRenderedState) {
             val updateBarsStart = ImePerfLogger.mark()
@@ -3064,7 +2699,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             lastRenderedSymMappings = symMappings
             lastRenderedStatusInputConnection = inputConnection
             lastRenderedPastierinaModeActive = pastierinaModeActive
-            lastRenderedSoftwareKeyboardMode = effectiveSoftwareKeyboardMode
             lastRenderedModifierIndicators = modifierIndicators
         }
         ImePerfLogger.logDuration(
@@ -3074,35 +2708,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             details = "variation=${variationMs}ms suggestions=${suggestionsMs}ms updateBars=${updateBarsMs}ms pkg=$currentPackageName"
         )
     }
-
-    private fun buildSoftwareSymPreviewProjection(
-        modifierSnapshot: it.palsoftware.pastiera.core.ModifierStateController.Snapshot
-    ): SoftwareKeyboardSymLabels.Projection {
-        val shiftActive = modifierSnapshot.capsLockEnabled ||
-                modifierSnapshot.shiftPhysicallyPressed ||
-                modifierSnapshot.shiftOneShot
-        val mappings = symLayoutController.previewNextSoftwareSymPageMappings(shiftActive)
-        if (mappings.isEmpty()) {
-            return SoftwareKeyboardSymLabels.Projection(emptyMap(), emptyMap())
-        }
-        return SoftwareKeyboardSymLabels.project(
-            page = symLayoutController.nextSoftwareTextSymPage(),
-            rows = SoftwareKeyboardLayoutTemplates.rowTemplateFor(
-                activeKeyboardLayoutName,
-                softwareKeyboardLayoutStyle()
-            ),
-            symMappings = mappings,
-            layoutName = activeKeyboardLayoutName
-        )
-    }
-
-    private fun softwareKeyboardLayoutStyle(): AospKeyboardView.SoftwareLayoutStyle =
-        when (SettingsManager.getSoftwareKeyboardLayoutStyle(this)) {
-            SettingsManager.SoftwareKeyboardLayoutStyle.COMPACT -> AospKeyboardView.SoftwareLayoutStyle.COMPACT
-            SettingsManager.SoftwareKeyboardLayoutStyle.EXTENDED_ISO -> AospKeyboardView.SoftwareLayoutStyle.EXTENDED_ISO
-            SettingsManager.SoftwareKeyboardLayoutStyle.FULL_ANSI -> AospKeyboardView.SoftwareLayoutStyle.FULL_ANSI
-            SettingsManager.SoftwareKeyboardLayoutStyle.FULL_ISO -> AospKeyboardView.SoftwareLayoutStyle.FULL_ISO
-        }
 
     private fun shouldShowSoftwareCtrlPreview(
         modifierSnapshot: it.palsoftware.pastiera.core.ModifierStateController.Snapshot
@@ -3998,7 +3603,6 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             candidatesBarController.dismissEmojiPickerPopups()
         }
         keyboardVisibilityController.onImeWindowVisibilityChanged(shown = false)
-        SoftwareKeyboardAutoDetector.onInputWindowHidden()
         invalidateRenderedStatusSnapshot()
         if (::candidatesBarController.isInitialized) {
             candidatesBarController.resetSuggestionActionMode()
@@ -4821,11 +4425,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                     shiftOneShot = shiftOneShot,
                     capsLockEnabled = capsLockEnabled,
                     cursorUpdateDelayMs = CURSOR_UPDATE_DELAY,
-                    altMappingsOverride = if (dispatchingSoftwareKeyboardKey) {
-                        AltModifierMappingResolver.resolve(assets, this)
-                    } else {
-                        null
-                    },
+                    altMappingsOverride = null,
                     shouldDisableSmartFeatures = shouldDisableSmartFeatures
                 ),
                 controllers = InputEventRouter.EditableFieldKeyDownControllers(

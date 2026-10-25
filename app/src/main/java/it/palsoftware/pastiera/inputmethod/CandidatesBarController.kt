@@ -128,13 +128,6 @@ class CandidatesBarController(
             candidatesStatusBar.onSymbolsPageRequested = value
         }
 
-    var onSoftwareKeyboardSymToggleRequested: (() -> Unit)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardSymToggleRequested = value
-            candidatesStatusBar.onSoftwareKeyboardSymToggleRequested = value
-        }
-
     var onSymCloseRequested: (() -> Unit)? = null
         set(value) {
             field = value
@@ -156,74 +149,11 @@ class CandidatesBarController(
             candidatesStatusBar.onRedoRequested = value
         }
 
-    var onSoftwareKeyboardKeyPressed: ((Int) -> Unit)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardKeyPressed = value
-            candidatesStatusBar.onSoftwareKeyboardKeyPressed = value
-        }
-
-    var onSoftwareKeyboardModifierKeyDown: ((Int) -> Boolean)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardModifierKeyDown = value
-            candidatesStatusBar.onSoftwareKeyboardModifierKeyDown = value
-        }
-
-    var onSoftwareKeyboardModifierKeyUp: ((Int) -> Boolean)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardModifierKeyUp = value
-            candidatesStatusBar.onSoftwareKeyboardModifierKeyUp = value
-        }
-
-    var onSoftwareKeyboardKeyStroke: ((Int, String) -> Boolean)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardKeyStroke = value
-            candidatesStatusBar.onSoftwareKeyboardKeyStroke = value
-        }
-
-    var onSoftwareKeyboardShiftTapped: (() -> Unit)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardShiftTapped = value
-            candidatesStatusBar.onSoftwareKeyboardShiftTapped = value
-        }
-
-    var onSoftwareKeyboardNonShiftInteraction: (() -> Unit)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardNonShiftInteraction = value
-            candidatesStatusBar.onSoftwareKeyboardNonShiftInteraction = value
-        }
-
-    var onSoftwareKeyboardTextInput: ((String, InputConnection?, StatusBarController.StatusSnapshot) -> Boolean)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardTextInput = value
-            candidatesStatusBar.onSoftwareKeyboardTextInput = value
-        }
-
-    var onSoftwareKeyboardBoundaryTextInput: ((String, InputConnection?) -> Boolean)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardBoundaryTextInput = value
-            candidatesStatusBar.onSoftwareKeyboardBoundaryTextInput = value
-        }
-
     var onMinimalUiToggleRequested: (() -> Unit)? = null
         set(value) {
             field = value
             inputStatusBar.onMinimalUiToggleRequested = value
             candidatesStatusBar.onMinimalUiToggleRequested = value
-        }
-
-    var onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null
-        set(value) {
-            field = value
-            inputStatusBar.onSoftwareKeyboardModeToggleRequested = value
-            candidatesStatusBar.onSoftwareKeyboardModeToggleRequested = value
         }
 
     fun getInputView(emojiMapText: String = ""): LinearLayout {
@@ -382,10 +312,4 @@ class CandidatesBarController(
         inputStatusBar.clearExpansionSuggestions()
         candidatesStatusBar.clearExpansionSuggestions()
     }
-
-    fun cancelSoftwareKeyboardTouchState() {
-        inputStatusBar.cancelSoftwareKeyboardTouchState()
-        candidatesStatusBar.cancelSoftwareKeyboardTouchState()
-    }
-
 }

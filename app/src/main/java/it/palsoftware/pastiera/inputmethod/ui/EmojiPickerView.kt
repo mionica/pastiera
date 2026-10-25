@@ -453,16 +453,6 @@ class EmojiPickerView(
         }
     }
 
-    fun configureSoftwareKeyboardMode(heightPx: Int?, onKeyboardLayoutRequested: (() -> Unit)?) {
-        val configuredHeight = configuredHeightPx(context)
-        val targetHeight = heightPx?.takeIf { it > 0 } ?: configuredHeight
-        updateHeight(targetHeight)
-        keyboardSwitcherButton.visibility = if (onKeyboardLayoutRequested != null) View.VISIBLE else View.GONE
-        keyboardSwitcherButton.setOnClickListener {
-            onKeyboardLayoutRequested?.invoke()
-        }
-    }
-
     private fun updateHeight(heightPx: Int) {
         (layoutParams ?: LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)).also {
             it.height = heightPx

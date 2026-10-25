@@ -214,11 +214,6 @@ class ClipboardHistoryView(
         closeButton?.visibility = if (enabled) View.GONE else View.VISIBLE
     }
 
-    fun configureSoftwareKeyboardMode(heightPx: Int?) {
-        val targetHeight = heightPx?.takeIf { it > 0 } ?: dpToPx(177f)
-        updateHeight(targetHeight)
-    }
-
     private fun updateHeight(heightPx: Int) {
         (layoutParams ?: ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx)).also {
             it.height = heightPx

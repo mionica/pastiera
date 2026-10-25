@@ -44,9 +44,7 @@ class KeyboardVisibilityController(
     private var waitingForBackendHide = false
 
     fun usesCandidatesView(): Boolean =
-        SettingsManager.getExperimentalCandidatesViewEnabled(context) &&
-            SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) !=
-            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL
+        SettingsManager.getExperimentalCandidatesViewEnabled(context)
 
     private fun expectedSurface() = if (usesCandidatesView()) {
         RenderedSurface.CANDIDATES_VIEW
@@ -69,7 +67,6 @@ class KeyboardVisibilityController(
     }
 
     fun onEvaluateInputViewShown(shouldShowInputView: Boolean): Boolean {
-        SoftwareKeyboardAutoDetector.updateSystemInputViewDecision(shouldShowInputView)
         // The stable backend deliberately uses an input view even for the compact hardware row.
         // Keep evaluation pure: a show from here re-enters Android's unfinished show operation.
         return !usesCandidatesView()
@@ -144,8 +141,7 @@ class KeyboardVisibilityController(
     }
 
     fun shouldShowSurfaceOnInputStart(autoShowKeyboardEnabled: Boolean): Boolean =
-        SettingsManager.resolveEffectiveSoftwareKeyboardMode(context) !=
-            SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL || autoShowKeyboardEnabled
+        autoShowKeyboardEnabled
 
     fun onImeWindowVisibilityChanged(shown: Boolean) {
         windowShown = shown

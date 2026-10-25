@@ -59,7 +59,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -93,7 +92,6 @@ fun AdvancedSettingsScreen(
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val prefs = remember { SettingsManager.getPreferences(context) }
@@ -586,7 +584,6 @@ fun AdvancedSettingsScreen(
                                         if (minutes != null) {
                                             SettingsManager.setClipboardRetentionTime(context, minutes)
                                         }
-                                        keyboardController?.hide()
                                         focusManager.clearFocus()
                                     }
                                 ) {

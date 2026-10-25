@@ -830,62 +830,6 @@ object SettingLinkRegistry {
 
         // Keyboard theme editor (customization sub-screen)
         entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_SHOW_LEDS,
-            R.string.keyboard_theme_show_leds,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_DISTRIBUTE_SPACING,
-            R.string.keyboard_theme_distribute_spacing,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_ORTHOLINEAR,
-            R.string.keyboard_theme_ortholinear,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_ATTACH_POPUP,
-            R.string.keyboard_theme_attach_popup,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_POPUP_TAIL,
-            R.string.keyboard_theme_popup_tail,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_PREVIEW_ON_HOLD,
-            R.string.keyboard_theme_preview_on_hold,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
-            SettingLinkIds.KEYBOARD_THEME_TOGGLE_CHARACTER_PICKER,
-            R.string.keyboard_theme_character_picker,
-            destination = SettingsDestination.Customization,
-            customizationDestination = SettingsActivity.CUSTOMIZATION_DESTINATION_KEYBOARD_THEME,
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        ),
-        entry(
             SettingLinkIds.KEYBOARD_THEME_LED_COLORS,
             R.string.keyboard_theme_wizard_leds,
             R.string.keyboard_theme_wizard_leds_description,
@@ -1034,7 +978,6 @@ object SettingLinkRegistry {
     )
 
     val keyboardsDevicesSubtitles: Map<KeyboardsDevicesDestination, Int> = mapOf(
-        KeyboardsDevicesDestination.OnScreen to R.string.on_screen_keyboard_title,
         KeyboardsDevicesDestination.BuiltIn to R.string.built_in_keyboards_title,
     )
 

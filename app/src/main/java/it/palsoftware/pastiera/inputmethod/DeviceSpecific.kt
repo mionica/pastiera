@@ -356,41 +356,6 @@ object DeviceSpecific {
         return keyboardModelForProfile()
     }
 
-    fun resolveInputProfile(
-        event: KeyEvent?
-    ): ResolvedInputProfile {
-        val identity = event
-            ?.takeIf { it.deviceId >= 0 }
-            ?.let { InputDevice.getDevice(it.deviceId) }
-            ?.let(::keyboardInputIdentity)
-        return resolveInputProfile(identity)
-    }
-
-    internal fun resolveInputProfile(
-        identity: KeyboardInputIdentity?
-    ): ResolvedInputProfile {
-        val kind = when {
-            identity == null -> InputDeviceKind.UNKNOWN
-            identity.isExternal -> InputDeviceKind.ACCESSORY
-            else -> InputDeviceKind.BUILT_IN
-        }
-
-        val manualProfile = normalizePhysicalProfileOverride()
-        if (manualProfile != null) {
-            return ResolvedInputProfile(
-                profileId = manualProfile,
-                kind = kind,
-                autoDetected = false
-            )
-        }
-
-        return ResolvedInputProfile(
-            profileId = currentDeviceProfile().physicalLayoutName,
-            kind = kind,
-            autoDetected = currentDeviceProfile().model != KeyboardModel.UNKNOWN
-        )
-    }
-
     fun detectedInputProfiles(): List<ResolvedInputProfile> {
         val profiles = mutableListOf<ResolvedInputProfile>()
         val builtIn = currentDeviceProfile()

@@ -1,6 +1,5 @@
 package it.palsoftware.pastiera
 
-import it.palsoftware.pastiera.inputmethod.aospkeyboard.AospKeyboardView
 import it.palsoftware.pastiera.inputmethod.ui.KeyboardThemeColors
 
 internal data class KeyboardThemePreset(
@@ -52,50 +51,6 @@ internal const val SOFTWARE_THEME_DEFAULT_NUMBER_ROW_HEIGHT = 0.8f
 internal const val SOFTWARE_THEME_DEFAULT_ROW_GAP = 0.47933885f
 internal const val SOFTWARE_THEME_DEFAULT_SUGGESTIONS_HEIGHT = 0.8982954f
 internal const val SOFTWARE_THEME_DEFAULT_VARIATIONS_HEIGHT = 0.95914257f
-
-internal fun KeyboardThemePreset.withSoftwareKeyboardDefaults(): KeyboardThemePreset =
-    if (keepsSoftwareGeometry) {
-        this
-    } else {
-        copy(
-            keyCornerRadiusRatio = SOFTWARE_THEME_DEFAULT_KEY_CORNER_RADIUS,
-            chromeCornerRadiusRatio = SOFTWARE_THEME_DEFAULT_CHROME_CORNER_RADIUS,
-            keyHeightScale = SOFTWARE_THEME_DEFAULT_KEY_HEIGHT,
-            numberRowHeightScale = SOFTWARE_THEME_DEFAULT_NUMBER_ROW_HEIGHT,
-            rowGapScale = SOFTWARE_THEME_DEFAULT_ROW_GAP,
-            ortholinear = true,
-            showLeds = false,
-            suggestionsHeightScale = SOFTWARE_THEME_DEFAULT_SUGGESTIONS_HEIGHT,
-            variationsHeightScale = SOFTWARE_THEME_DEFAULT_VARIATIONS_HEIGHT
-        )
-    }
-
-internal fun KeyboardThemePreset.toAospThemeOverride(): AospKeyboardView.ThemeOverride =
-    AospKeyboardView.ThemeOverride(
-        background = background,
-        divider = divider,
-        normalKey = normalKey,
-        specialKey = specialKey,
-        textAndIcons = textAndIcons,
-        ledInactive = ledInactive,
-        ledActive = ledActive,
-        ledLocked = ledLocked,
-        accent = accent,
-        keyPopup = keyPopup,
-        keyPopupSelected = keyPopupSelected,
-        keyCornerRadiusRatio = keyCornerRadiusRatio,
-        keyHeightScale = keyHeightScale,
-        numberRowHeightScale = numberRowHeightScale,
-        keyWidthScale = keyWidthScale,
-        rowGapScale = rowGapScale,
-        distributeHorizontalSpacing = distributeHorizontalSpacing,
-        ortholinear = ortholinear,
-        keyPopupStyle = keyPopupStyle,
-        keyPopupAttached = keyPopupAttached,
-        keyPopupTailEnabled = keyPopupTailEnabled,
-        keyPreviewAfterLongPress = keyPreviewAfterLongPress,
-        keyAlternatesPopupEnabled = keyAlternatesPopupEnabled
-    )
 
 internal fun KeyboardThemePreset.toKeyboardThemeColors(): KeyboardThemeColors =
     KeyboardThemeColors(

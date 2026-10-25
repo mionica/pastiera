@@ -1156,8 +1156,7 @@ private fun buildKeyboardDebugReport(
                     "id=${device.id} name='${device.name}' descriptor='${device.descriptor}' " +
                         "vendor_id=${device.vendorId} product_id=${device.productId} " +
                         "keyboard_type=${device.keyboardType} sources=${device.sources} " +
-                        "sources_hex=${formatHexInt(device.sources)} " +
-                        "external=${device.isExternal} virtual=${device.isVirtual}"
+                        "sources_hex=${formatHexInt(device.sources)} "
                 )
             }
         }

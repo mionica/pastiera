@@ -81,7 +81,6 @@ class VariationBarView(
     var onRedoRequested: (() -> Unit)? = null
     var onHamburgerMenuRequested: (() -> Unit)? = null
     var onMinimalUiToggleRequested: (() -> Unit)? = null
-    var onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null
     
     /**
      * Sets the microphone button active state (red pulsing background) during speech recognition.
@@ -641,7 +640,6 @@ class VariationBarView(
             onLanguageSwitchRequested = onLanguageSwitchRequested,
             onHamburgerMenuRequested = onHamburgerMenuRequested,
             onMinimalUiToggleRequested = onMinimalUiToggleRequested,
-            onSoftwareKeyboardModeToggleRequested = onSoftwareKeyboardModeToggleRequested,
             onOpenSettings = { openSettings() },
             onSymbolsPageRequested = onSymbolsPageRequested,
             onUndoRequested = onUndoRequested,

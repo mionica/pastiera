@@ -491,32 +491,11 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         unavailableFallbackId = "status_bar.presentation"
     ),
     SettingEntry(
-        id = "keyboard_theme.software.key_rounding",
-        titleRes = R.string.setting_link_theme_software_key_rounding,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
         id = "keyboard_theme.hardware.chrome_rounding",
         titleRes = R.string.setting_link_theme_hardware_chrome_rounding,
         route = SettingRoute(
             destination = SettingsDestination.Customization,
             customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.chrome_rounding",
-        titleRes = R.string.setting_link_theme_software_chrome_rounding,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
             keyboardThemeTab = KeyboardThemeEditorTab.Keys
         )
     ),
@@ -526,17 +505,6 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         route = SettingRoute(
             destination = SettingsDestination.Customization,
             customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.suggestions_height",
-        titleRes = R.string.setting_link_theme_software_suggestions_height,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
             keyboardThemeTab = KeyboardThemeEditorTab.Keys
         )
     ),
@@ -546,67 +514,7 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         route = SettingRoute(
             destination = SettingsDestination.Customization,
             customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE,
             keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.variations_height",
-        titleRes = R.string.setting_link_theme_software_variations_height,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.key_height",
-        titleRes = R.string.setting_link_theme_software_key_height,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.number_row_height",
-        titleRes = R.string.setting_link_theme_software_number_row_height,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.key_width",
-        titleRes = R.string.setting_link_theme_software_key_width,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.row_spacing",
-        titleRes = R.string.setting_link_theme_software_row_spacing,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Keys
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.preview_viewport",
-        titleRes = R.string.setting_link_theme_preview_viewport,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE
         )
     ),
     SettingEntry(
@@ -615,7 +523,6 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         route = SettingRoute(
             destination = SettingsDestination.Customization,
             customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE,
             keyboardThemeTab = KeyboardThemeEditorTab.Colors
         )
     ),
@@ -624,8 +531,7 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         titleRes = R.string.setting_link_theme_hardware_assignment,
         route = SettingRoute(
             destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE
+            customizationDestination = "keyboard_theme_assignment"
         )
     ),
     SettingEntry(
@@ -633,10 +539,9 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         titleRes = R.string.setting_link_theme_hardware_light_theme,
         route = SettingRoute(
             destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE
+            customizationDestination = "keyboard_theme_assignment"
         ),
-        availabilityCheck = { SettingsManager.getKeyboardThemeAssignmentMode(it, SettingsManager.KeyboardThemeTarget.HARDWARE) == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM },
+        availabilityCheck = { SettingsManager.getKeyboardThemeAssignmentMode(it) == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM },
         unavailableFallbackId = "keyboard_theme.hardware.assignment"
     ),
     SettingEntry(
@@ -644,10 +549,9 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         titleRes = R.string.setting_link_theme_hardware_dark_theme,
         route = SettingRoute(
             destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE
+            customizationDestination = "keyboard_theme_assignment"
         ),
-        availabilityCheck = { SettingsManager.getKeyboardThemeAssignmentMode(it, SettingsManager.KeyboardThemeTarget.HARDWARE) == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM },
+        availabilityCheck = { SettingsManager.getKeyboardThemeAssignmentMode(it) == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM },
         unavailableFallbackId = "keyboard_theme.hardware.assignment"
     ),
     SettingEntry(
@@ -655,58 +559,7 @@ internal fun customizationSettingEntries(): List<SettingEntry> = listOf(
         titleRes = R.string.setting_link_theme_hardware_layout_overrides,
         route = SettingRoute(
             destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.HARDWARE
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.led_colors",
-        titleRes = R.string.setting_link_theme_software_led_colors,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE,
-            keyboardThemeTab = KeyboardThemeEditorTab.Colors
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.assignment",
-        titleRes = R.string.setting_link_theme_software_assignment,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE
-        )
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.light_theme",
-        titleRes = R.string.setting_link_theme_software_light_theme,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE
-        ),
-        availabilityCheck = { SettingsManager.getKeyboardThemeAssignmentMode(it, SettingsManager.KeyboardThemeTarget.SOFTWARE) == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM },
-        unavailableFallbackId = "keyboard_theme.software.assignment"
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.dark_theme",
-        titleRes = R.string.setting_link_theme_software_dark_theme,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE
-        ),
-        availabilityCheck = { SettingsManager.getKeyboardThemeAssignmentMode(it, SettingsManager.KeyboardThemeTarget.SOFTWARE) == SettingsManager.KEYBOARD_THEME_ASSIGNMENT_MODE_FOLLOW_SYSTEM },
-        unavailableFallbackId = "keyboard_theme.software.assignment"
-    ),
-    SettingEntry(
-        id = "keyboard_theme.software.layout_overrides",
-        titleRes = R.string.setting_link_theme_software_layout_overrides,
-        route = SettingRoute(
-            destination = SettingsDestination.Customization,
-            customizationDestination = "keyboard_theme_assignment",
-            keyboardThemeTarget = SettingsManager.KeyboardThemeTarget.SOFTWARE
+            customizationDestination = "keyboard_theme_assignment"
         )
     ),
 )

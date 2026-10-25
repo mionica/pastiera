@@ -54,18 +54,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import it.palsoftware.pastiera.ui.theme.PastieraTheme
-import it.palsoftware.pastiera.BuildConfig
-/*
-import it.palsoftware.pastiera.update.checkForUpdate
-*/
 import it.palsoftware.pastiera.update.fetchReleaseNotesForVersion
 import it.palsoftware.pastiera.update.ReleaseNotesSummary
-/*
-import it.palsoftware.pastiera.update.showUpdateDialog
-import it.palsoftware.pastiera.update.shouldUseGithubUpdateChecks
-*/
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
-import it.palsoftware.pastiera.inputmethod.SoftwareKeyboardAutoDetector
 import it.palsoftware.pastiera.inputmethod.TypingSoundPlayer
 import it.palsoftware.pastiera.data.variation.VariationRepository
 import java.util.Locale
@@ -167,13 +158,6 @@ sealed class TutorialPageType {
     data class ImeCaptionBar(
         val title: String,
         val description: String
-    ) : TutorialPageType()
-
-    data class SoftwareKeyboard(
-        val title: String,
-        val description: String,
-        val icon: ImageVector,
-        val iconTint: Color
     ) : TutorialPageType()
 
     data class LedIndicator(
@@ -285,14 +269,6 @@ fun TutorialScreen(
             TutorialPageType.ImeCaptionBar(
                 title = stringResource(R.string.tutorial_android16_ime_caption_title),
                 description = stringResource(R.string.tutorial_android16_ime_caption_description)
-            )
-        )
-        add(
-            TutorialPageType.SoftwareKeyboard(
-                title = stringResource(R.string.tutorial_page_software_keyboard_title),
-                description = stringResource(R.string.tutorial_page_software_keyboard_description),
-                icon = Icons.Filled.Keyboard,
-                iconTint = MaterialTheme.colorScheme.primary
             )
         )
         add(
@@ -438,12 +414,6 @@ fun TutorialScreen(
                         }
                         is TutorialPageType.ImeCaptionBar -> {
                             TutorialImeCaptionBarPageContent(
-                                page = pageType,
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                        is TutorialPageType.SoftwareKeyboard -> {
-                            TutorialSoftwareKeyboardPageContent(
                                 page = pageType,
                                 modifier = Modifier.fillMaxSize()
                             )
@@ -605,119 +575,6 @@ fun TutorialScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TutorialSoftwareKeyboardPageContent(
-    page: TutorialPageType.SoftwareKeyboard,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    var expanded by remember { mutableStateOf(false) }
-    var selectedMode by remember { mutableStateOf(SettingsManager.getSoftwareKeyboardMode(context)) }
-    val autoDetection = remember(selectedMode) { resolveSoftwareKeyboardAutoDetection(context, selectedMode) }
-
-    val label = when (selectedMode) {
-        SettingsManager.SoftwareKeyboardMode.AUTO -> stringResource(R.string.software_keyboard_mode_auto_short)
-        SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL -> stringResource(R.string.software_keyboard_mode_always_virtual)
-        SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE -> stringResource(R.string.software_keyboard_mode_always_hardware)
-    }
-
-    TutorialPageLayout(
-        title = page.title,
-        description = page.description,
-        modifier = modifier,
-        centered = true,
-        descriptionLeftAligned = true,
-        iconContent = {
-            TutorialIconSurface(
-                icon = page.icon,
-                tint = page.iconTint
-            )
-        }
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
-            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.38f),
-            contentColor = MaterialTheme.colorScheme.onErrorContainer
-        ) {
-            Row(
-                modifier = Modifier.padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Science,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = stringResource(R.string.tutorial_software_keyboard_alpha_warning),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            TutorialKeyboardModeInfoRow(
-                title = stringResource(R.string.software_keyboard_mode_auto_short),
-                description = stringResource(R.string.tutorial_software_keyboard_auto_bullet),
-                icon = Icons.Filled.AutoMode
-            )
-            TutorialKeyboardModeInfoRow(
-                title = stringResource(R.string.software_keyboard_mode_always_hardware),
-                description = stringResource(R.string.tutorial_software_keyboard_hardware_bullet),
-                icon = Icons.Filled.Keyboard
-            )
-            TutorialKeyboardModeInfoRow(
-                title = stringResource(R.string.software_keyboard_mode_always_virtual),
-                description = stringResource(R.string.tutorial_software_keyboard_virtual_bullet),
-                icon = Icons.Filled.TabletAndroid
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it }
-        ) {
-            OutlinedTextField(
-                value = label,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text(stringResource(R.string.software_keyboard_mode_title)) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                listOf(
-                    SettingsManager.SoftwareKeyboardMode.AUTO to stringResource(R.string.software_keyboard_mode_auto_short),
-                    SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL to stringResource(R.string.software_keyboard_mode_always_virtual),
-                    SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE to stringResource(R.string.software_keyboard_mode_always_hardware)
-                ).forEach { (mode, title) ->
-                    DropdownMenuItem(
-                        text = { Text(title) },
-                        onClick = {
-                            SettingsManager.setSoftwareKeyboardMode(context, mode)
-                            selectedMode = mode
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-        SoftwareKeyboardAutoDetectionCard(autoDetection)
-    }
-}
-
 @Composable
 private fun TutorialKeyboardModeInfoRow(
     title: String,
@@ -866,53 +723,6 @@ fun TutorialImeCaptionBarPageContent(
 }
 
 @Composable
-private fun SoftwareKeyboardAutoDetectionCard(
-    detection: SoftwareKeyboardAutoDetection
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Rule,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = stringResource(R.string.tutorial_software_keyboard_auto_checker_title),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-            RequirementRow(
-                label = detection.modeLabel,
-                isMet = true
-            )
-            RequirementRow(
-                label = detection.profileLabel,
-                isMet = detection.isPhysicalKeyboardProfile
-            )
-            Text(
-                text = detection.reason,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
-    }
-}
-
-@Composable
 private fun ImeCaptionBarPreviewImage(
     @DrawableRes imageRes: Int,
     label: String
@@ -971,56 +781,6 @@ private data class SoftwareKeyboardAutoDetection(
     val reason: String,
     val isPhysicalKeyboardProfile: Boolean
 )
-
-private fun resolveSoftwareKeyboardAutoDetection(
-    context: Context,
-    configuredMode: SettingsManager.SoftwareKeyboardMode
-): SoftwareKeyboardAutoDetection {
-    val physicalProfile = DeviceSpecific.physicalKeyboardName()
-    val keyboardFamily = DeviceSpecific.keyboardName()
-    val isPhysicalKeyboardProfile = DeviceSpecific.isPhysicalKeyboardDevice()
-    val autoMode = SoftwareKeyboardAutoDetector.resolve(context)
-    val effectiveMode = if (configuredMode == SettingsManager.SoftwareKeyboardMode.AUTO) {
-        autoMode
-    } else {
-        configuredMode
-    }
-    val effectiveLabel = context.softwareKeyboardModeLabel(effectiveMode)
-    val autoLabel = context.softwareKeyboardModeLabel(autoMode)
-    val modeLabel = if (configuredMode == SettingsManager.SoftwareKeyboardMode.AUTO) {
-        context.getString(R.string.tutorial_software_keyboard_auto_selected, autoLabel)
-    } else {
-        context.getString(
-            R.string.tutorial_software_keyboard_auto_overridden,
-            effectiveLabel,
-            autoLabel
-        )
-    }
-    val profileLabel = context.getString(
-        R.string.tutorial_software_keyboard_auto_profile,
-        keyboardFamily,
-        physicalProfile
-    )
-    val reason = if (isPhysicalKeyboardProfile) {
-        context.getString(R.string.tutorial_software_keyboard_auto_reason_physical)
-    } else {
-        context.getString(R.string.tutorial_software_keyboard_auto_reason_touch)
-    }
-    return SoftwareKeyboardAutoDetection(
-        modeLabel = modeLabel,
-        profileLabel = profileLabel,
-        reason = reason,
-        isPhysicalKeyboardProfile = isPhysicalKeyboardProfile
-    )
-}
-
-private fun Context.softwareKeyboardModeLabel(mode: SettingsManager.SoftwareKeyboardMode): String {
-    return when (mode) {
-        SettingsManager.SoftwareKeyboardMode.AUTO -> getString(R.string.software_keyboard_mode_auto_short)
-        SettingsManager.SoftwareKeyboardMode.FORCE_VIRTUAL -> getString(R.string.software_keyboard_mode_always_virtual)
-        SettingsManager.SoftwareKeyboardMode.FORCE_HARDWARE -> getString(R.string.software_keyboard_mode_always_hardware)
-    }
-}
 
 private fun resolveImeCaptionBarChecks(context: Context): List<ImeCaptionBarRequirement> {
     return listOf(
@@ -1666,7 +1426,6 @@ private fun launcherShortcutLabel(shortcut: SettingsManager.LauncherShortcut?): 
 
 internal fun applyDevsChoiceSettings(context: Context) {
     SettingsManager.setAppLanguageTag(context, null)
-    SettingsManager.setSoftwareKeyboardMode(context, SettingsManager.SoftwareKeyboardMode.AUTO)
     SettingsManager.setLongPressModifier(context, "variations")
     SettingsManager.setLongPressThreshold(context, 200L)
     SettingsManager.setTrackpadGesturesEnabled(context, true)

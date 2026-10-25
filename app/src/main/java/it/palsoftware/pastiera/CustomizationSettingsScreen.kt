@@ -529,19 +529,6 @@ fun CustomizationSettingsScreen(
                 KeyboardThemeScreen(
                     modifier = modifier,
                     onBack = { navigateBack() },
-                    initialTarget = when {
-                        initialKeyboardThemeTarget.equals(
-                            SettingsManager.KeyboardThemeTarget.SOFTWARE.name,
-                            ignoreCase = true
-                        ) ->
-                            SettingsManager.KeyboardThemeTarget.SOFTWARE
-                        initialKeyboardThemeTarget.equals(
-                            SettingsManager.KeyboardThemeTarget.HARDWARE.name,
-                            ignoreCase = true
-                        ) ->
-                            SettingsManager.KeyboardThemeTarget.HARDWARE
-                        else -> null
-                    },
                     initialAssignment = initialDestination == "keyboard_theme_assignment",
                     initialTab = KeyboardThemeEditorTab.values().firstOrNull { tab ->
                         tab.name.equals(initialKeyboardThemeTab, ignoreCase = true)

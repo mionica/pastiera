@@ -13,7 +13,6 @@ sealed class StatusBarButtonId(val key: String) {
     object Emoji : StatusBarButtonId("emoji")
     object Hamburger : StatusBarButtonId("hamburger")
     object MinimalUi : StatusBarButtonId("minimal_ui")
-    object SoftwareKeyboardMode : StatusBarButtonId("software_keyboard_mode")
     object Settings : StatusBarButtonId("settings")
     object Symbols : StatusBarButtonId("symbols")
     object Undo : StatusBarButtonId("undo")
@@ -86,9 +85,6 @@ data class StatusBarCallbacks(
     /** Called when the Pastierina status-bar presentation is toggled. */
     val onMinimalUiToggleRequested: (() -> Unit)? = null,
 
-    /** Called when the hardware/virtual keyboard mode override is requested */
-    val onSoftwareKeyboardModeToggleRequested: (() -> Unit)? = null,
-    
     /** Called when language button is long-pressed (opens settings) */
     val onOpenSettings: (() -> Unit)? = null,
     

@@ -37,7 +37,6 @@ class HamburgerMenuView(
         StatusBarButtonId.Redo,
         StatusBarButtonId.Language,
         StatusBarButtonId.MinimalUi,
-        StatusBarButtonId.SoftwareKeyboardMode,
         StatusBarButtonId.Settings
     )
 
@@ -172,9 +171,6 @@ class HamburgerMenuView(
             onHamburgerMenuRequested = null,
             onMinimalUiToggleRequested = {
                 callbacks.onMinimalUiToggleRequested?.invoke()
-            },
-            onSoftwareKeyboardModeToggleRequested = {
-                callbacks.onSoftwareKeyboardModeToggleRequested?.invoke()
             },
             onOpenSettings = {
                 onClose()
