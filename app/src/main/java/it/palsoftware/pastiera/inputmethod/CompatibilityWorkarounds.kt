@@ -1,7 +1,5 @@
 package it.palsoftware.pastiera.inputmethod
 
-import android.view.KeyEvent
-
 /**
  * Central registry for narrow app- and device-specific compatibility workarounds.
  *

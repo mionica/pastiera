@@ -13,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
@@ -26,7 +25,6 @@ import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils.locale
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import it.palsoftware.pastiera.inputmethod.AutoCorrector
-import it.palsoftware.pastiera.R
 import java.util.Locale
 import android.widget.Toast
 

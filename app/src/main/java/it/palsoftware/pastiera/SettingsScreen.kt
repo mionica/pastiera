@@ -2,7 +2,6 @@ package it.palsoftware.pastiera
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,7 +16,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.size
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.material.icons.Icons
@@ -31,32 +29,20 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Spellcheck
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.activity.ComponentActivity
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import it.palsoftware.pastiera.R
 import android.widget.Toast
-import it.palsoftware.pastiera.BuildConfig
-import it.palsoftware.pastiera.inputmethod.DeviceSpecific
-/*
-import it.palsoftware.pastiera.update.checkForUpdateNotices
-import it.palsoftware.pastiera.update.showReleaseNotice
-import it.palsoftware.pastiera.update.shouldUseGithubUpdateChecks
-*/
 import kotlinx.coroutines.delay
 
 /**

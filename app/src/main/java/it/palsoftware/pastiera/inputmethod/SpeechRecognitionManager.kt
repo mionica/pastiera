@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.SettingsManager
-import it.palsoftware.pastiera.inputmethod.AutoCapitalizeHelper
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils.localeString
 import java.util.Locale
 

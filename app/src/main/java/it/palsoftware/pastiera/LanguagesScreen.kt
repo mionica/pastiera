@@ -3,8 +3,6 @@ package it.palsoftware.pastiera
 import android.content.Context
 import android.content.Intent
 import android.view.inputmethod.InputMethodManager
-import android.view.inputmethod.InputMethodSubtype
-import it.palsoftware.pastiera.SettingsManager
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils.localeString
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import it.palsoftware.pastiera.R
 import java.util.Locale
 
 /**

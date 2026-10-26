@@ -89,21 +89,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".SoftwareKeyboardModeActionActivity"
-            android:exported="true"
-            android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true"
-            android:label="@string/software_keyboard_mode_toggle_shortcut_short"
-            android:launchMode="singleTop"
-            android:noHistory="true"
-            android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter>
-                <action android:name="it.palsoftware.pastiera.action.TOGGLE_SOFTWARE_KEYBOARD_MODE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        
         <!-- Activity per la personalizzazione SYM -->
         <activity
             android:name=".SymCustomizationActivity"
@@ -199,19 +184,6 @@
             <meta-data
                 android:name="android.view.im"
                 android:resource="@xml/method" />
-        </service>
-
-        <service
-            android:name=".inputmethod.ClicksLauncherButtonAccessibilityService"
-            android:exported="true"
-            android:label="@string/clicks_launcher_interception_service_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/clicks_launcher_button_accessibility_service" />
         </service>
 
         <!-- BroadcastReceiver for Direct Boot support -->

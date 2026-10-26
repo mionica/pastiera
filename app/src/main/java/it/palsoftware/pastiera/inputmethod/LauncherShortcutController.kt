@@ -2,7 +2,6 @@ package it.palsoftware.pastiera.inputmethod
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.util.Log
 import it.palsoftware.pastiera.R

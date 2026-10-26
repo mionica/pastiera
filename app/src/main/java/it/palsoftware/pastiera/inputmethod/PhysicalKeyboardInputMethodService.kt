@@ -11,7 +11,6 @@ import it.palsoftware.pastiera.SettingsManager
 import android.inputmethodservice.InputMethodService
 import android.hardware.input.InputManager
 import android.os.Build
-import android.os.SystemClock
 import android.media.AudioManager
 import android.util.Log
 import androidx.core.content.ContextCompat

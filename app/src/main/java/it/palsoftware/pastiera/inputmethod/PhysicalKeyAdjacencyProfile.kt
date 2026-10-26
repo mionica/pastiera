@@ -1,7 +1,5 @@
 package it.palsoftware.pastiera.inputmethod
 
-import android.view.KeyEvent
-
 /** Stable physical key identity, independent of the character emitted by the keyboard firmware. */
 @JvmInline
 value class PhysicalKeyId(val value: String) {

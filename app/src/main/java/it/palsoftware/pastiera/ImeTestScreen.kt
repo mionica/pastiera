@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.viewinterop.AndroidView
 import android.text.InputType
 import android.widget.EditText
-import androidx.compose.ui.graphics.Color as ComposeColor
 
 /**
  * IME Test Screen - Contains all possible Android input field types and IME actions

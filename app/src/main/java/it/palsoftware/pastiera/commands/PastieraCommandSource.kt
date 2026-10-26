@@ -1,8 +1,6 @@
 package it.palsoftware.pastiera.commands
 
 import android.content.Context
-import androidx.core.content.ContextCompat
-import it.palsoftware.pastiera.R
 
 class PastieraCommandSource : CommandSource {
     override val id = CommandSourceId.Pastiera

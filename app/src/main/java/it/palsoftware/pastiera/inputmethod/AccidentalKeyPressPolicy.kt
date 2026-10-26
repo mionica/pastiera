@@ -1,7 +1,5 @@
 package it.palsoftware.pastiera.inputmethod
 
-import it.palsoftware.pastiera.SettingsManager
-
 /** Pure settings-to-filter policy. Rules may strengthen one another, never weaken. */
 internal object AccidentalKeyPressPolicy {
     fun configuration(

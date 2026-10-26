@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -35,12 +34,10 @@ import it.palsoftware.pastiera.data.layout.LayoutFileStore.LayoutImportResult
 import it.palsoftware.pastiera.data.layout.LayoutMappingRepository
 import it.palsoftware.pastiera.layout.OnlineLayoutsActivity
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils
-import it.palsoftware.pastiera.R
 import kotlinx.coroutines.launch
 import java.util.Locale
 import android.content.res.AssetManager
 import org.json.JSONObject
-import java.nio.charset.StandardCharsets
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 

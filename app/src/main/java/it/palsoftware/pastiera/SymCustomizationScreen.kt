@@ -1,9 +1,7 @@
 package it.palsoftware.pastiera
 
-import android.content.Context
 import android.content.Intent
 import android.view.KeyEvent
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -35,9 +33,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.inputmethod.StatusBarController
 import kotlinx.coroutines.launch
 

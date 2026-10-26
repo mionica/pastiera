@@ -6,14 +6,8 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.DashPathEffect
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.TextPaint
-import android.text.style.UnderlineSpan
-import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
 import android.os.Handler
@@ -24,7 +18,6 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -43,7 +36,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import android.content.res.AssetManager
-import it.palsoftware.pastiera.inputmethod.SubtypeCycler
 import it.palsoftware.pastiera.inputmethod.statusbar.StatusBarButtonRegistry
 import it.palsoftware.pastiera.inputmethod.statusbar.StatusBarButtonHost
 import it.palsoftware.pastiera.inputmethod.statusbar.StatusBarAnimator

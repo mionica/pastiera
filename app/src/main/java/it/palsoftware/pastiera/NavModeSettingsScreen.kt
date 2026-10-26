@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.window.DialogProperties
-import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.commands.CommandRegistry
 import it.palsoftware.pastiera.commands.CommandSurface
 import it.palsoftware.pastiera.commands.CommandTarget

@@ -2,7 +2,6 @@ package it.palsoftware.pastiera
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.AssetManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.WindowInsets
@@ -29,7 +28,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import it.palsoftware.pastiera.inputmethod.AutoCorrector
 import it.palsoftware.pastiera.core.suggestions.UserDictionaryStore
-import it.palsoftware.pastiera.R
 import org.json.JSONObject
 import java.util.Locale
 import java.util.LinkedHashMap

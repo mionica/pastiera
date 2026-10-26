@@ -7,7 +7,6 @@ import android.view.inputmethod.InputConnection
 import it.palsoftware.pastiera.inputmethod.AutoCorrector
 import it.palsoftware.pastiera.inputmethod.DebugCaptureStore
 import it.palsoftware.pastiera.inputmethod.NotificationHelper
-import it.palsoftware.pastiera.core.AutoSpaceTracker
 
 class AutoCorrectionManager(
     private val context: Context

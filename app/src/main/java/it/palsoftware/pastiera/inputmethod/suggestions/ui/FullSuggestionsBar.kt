@@ -20,7 +20,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.TextViewCompat
-import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.SettingsActivity
 import it.palsoftware.pastiera.inputmethod.NotificationHelper
 import it.palsoftware.pastiera.inputmethod.suggestions.SuggestionButtonHandler

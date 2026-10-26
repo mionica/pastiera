@@ -2,7 +2,6 @@ package it.palsoftware.pastiera
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.app.Activity
 import android.view.inputmethod.InputMethodManager
@@ -41,13 +40,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import it.palsoftware.pastiera.data.layout.LayoutFileStore
-import it.palsoftware.pastiera.data.layout.LayoutMappingRepository
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils
-import it.palsoftware.pastiera.SettingsManager
-import it.palsoftware.pastiera.R
 import it.palsoftware.pastiera.dictionaries.InstalledDictionariesActivity
 import java.util.Locale
-import android.content.res.AssetManager
 
 /**
  * Data class representing a custom input style entry.

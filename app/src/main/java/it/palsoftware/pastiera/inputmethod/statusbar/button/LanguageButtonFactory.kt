@@ -19,7 +19,6 @@ import android.view.inputmethod.InputMethodSubtype
 import android.widget.TextView
 import androidx.core.view.ViewCompat
 import it.palsoftware.pastiera.R
-import it.palsoftware.pastiera.SettingsManager
 import it.palsoftware.pastiera.data.layout.LayoutFileStore
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils
 import it.palsoftware.pastiera.inputmethod.subtype.AdditionalSubtypeUtils.languageCode
