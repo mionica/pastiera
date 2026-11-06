@@ -66,6 +66,8 @@ fun KeyboardsDevicesSettingsScreen(
     }
 }
 
+private val detectedInputProfiles = DeviceSpecific.detectedInputProfiles()
+
 @Composable
 private fun KeyboardsDevicesMainScreen(
     modifier: Modifier,
@@ -94,7 +96,7 @@ private fun KeyboardsDevicesMainScreen(
 
     val autoEnabled = true
     val builtInDetected = remember(inputDeviceRevision) {
-        DeviceSpecific.detectedInputProfiles().any {
+        detectedInputProfiles.any {
             it.kind == DeviceSpecific.InputDeviceKind.BUILT_IN
         }
     }

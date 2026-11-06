@@ -789,7 +789,7 @@ private fun resolveImeCaptionBarChecks(context: Context): List<ImeCaptionBarRequ
         ),
         ImeCaptionBarRequirement(
             labelRes = R.string.tutorial_android16_ime_caption_check_titan2,
-            isMet = DeviceSpecific.isTitan2Device()
+            isMet = DeviceSpecific.isTitan2Device
         ),
         ImeCaptionBarRequirement(
             labelRes = R.string.tutorial_android16_ime_caption_check_setting,

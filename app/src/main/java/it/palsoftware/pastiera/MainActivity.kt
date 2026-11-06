@@ -1039,7 +1039,7 @@ private fun buildKeyboardDebugReport(
     val filteredSuggestionsRows = if (includeSuggestions) buildFilteredSuggestionRows(suggestionsSnapshots) else emptyList()
     val suggestionFilterMode = "empty_hidden,dedupe_consecutive"
     val inputDevices = keyboardInputDevicesSnapshot()
-    val resolvedPhysicalProfile = DeviceSpecific.physicalKeyboardName()
+    val resolvedPhysicalProfile = DeviceSpecific.physicalKeyboardName
     val settingsDump = prefs.all.entries
         .sortedBy { it.key }
         .joinToString("\n") { (key, value) -> "$key=${flattenPreferenceValue(value)}" }
@@ -1092,8 +1092,8 @@ private fun buildKeyboardDebugReport(
             appendLine("soc_manufacturer=n/a")
             appendLine("soc_model=n/a")
         }
-        appendLine("physical_keyboard_name=${DeviceSpecific.physicalKeyboardName()}")
-        appendLine("keyboard_family=${DeviceSpecific.keyboardName()}")
+        appendLine("physical_keyboard_name=${DeviceSpecific.physicalKeyboardName}")
+        appendLine("keyboard_family=${DeviceSpecific.keyboardName}")
         appendLine("resolved_physical_profile=$resolvedPhysicalProfile")
         appendLine()
         appendLine("[input_devices]")

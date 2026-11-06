@@ -414,9 +414,10 @@ class StatusBarController(
         applySurfaceCloseButtonTheme(activeColors)
     }
 
+    private val isTitan2EliteDevice = DeviceSpecific.isTitan2EliteDevice()
     private fun modifierLedLayout() = ModifierLedLayouts.resolve(
         physicalProfileOverride = "auto",
-        titan2EliteAutoDetected = DeviceSpecific.isTitan2EliteDevice()
+        titan2EliteAutoDetected = isTitan2EliteDevice
     )
 
     private fun statusBarCallbacks(): StatusBarCallbacks =
@@ -1154,6 +1155,8 @@ class StatusBarController(
         }
     }
 
+    private val hasBlackberryKeyboard = DeviceSpecific.hasBlackberryKeyboard
+
     /**
      * Aggiorna la griglia emoji/caratteri con le mappature SYM.
      * @param symMappings Le mappature da visualizzare
@@ -1201,7 +1204,7 @@ class StatusBarController(
         )
         val keyboardRowsDefault = listOf(keyboardRow0, keyboardRow1, keyboardRow2default)
         val keyboardRowsBlackberry = listOf(keyboardRow0, keyboardRow1, keyboardRow2bb)
-        val isBlackberry = DeviceSpecific.hasBlackberryKeyboard()
+        val isBlackberry = hasBlackberryKeyboard
         val keyboardRows = if (isBlackberry) keyboardRowsBlackberry else keyboardRowsDefault
         
         val keyLabels = mapOf(
@@ -2022,7 +2025,7 @@ class StatusBarController(
         )
         val keyboardRowsDefault = listOf(keyboardRow0, keyboardRow1, keyboardRow2default)
         val keyboardRowsBlackberry = listOf(keyboardRow0, keyboardRow1, keyboardRow2bb)
-        val isBlackberry = DeviceSpecific.hasBlackberryKeyboard()
+        val isBlackberry = hasBlackberryKeyboard
         val keyboardRows = if (isBlackberry) keyboardRowsBlackberry else keyboardRowsDefault
         
         val keyLabels = mapOf(

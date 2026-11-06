@@ -232,8 +232,8 @@ fun AboutScreen(
                     Text(
                         text = stringResource(
                             R.string.settings_device_keyboard_info,
-                            DeviceSpecific.deviceName(),
-                            DeviceSpecific.keyboardName()
+                            DeviceSpecific.deviceName,
+                            DeviceSpecific.keyboardName
                         ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

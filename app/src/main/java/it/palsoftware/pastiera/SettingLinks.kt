@@ -217,6 +217,8 @@ object SettingLinkRegistry {
     const val WEB_LINK_PATH_PREFIX = "/settings/"
     private val settingIdPattern = Regex("^[a-z0-9_]+(\\.[a-z0-9_]+)+$")
 
+    private val hasBlackberryKeyboard = DeviceSpecific.hasBlackberryKeyboard
+
     private fun entry(
         id: String,
         titleRes: Int,
@@ -422,11 +424,11 @@ object SettingLinkRegistry {
         ),
         entry(
             SettingLinkIds.TEXT_INPUT_ALT_CTRL_SPEECH_SHORTCUT,
-            if (! DeviceSpecific.hasBlackberryKeyboard())
+            if (! hasBlackberryKeyboard)
                 R.string.alt_ctrl_speech_shortcut_title
             else
                 R.string.alt_zero_speech_shortcut_title,
-            if (! DeviceSpecific.hasBlackberryKeyboard())
+            if (! hasBlackberryKeyboard)
                 R.string.alt_ctrl_speech_shortcut_description
             else
                 R.string.alt_zero_speech_shortcut_description,

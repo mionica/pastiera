@@ -94,7 +94,7 @@ private fun HardwareKeyboardListScreen(
     val detectedProfiles = remember { DeviceSpecific.detectedInputProfiles() }
     val detectedProfileLabels = detectedProfiles
         .map { it.profileId }
-        .ifEmpty { listOf(DeviceSpecific.physicalKeyboardName()) }
+        .ifEmpty { listOf(DeviceSpecific.physicalKeyboardName) }
         .map { profileId ->
             hardwareKeyboardProfiles
                 .firstOrNull { it.first.equals(profileId, ignoreCase = true) }
@@ -150,7 +150,7 @@ private fun HardwareKeyboardListScreen(
             HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_detected_device_title))
 
             Text(
-                text = stringResource(R.string.hardware_keyboard_detected_device_summary, DeviceSpecific.deviceName(), detectedProfile),
+                text = stringResource(R.string.hardware_keyboard_detected_device_summary, DeviceSpecific.deviceName, detectedProfile),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -173,7 +173,7 @@ private fun HardwareKeyboardListScreen(
 
             HardwareKeyboardSectionDivider(stringResource(R.string.hardware_keyboard_behavior_title))
 
-            if (DeviceSpecific.hasUnihertzKeyboard()) {
+            if (DeviceSpecific.hasUnihertzKeyboard) {
                 HardwareKeyboardSwitchRow(
                     title = stringResource(R.string.titan2_layout_title),
                     linkId = "hardware.titan2_layout",
@@ -186,7 +186,7 @@ private fun HardwareKeyboardListScreen(
                 )
             }
 
-            if (DeviceSpecific.hasBlackberryKeyboard()) {
+            if (DeviceSpecific.hasBlackberryKeyboard) {
                 HardwareKeyboardSectionTitle(stringResource(R.string.keyboard_currency_symbol_title))
                 Text(
                     text = stringResource(R.string.keyboard_currency_symbol_description),

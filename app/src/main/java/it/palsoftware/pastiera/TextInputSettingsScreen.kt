@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import it.palsoftware.pastiera.core.Punctuation
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 
+private val hasBlackberryKeyboard = DeviceSpecific.hasBlackberryKeyboard
+
 /**
  * Text Input settings screen.
  */
@@ -496,11 +498,11 @@ fun TextInputSettingsScreen(
                 }
             )
             SettingsSwitchRow(
-                title = if (DeviceSpecific.hasBlackberryKeyboard())
+                title = if (hasBlackberryKeyboard)
                           stringResource(R.string.alt_zero_speech_shortcut_title)
                         else
                           stringResource(R.string.alt_ctrl_speech_shortcut_title),
-                description = if (DeviceSpecific.hasBlackberryKeyboard())
+                description = if (hasBlackberryKeyboard)
                                 stringResource(R.string.alt_zero_speech_shortcut_description)
                               else
                                 stringResource(R.string.alt_ctrl_speech_shortcut_description),

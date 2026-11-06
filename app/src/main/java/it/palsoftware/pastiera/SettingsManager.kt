@@ -1191,7 +1191,7 @@ object SettingsManager {
         if (prefs.contains(KEY_TITAN2_LAYOUT_ENABLED)) {
             return prefs.getBoolean(KEY_TITAN2_LAYOUT_ENABLED, false)
         }
-        return DeviceSpecific.isTitan2Device()
+        return DeviceSpecific.isTitan2Device
     }
 
     fun setTitan2LayoutEnabled(context: Context, enabled: Boolean) {

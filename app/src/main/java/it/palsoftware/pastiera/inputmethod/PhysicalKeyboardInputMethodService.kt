@@ -585,9 +585,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                 keyCode == KEYCODE_SYM
     }
 
-    private fun isMinimalPhoneHardwareActive(): Boolean {
-        return DeviceSpecific.isMinimalPhoneDevice()
-    }
+    private val isMinimalPhoneHardwareActive : Boolean = DeviceSpecific.isMinimalPhoneDevice
 
     private fun openQuickLauncher(): Boolean = QuickLauncherOpener.open(this)
 
@@ -2317,7 +2315,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         val gesturesEnabled = SettingsManager.getTrackpadGesturesEnabled(this)
         val swipeThreshold = SettingsManager.getTrackpadSuggestionSwipeThreshold(this).toInt()
         val eventDeviceSelection = SettingsManager.getTrackpadShizukuDevice(this)
-        val fallbackEventDevice = resolveTrackpadEventDevice()
+        val fallbackEventDevice = resolveTrackpadEventDevice
         Log.d(
             TRACKPAD_DEBUG_TAG,
             "buildTrackpadGestureDetector() - gesturesEnabled=$gesturesEnabled, swipeThreshold=$swipeThreshold, eventDeviceSelection=$eventDeviceSelection, fallbackEventDevice=$fallbackEventDevice"
@@ -2332,12 +2330,10 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         )
     }
 
-    private fun resolveTrackpadEventDevice(): String {
-        return TrackpadEventDeviceResolver.resolve(
-            physicalKeyboardName = DeviceSpecific.physicalKeyboardName(),
+    private val resolveTrackpadEventDevice = TrackpadEventDeviceResolver.resolve(
+            physicalKeyboardName = DeviceSpecific.physicalKeyboardName,
             firmwareIncremental = Build.VERSION.INCREMENTAL.orEmpty()
         )
-    }
 
     override fun onDestroy() {
         accidentalKeyPressFilter.reset()
@@ -3775,6 +3771,8 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         }
     }
 
+    private val hasBlackberryKeyboard = DeviceSpecific.hasBlackberryKeyboard
+
     override fun onKeyLongPress(keyCode_: Int, event_: KeyEvent?): Boolean {
         if (!replayingProtectedNumberKey) {
             val accidentalInput = accidentalKeyInput(keyCode_, event_)
@@ -3785,9 +3783,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                 configuration = accidentalInput.configuration
             )?.let { return true }
         }
-        val remapped = DeviceSpecific.remapHardwareKeyEvent( keyCode_, event_ )
-        val keyCode = remapped.keyCode
-        val event = remapped.event
+        val remapped = if (hasBlackberryKeyboard) DeviceSpecific.remapHardwareKeyEvent( keyCode_, event_ ) else null
+        val keyCode = if (remapped != null) remapped.keyCode else keyCode_
+        val event = if (remapped != null) remapped.event else event_
         // Handle long press even when the keyboard is hidden but we still have a valid InputConnection.
         val inputConnection = currentInputConnection
         if (inputConnection == null) {
@@ -3832,9 +3830,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                     return true
                 }
             }
-            val remapped = DeviceSpecific.remapHardwareKeyEvent(keyCode_, event_)
-            val keyCode = remapped.keyCode
-            val event = remapped.event
+            val remapped = if (hasBlackberryKeyboard) DeviceSpecific.remapHardwareKeyEvent( keyCode_, event_ ) else null
+            val keyCode = if (remapped != null) remapped.keyCode else keyCode_
+            val event = if (remapped != null) remapped.event else event_
             bounceKeyFilter.shouldConsumeKeyDown(this, keyCode, event)?.let { suppressed ->
                 notifyDebugKeyEvent(
                     keyCode = keyCode,
@@ -3954,7 +3952,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             val altActiveForDedicatedKeys = event?.isAltPressed == true || altLatchActive || altOneShot
             if (
                 hasEditableField &&
-                isMinimalPhoneHardwareActive() &&
+                isMinimalPhoneHardwareActive &&
                 keyCode == KEYCODE_EM &&
                 event?.repeatCount == 0 &&
                 !altActiveForDedicatedKeys
@@ -3971,7 +3969,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             }
             if (
                 hasEditableField &&
-                isMinimalPhoneHardwareActive() &&
+                isMinimalPhoneHardwareActive &&
                 keyCode == KEYCODE_MIC &&
                 event?.repeatCount == 0 &&
                 !altActiveForDedicatedKeys
@@ -3984,7 +3982,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             // but only do this if the speech shortcut is enabled
             if (
                 hasEditableField &&
-                DeviceSpecific.hasBlackberryKeyboard() &&
+                hasBlackberryKeyboard &&
                 keyCode == KeyEvent.KEYCODE_0 &&
                 event?.repeatCount == 0 &&
                 altActiveForDedicatedKeys
@@ -4398,7 +4396,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
             }
 
             // Blackberry keyboards have a currency key
-            if (DeviceSpecific.hasBlackberryKeyboard() && keyCode == KeyEvent.KEYCODE_GRAVE)
+            if (hasBlackberryKeyboard && keyCode == KeyEvent.KEYCODE_GRAVE)
                 if (handleCurrencyKey(event))
                     return true
 
@@ -4452,7 +4450,7 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                     },
                     // speech recognition is triggered by Alt-0 on Blackberry keyboards (already handled)
                     // so only leave that callback for non-blackberry devices
-                    startSpeechRecognition = { if (! DeviceSpecific.hasBlackberryKeyboard()) startSpeechRecognition() },
+                    startSpeechRecognition = { if (hasBlackberryKeyboard) startSpeechRecognition() },
                     getMapping = { code -> LayoutMappingRepository.getMapping(code) },
                     handleMultiTapCommit = { code, mapping, uppercase, inputConnection, allowLongPress ->
                         handleMultiTapCommit(code, mapping, uppercase, inputConnection, allowLongPress)
@@ -4515,9 +4513,9 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
                 null -> Unit
             }
         }
-        val remapped = DeviceSpecific.remapHardwareKeyEvent(keyCode_, event_)
-        val keyCode = remapped.keyCode
-        val event = remapped.event
+        val remapped = if (hasBlackberryKeyboard) DeviceSpecific.remapHardwareKeyEvent( keyCode_, event_ ) else null
+        val keyCode = if (remapped != null) remapped.keyCode else keyCode_
+        val event = if (remapped != null) remapped.event else event_
         if (keyCode == KeyEvent.KEYCODE_ENTER && consumeAltEnterUntilKeyUp) {
             consumeAltEnterUntilKeyUp = false
             return true
@@ -5042,11 +5040,12 @@ class PhysicalKeyboardInputMethodService : InputMethodService() {
         }
     }
 
+    val isTitan2Device = DeviceSpecific.isTitan2Device
     private fun handleNativeImeTrackpadMotion(event: MotionEvent, origin: String): Boolean {
         if (!isNativeImeTrackpadProviderActive()) {
             return false
         }
-        if (!DeviceSpecific.isTitan2Device()) {
+        if (isTitan2Device) {
             return false
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.BAKLAVA) {

@@ -7,12 +7,15 @@ import android.view.KeyEvent
 import it.palsoftware.pastiera.SettingsManager
 import it.palsoftware.pastiera.inputmethod.DeviceSpecific
 
+private val detectedInputProfiles = DeviceSpecific.detectedInputProfiles()
+private val physicalKeyboardName = DeviceSpecific.physicalKeyboardName
+
 object DeviceSymProfileResolver {
     fun resolve(context: Context): String {
-        DeviceSpecific.detectedInputProfiles()
+        detectedInputProfiles
             .firstOrNull { it.kind == DeviceSpecific.InputDeviceKind.ACCESSORY }
             ?.let { return it.profileId }
-        return DeviceSpecific.physicalKeyboardName().takeUnless { it == "unknown" } ?: VIRTUAL_PROFILE_ID
+        return physicalKeyboardName.takeUnless { it == "unknown" } ?: VIRTUAL_PROFILE_ID
     }
 
     const val VIRTUAL_PROFILE_ID = "virtual"
