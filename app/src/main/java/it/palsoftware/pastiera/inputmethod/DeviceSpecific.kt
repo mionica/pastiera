@@ -175,7 +175,7 @@ object DeviceSpecific {
     }
 
     private fun shouldRemapQ25Event(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KEYCODE_Q25_CTRL || keyCode == KEYCODE_Q25_SYM) {
+        if (keyCode == KEYCODE_Q25_SYM) {
             return true
         }
         if (event == null) {
@@ -200,12 +200,10 @@ object DeviceSpecific {
 
         val normalizedMetaState = rebuildNormalizedMetaState(currentMetaState)
         val normalizedKeyCode = when (event.keyCode) {
-            KEYCODE_Q25_CTRL -> KEYCODE_CTRL
             KEYCODE_Q25_SYM -> KEYCODE_SYM
             else -> event.keyCode
         }
         val normalizedScanCode = when (event.keyCode) {
-            KEYCODE_Q25_CTRL -> SCANCODE_TITAN2_CTRL
             KEYCODE_Q25_SYM -> SCANCODE_TITAN2_SYM
             else -> event.scanCode
         }
@@ -233,8 +231,8 @@ object DeviceSpecific {
     }
 
     private fun rebuildNormalizedMetaState(metaState: Int): Int {
-        val mappedShift = if ((metaState and META_Q25_SHIFT) != 0) META_SHIFT else 0
-        val mappedCtrl = if ((metaState and META_Q25_CTRL) != 0) META_CTRL else 0
+        val mappedShift = if ((metaState and (META_Q25_SHIFT or META_Q25_CTRL)) != 0) META_SHIFT else 0
+        val mappedCtrl = 0
         val mappedAlt = if ((metaState and META_Q25_ALT) != 0) META_ALT else 0
         val mappedSym = if ((metaState and META_Q25_SYM) != 0) META_SYM else 0
         val mappedMetaState = mappedShift or mappedCtrl or mappedAlt or mappedSym
