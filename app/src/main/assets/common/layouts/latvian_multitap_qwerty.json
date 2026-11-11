@@ -1,116 +1,116 @@
 {
-  "name": "Latvian (multi-tap)",
-  "description": "Latvian QWERTY keyboard layout",
-  "mappings": {
-    "KEYCODE_Q": { "lowercase": "q", "uppercase": "Q" },
-    "KEYCODE_W": { "lowercase": "w", "uppercase": "W" },
-    "KEYCODE_E": { "lowercase": "e", "uppercase": "E" },
-    "KEYCODE_R": {
-		"lowercase": "r", "uppercase": "R",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "r", "uppercase": "R" },
-			{ "lowercase": "ŗ", "uppercase": "Ŗ" }
-		]
-	},
-    "KEYCODE_T": { "lowercase": "t", "uppercase": "T" },
-    "KEYCODE_Y": { "lowercase": "y", "uppercase": "Y" },
-    "KEYCODE_U": {
-		"lowercase": "u", "uppercase": "U",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "u", "uppercase": "U" },
-			{ "lowercase": "ū", "uppercase": "Ū" }
-		]
-	},
-    "KEYCODE_I": { 
-		"lowercase": "i", "uppercase": "I",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "i", "uppercase": "I" },
-			{ "lowercase": "ī", "uppercase": "Ī" }
-		]
-	},
-    "KEYCODE_O": { 
-		"lowercase": "o", "uppercase": "O",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "o", "uppercase": "O" },
-			{ "lowercase": "ō", "uppercase": "Ō" }
-		]
-	},
-    "KEYCODE_P": { "lowercase": "p", "uppercase": "P" },
-    "KEYCODE_A": {
-		"lowercase": "a", "uppercase": "A",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "a", "uppercase": "A" },
-			{ "lowercase": "ā", "uppercase": "Ā" }
-		]
-	},
-    "KEYCODE_S": {
-		"lowercase": "s", "uppercase": "S",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "s", "uppercase": "S" },
-			{ "lowercase": "š", "uppercase": "Š" }
-		]
-	},
-    "KEYCODE_D": { "lowercase": "d", "uppercase": "D" },
-    "KEYCODE_F": { "lowercase": "f", "uppercase": "F" },
-    "KEYCODE_G": {
-		"lowercase": "g", "uppercase": "G",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "g", "uppercase": "G" },
-			{ "lowercase": "ģ", "uppercase": "Ģ" }
-		]
-	},
-    "KEYCODE_H": { "lowercase": "h", "uppercase": "H" },
-    "KEYCODE_J": { "lowercase": "j", "uppercase": "J" },
-    "KEYCODE_K": {
-		"lowercase": "k", "uppercase": "K",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "k", "uppercase": "K" },
-			{ "lowercase": "ķ", "uppercase": "Ķ" }
-		]
-	},
-    "KEYCODE_L": {
-		"lowercase": "l", "uppercase": "L",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "l", "uppercase": "L" },
-			{ "lowercase": "ļ", "uppercase": "Ļ" }
-		]
-	},
-    "KEYCODE_Z": {
-		"lowercase": "z", "uppercase": "Z",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "z", "uppercase": "Z" },
-			{ "lowercase": "ž", "uppercase": "Ž" }
-		]
-	},
-    "KEYCODE_X": { "lowercase": "x", "uppercase": "X" },
-    "KEYCODE_C": {
-		"lowercase": "c", "uppercase": "C",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "c", "uppercase": "C" },
-			{ "lowercase": "č", "uppercase": "Č" }
-		]
-	},
-    "KEYCODE_V": { "lowercase": "v", "uppercase": "V" },
-    "KEYCODE_B": { "lowercase": "b", "uppercase": "B" },
-    "KEYCODE_N": {
-		"lowercase": "n", "uppercase": "N",
-		"multiTapEnabled": true,
-		"taps": [
-			{ "lowercase": "n", "uppercase": "N" },
-			{ "lowercase": "ņ", "uppercase": "Ņ" }
-		]
-	},
-    "KEYCODE_M": { "lowercase": "m", "uppercase": "M" }
-  }
+	"name": "Latvian (multi-tap)",
+	"description": "Latvian QWERTY keyboard layout",
+	"mappings": {
+		"KEYCODE_Q": { "lowercase": "q", "uppercase": "Q" },
+		"KEYCODE_W": { "lowercase": "w", "uppercase": "W" },
+		"KEYCODE_E": { "lowercase": "e", "uppercase": "E" },
+		"KEYCODE_R": {
+			"lowercase": "r", "uppercase": "R",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "r", "uppercase": "R" },
+				{ "lowercase": "ŗ", "uppercase": "Ŗ" }
+			]
+		},
+		"KEYCODE_T": { "lowercase": "t", "uppercase": "T" },
+		"KEYCODE_Y": { "lowercase": "y", "uppercase": "Y" },
+		"KEYCODE_U": {
+			"lowercase": "u", "uppercase": "U",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "u", "uppercase": "U" },
+				{ "lowercase": "ū", "uppercase": "Ū" }
+			]
+		},
+		"KEYCODE_I": { 
+			"lowercase": "i", "uppercase": "I",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "i", "uppercase": "I" },
+				{ "lowercase": "ī", "uppercase": "Ī" }
+			]
+		},
+		"KEYCODE_O": { 
+			"lowercase": "o", "uppercase": "O",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "o", "uppercase": "O" },
+				{ "lowercase": "ō", "uppercase": "Ō" }
+			]
+		},
+		"KEYCODE_P": { "lowercase": "p", "uppercase": "P" },
+		"KEYCODE_A": {
+			"lowercase": "a", "uppercase": "A",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "a", "uppercase": "A" },
+				{ "lowercase": "ā", "uppercase": "Ā" }
+			]
+		},
+		"KEYCODE_S": {
+			"lowercase": "s", "uppercase": "S",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "s", "uppercase": "S" },
+				{ "lowercase": "š", "uppercase": "Š" }
+			]
+		},
+		"KEYCODE_D": { "lowercase": "d", "uppercase": "D" },
+		"KEYCODE_F": { "lowercase": "f", "uppercase": "F" },
+		"KEYCODE_G": {
+			"lowercase": "g", "uppercase": "G",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "g", "uppercase": "G" },
+				{ "lowercase": "ģ", "uppercase": "Ģ" }
+			]
+		},
+		"KEYCODE_H": { "lowercase": "h", "uppercase": "H" },
+		"KEYCODE_J": { "lowercase": "j", "uppercase": "J" },
+		"KEYCODE_K": {
+			"lowercase": "k", "uppercase": "K",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "k", "uppercase": "K" },
+				{ "lowercase": "ķ", "uppercase": "Ķ" }
+			]
+		},
+		"KEYCODE_L": {
+			"lowercase": "l", "uppercase": "L",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "l", "uppercase": "L" },
+				{ "lowercase": "ļ", "uppercase": "Ļ" }
+			]
+		},
+		"KEYCODE_Z": {
+			"lowercase": "z", "uppercase": "Z",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "z", "uppercase": "Z" },
+				{ "lowercase": "ž", "uppercase": "Ž" }
+			]
+		},
+		"KEYCODE_X": { "lowercase": "x", "uppercase": "X" },
+		"KEYCODE_C": {
+			"lowercase": "c", "uppercase": "C",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "c", "uppercase": "C" },
+				{ "lowercase": "č", "uppercase": "Č" }
+			]
+		},
+		"KEYCODE_V": { "lowercase": "v", "uppercase": "V" },
+		"KEYCODE_B": { "lowercase": "b", "uppercase": "B" },
+		"KEYCODE_N": {
+			"lowercase": "n", "uppercase": "N",
+			"multiTapEnabled": true,
+			"taps": [
+				{ "lowercase": "n", "uppercase": "N" },
+				{ "lowercase": "ņ", "uppercase": "Ņ" }
+			]
+		},
+		"KEYCODE_M": { "lowercase": "m", "uppercase": "M" }
+	}
 }
