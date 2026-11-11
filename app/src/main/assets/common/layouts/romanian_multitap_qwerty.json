@@ -1,6 +1,6 @@
 {
-  "name": "Romanian",
-  "description": "Romanian QWERTY keyboard layout (â-on-q multi-tap)",
+  "name": "Romanian (multi-tap)",
+  "description": "Romanian QWERTY keyboard layout (â-on-q)",
   "mappings": {
     "KEYCODE_Q": {
       "lowercase": "q",

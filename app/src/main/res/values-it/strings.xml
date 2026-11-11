@@ -14,6 +14,7 @@
     <string name="input_method_name_sr">Српски</string>
     <string name="input_method_name_uk">Українська</string>
     <string name="input_method_name_ro">Română</string>
+    <string name="input_method_name_lv">Latviešu</string>
     
     <!-- Settings Screen -->
     <string name="settings_title">Impostazioni</string>

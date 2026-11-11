@@ -32,7 +32,7 @@ object AdditionalSubtypeUtils {
     private val BASE_SUBTYPE_LOCALES = setOf(
         "en_US", "it_IT", "fr_FR", "de_DE", "pl_PL", "da_DK",
         "no_NO", "es_ES", "pt_PT", "ru_RU", "sr_RS", "uk_UA",
-        "ro_RO"
+        "ro_RO", "lv_LV"
     )
 
     fun InputMethodSubtype.localeString(): String =
@@ -293,6 +293,7 @@ object AdditionalSubtypeUtils {
             "de" -> R.string.input_method_name_de
             "pl" -> R.string.input_method_name_pl
             "ro" -> R.string.input_method_name_ro
+            "lv" -> R.string.input_method_name_lv
             "es" -> R.string.input_method_name_es
             "pt" -> R.string.input_method_name_pt
             "ru" -> R.string.input_method_name_ru
@@ -740,6 +741,7 @@ object AdditionalSubtypeUtils {
             "es" -> listOf("es_ES", "es_MX", "es_AR", "es")
             "pt" -> listOf("pt_PT", "pt_BR", "pt")
             "ro" -> listOf("ro_RO", "ro_MD", "ro")
+            "lv" -> listOf("lv_LV", "lv")
             "ru" -> listOf("ru_RU", "ru")
             else -> listOf(langCode)
         }

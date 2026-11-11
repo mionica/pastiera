@@ -2808,7 +2808,7 @@ object SettingsManager {
         
         // Default: system language + x-pastiera, with fallback to English
         val systemLanguage = context.applicationContext.resources.configuration.locales[0].language.lowercase()
-        val supportedLanguages = setOf("it", "en", "es", "fr", "de", "pl", "ro")
+        val supportedLanguages = setOf("it", "en", "es", "fr", "de", "pl", "ro", "lv")
         
         val defaultLanguage = if (systemLanguage in supportedLanguages) {
             systemLanguage

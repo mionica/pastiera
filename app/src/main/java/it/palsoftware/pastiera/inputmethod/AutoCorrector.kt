@@ -94,7 +94,7 @@ object AutoCorrector {
             customLanguages.clear()
 
             // List of supported languages by default
-            val standardLocales = listOf("it", "en", "es", "fr", "de", "pl", "ro", "x-pastiera")
+            val standardLocales = listOf("it", "en", "es", "fr", "de", "pl", "ro", "lv", "x-pastiera")
 
             for (locale in standardLocales) {
                 try {
